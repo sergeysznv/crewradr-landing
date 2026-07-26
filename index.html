@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — real-time location sharing for trusted crews. Coming soon.">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — Coming Soon</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.25);
+    --cream: #F5F4F0;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --bg: #F5F4F0;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --bg: #1A2327;
+    --sage-glow: rgba(142, 165, 149, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .theme-toggle {
+    position: fixed; top: 20px; right: 20px;
+    width: 40px; height: 40px; border: 1px solid rgba(142,165,149,0.2);
+    border-radius: 10px; background: transparent; cursor: pointer;
+    font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s;
+  }
+  .theme-toggle:hover { border-color: var(--sage); }
+
+  .glow {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 500px; height: 500px; pointer-events: none;
+    background: radial-gradient(ellipse, var(--sage-glow) 0%, transparent 60%);
+  }
+
+  .logo {
+    width: 96px; height: 96px; border-radius: 22px;
+    box-shadow: 0 8px 40px var(--sage-glow);
+    position: relative; margin-bottom: 36px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700;
+    letter-spacing: -0.02em; position: relative;
+  }
+  h1 span { color: var(--sage-dark); }
+
+  p {
+    margin-top: 12px; font-size: clamp(1rem, 2vw, 1.15rem);
+    color: var(--text-secondary); max-width: 400px; position: relative;
+  }
+
+  .footer {
+    position: fixed; bottom: 24px;
+    font-size: 0.8rem; color: var(--text-secondary);
+  }
+</style>
+</head>
+<body>
+
+<div class="glow"></div>
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+
+<img src="/logo.png" alt="CrewRadr" class="logo" width="96" height="96">
+<h1>CrewRadr is<br><span>coming soon</span></h1>
+<p>Real-time location sharing for trusted crews. We're putting the finishing touches on something great.</p>
+
+<div class="footer">&copy; 2026 CrewRadr</div>
+
+<script>
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('theme');
+  if (saved) { html.setAttribute('data-theme', saved); toggle.textContent = saved === 'dark' ? '🌙' : '☀️'; }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    html.setAttribute('data-theme', 'dark'); toggle.textContent = '🌙';
+  }
+  toggle.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', next);
+  });
+</script>
+</body>
+</html>
