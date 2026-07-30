@@ -10,6 +10,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Prevent flash of wrong theme — must run before any paint.
+            Sets data-theme on <html> synchronously, before CSS is parsed.
+            Uses 'theme' key shared with admin.crewradr.app. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(!t)t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.className=t})();`,
+          }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

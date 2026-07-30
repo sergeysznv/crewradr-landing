@@ -2,20 +2,31 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useVersionCheck } from "@/hooks/use-version-check";
+
+function getInitialTheme(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
+  if (document.documentElement.className === "dark") return "dark";
+  return "light";
+}
 
 export default function LandingPage() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
+  useVersionCheck();
 
+  // Sync with the flash-prevention script — pick up any external changes
+  // (e.g. from another tab or the admin portal changing localStorage).
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.className = saved;
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
-      document.documentElement.className = "dark";
-    }
-  }, []);
+    const onStorage = () => {
+      const saved = localStorage.getItem("theme") as "light" | "dark" | null;
+      if (saved && saved !== theme) {
+        setTheme(saved);
+        document.documentElement.className = saved;
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [theme]);
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
@@ -45,7 +56,7 @@ export default function LandingPage() {
         className="fixed right-5 top-5 flex h-10 w-10 items-center justify-center rounded-xl border transition-colors"
         style={{ borderColor: "rgba(142,165,149,0.2)" }}
       >
-        {theme === "dark" ? "🌙" : "☀️"}
+        {theme === "dark" ? "\u{1F319}" : "\u{2600}\u{FE0F}"}
       </button>
 
       {/* Logo */}
@@ -62,9 +73,7 @@ export default function LandingPage() {
       />
 
       {/* Heading */}
-      <h1
-        className="relative z-10 text-[clamp(2rem,5vw,3.2rem)] font-bold tracking-[-0.02em]"
-      >
+      <h1 className="relative z-10 text-[clamp(2rem,5vw,3.2rem)] font-bold tracking-[-0.02em]">
         CrewRadr is
         <br />
         <span style={{ color: "var(--sage-dark)" }}>coming soon</span>
