@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "CrewRadr — Coming Soon",
   description: "Real-time location sharing for trusted crews. Coming soon.",
-  icons: "/logo.png",
+  icons: "/logo-32.png",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

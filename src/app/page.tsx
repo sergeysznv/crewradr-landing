@@ -37,7 +37,7 @@ export default function LandingPage() {
 
       {/* Logo */}
       <Image
-        src="/logo.png" alt="CrewRadr" width={96} height={96}
+        src="/logo-96.png" alt="CrewRadr" width={96} height={96}
         className="relative z-10 mb-9 rounded-[22px]"
         style={{ boxShadow: "0 8px 40px rgba(142,165,149,0.25)" }}
         priority
