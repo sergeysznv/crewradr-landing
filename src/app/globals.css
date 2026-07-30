@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Light-mode defaults — scoped to :root (low specificity baseline) */
 :root {
   --sage: #8EA595;
   --sage-dark: #6E8679;
@@ -9,7 +10,9 @@
   --text-secondary: #5A6568;
 }
 
-.dark {
+/* Dark-mode overrides — html.dark beats :root on specificity so these
+   always win even if Tailwind generates its own :root-level variables. */
+html.dark {
   --cream: #1A2327;
   --text-primary: #EDE8E0;
   --text-secondary: #9AA5A8;
