@@ -1,24 +1,27 @@
 @import "tailwindcss";
 
-/* Light-mode defaults — scoped to :root (low specificity baseline) */
+/* ── Light mode (default) ── */
 :root {
   --sage: #8EA595;
   --sage-dark: #6E8679;
   --sage-glow: rgba(142, 165, 149, 0.25);
-  --cream: #F5F4F0;
-  --text-primary: #1A2327;
-  --text-secondary: #5A6568;
+  --bg: #F5F4F0;
+  --text: #1A2327;
+  --text-muted: #5A6568;
 }
 
-/* Dark-mode overrides — html.dark beats :root on specificity so these
-   always win even if Tailwind generates its own :root-level variables. */
-html.dark {
-  --cream: #1A2327;
-  --text-primary: #EDE8E0;
-  --text-secondary: #9AA5A8;
+/* ── Dark mode ── */
+[data-theme="dark"] {
+  --bg: #1A2327;
+  --text: #EDE8E0;
+  --text-muted: #9AA5A8;
   --sage-glow: rgba(142, 165, 149, 0.12);
 }
 
 body {
   font-family: 'PT Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
