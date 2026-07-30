@@ -1,27 +1,6 @@
 @import "tailwindcss";
 
-/* ── Light mode (default) ── */
-:root {
-  --sage: #8EA595;
-  --sage-dark: #6E8679;
-  --sage-glow: rgba(142, 165, 149, 0.25);
-  --bg: #F5F4F0;
-  --text: #1A2327;
-  --text-muted: #5A6568;
-}
-
-/* ── Dark mode ── */
-[data-theme="dark"] {
-  --bg: #1A2327;
-  --text: #EDE8E0;
-  --text-muted: #9AA5A8;
-  --sage-glow: rgba(142, 165, 149, 0.12);
-}
-
 body {
   font-family: 'PT Sans', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
