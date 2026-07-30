@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Use class-based dark mode (not prefers-color-scheme) so the
+   theme toggle actually controls Tailwind's dark: variants. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
   font-family: 'PT Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
