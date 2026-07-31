@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useVersionCheck } from "@/hooks/use-version-check";
 
@@ -10,8 +10,11 @@ function getTheme(): "light" | "dark" {
 }
 
 export default function LandingPage() {
-  const [theme, setTheme] = useState<"light" | "dark">(getTheme);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [mounted, setMounted] = useState(false);
   useVersionCheck();
+
+  useEffect(() => { setTheme(getTheme()); setMounted(true); }, []);
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
@@ -32,7 +35,7 @@ export default function LandingPage() {
         className="fixed right-5 top-5 flex h-10 w-10 items-center justify-center rounded-xl border text-lg transition-colors hover:border-[#8EA595]"
         style={{ borderColor: "rgba(142,165,149,0.2)" }}
       >
-        {theme === "dark" ? "\u{1F319}" : "\u{2600}\u{FE0F}"}
+        {mounted ? (theme === "dark" ? "\u{1F319}" : "\u{2600}\u{FE0F}") : "\u{2600}\u{FE0F}"}
       </button>
 
       {/* Logo */}
