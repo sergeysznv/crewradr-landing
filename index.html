@@ -1,6 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
+<!-- Must be the very first element in <head> — sets data-theme before
+     the browser parses any CSS or paints a single pixel.  No defer, no
+     async.  The IIFE runs synchronously, blocking the parser until done. -->
+<script>
+(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(!t)t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="CrewRadr — real-time location sharing for trusted crews. Coming soon.">
@@ -10,7 +16,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
 
-  :root {
+  :root, [data-theme="light"] {
     --sage: #8EA595;
     --sage-dark: #6E8679;
     --sage-glow: rgba(142, 165, 149, 0.25);
@@ -28,6 +34,13 @@
     --bg: #1A2327;
     --sage-glow: rgba(142, 165, 149, 0.12);
   }
+
+  /* Safety net: hide body until the theme attribute is set.
+     The <head> script above sets data-theme synchronously before
+     <body> is even parsed, so this rule should never fire in
+     practice — but it guarantees no white flash if something
+     delays the script (e.g. very slow device, CSP block). */
+  html:not([data-theme]) body { visibility: hidden; }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -89,20 +102,17 @@
 <h1>CrewRadr is<br><span>coming soon</span></h1>
 <p>Real-time location sharing for trusted crews. We're putting the finishing touches on something great.</p>
 
-<div class="footer">&copy; 2026 CrewRadr</div>
+<div class="footer">&copy; 2026 CrewRadr &middot; <a href="/privacy" style="color: inherit; text-decoration: none;">Privacy Policy</a> &middot; <a href="/terms" style="color: inherit; text-decoration: none;">Terms of Service</a></div>
 
 <script>
-  const html = document.documentElement;
-  const toggle = document.getElementById('themeToggle');
-  const saved = localStorage.getItem('theme');
-  if (saved) { html.setAttribute('data-theme', saved); toggle.textContent = saved === 'dark' ? '🌙' : '☀️'; }
-  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    html.setAttribute('data-theme', 'dark'); toggle.textContent = '🌙';
-  }
-  toggle.addEventListener('click', () => {
-    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  var html = document.documentElement;
+  var toggle = document.getElementById('themeToggle');
+  // Icon reflects current theme (already resolved in <head> script)
+  toggle.textContent = html.getAttribute('data-theme') === 'dark' ? '\u{1F319}' : '\u{2600}\u{FE0F}';
+  toggle.addEventListener('click', function () {
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
-    toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+    toggle.textContent = next === 'dark' ? '\u{1F319}' : '\u{2600}\u{FE0F}';
     localStorage.setItem('theme', next);
   });
 </script>

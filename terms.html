@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — Terms of Service. User agreement, subscriptions, and liability rules.">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — Terms of Service</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.3);
+    --cream: #F5F4F0;
+    --cream-warm: #EDE8E0;
+    --sand: #D9CDBC;
+    --slate: #1A2327;
+    --slate-container: #242F35;
+    --slate-surface: #2A363D;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --text-muted: #8A9598;
+    --bg: #F5F4F0;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(142, 165, 149, 0.15);
+    --card-shadow: 0 1px 3px rgba(26, 35, 39, 0.06), 0 8px 32px rgba(26, 35, 39, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --cream-warm: #242F35;
+    --sand: #6E8679;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --text-muted: #6A7578;
+    --bg: #1A2327;
+    --card-bg: #242F35;
+    --card-border: rgba(142, 165, 149, 0.1);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+    --sage-glow: rgba(142, 165, 149, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ─────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(245, 244, 240, 0.8);
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  [data-theme="dark"] nav {
+    background: rgba(26, 35, 39, 0.85);
+    border-bottom-color: rgba(142, 165, 149, 0.08);
+  }
+
+  nav.scrolled {
+    border-bottom-color: var(--card-border);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  [data-theme="dark"] nav.scrolled {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.3);
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-primary);
+    font-weight: 700; font-size: 1.25rem;
+  }
+
+  .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    width: 40px; height: 40px; border: 1px solid var(--card-border);
+    border-radius: 10px; background: var(--card-bg);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; transition: all 0.2s ease; color: var(--text-secondary);
+  }
+
+  .theme-toggle:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+  /* ── LEGAL PAGE CONTENT ───────────────── */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .last-updated {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    color: var(--sage-dark);
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  ul {
+    margin-bottom: 24px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  /* ── FOOTER ────────────────────────────── */
+  footer {
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  footer a { color: var(--sage-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    nav { padding: 12px 16px; }
+    .container { padding: 100px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-brand">
+    <img src="/logo.png" alt="CrewRadr" width="36" height="36">
+    CrewRadr
+  </a>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">☀️</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Terms of Service</h1>
+  <div class="last-updated">Last Updated: July 27, 2026</div>
+
+  <h2>1. Introduction</h2>
+  <p>Welcome to CrewRadr. By using our service, you agree to these Terms of Service. Please read them carefully before using the app.</p>
+
+  <h2>2. Eligibility</h2>
+  <p>To use CrewRadr, you must meet the following requirements:</p>
+  <ul>
+    <li>You must be at least 13 years old.</li>
+    <li>You must provide accurate account information.</li>
+    <li>You are responsible for maintaining account security.</li>
+    <li>You must comply with all applicable laws.</li>
+    <li>You may not use the service for illegal purposes.</li>
+  </ul>
+
+  <h2>3. Service Description</h2>
+  <p>CrewRadr provides location sharing, trip tracking, and crew safety features. Features may vary based on your subscription tier.</p>
+
+  <h2>4. Your Data</h2>
+  <p>Your data belongs to you. Here is how we handle it:</p>
+  <ul>
+    <li>You retain ownership of your data.</li>
+    <li>You grant us a license to process your data to provide the service.</li>
+    <li>Location data is encrypted end-to-end within crews.</li>
+    <li>We do not sell your personal information.</li>
+    <li>You can export or delete your data at any time.</li>
+  </ul>
+  <p>For full details, see our <a href="/privacy">Privacy Policy</a>.</p>
+
+  <h2>5. Acceptable Use</h2>
+  <p>To keep CrewRadr safe for everyone, you agree to follow these rules. Violation may result in account suspension or termination:</p>
+  <ul>
+    <li>Use the service only as intended.</li>
+    <li>Do not stalk, harass, or harm others.</li>
+    <li>Do not attempt to circumvent security features.</li>
+    <li>Do not use automated tools to access the service.</li>
+    <li>Do not impersonate others.</li>
+    <li>Report any safety concerns immediately.</li>
+  </ul>
+
+  <h2>6. Subscriptions and Payments</h2>
+  <p>Some features require a paid subscription:</p>
+  <ul>
+    <li>You may cancel at any time.</li>
+    <li>Paid subscriptions auto-renew unless cancelled.</li>
+    <li>Refunds are handled per app store policy.</li>
+    <li>Free features may change over time.</li>
+    <li>Subscription terms are managed through your app store account.</li>
+    <li>Prices may vary by region and are subject to change.</li>
+  </ul>
+
+  <h2>7. Disclaimer of Warranties</h2>
+  <p style="text-transform: uppercase;">The service is provided "as is" without warranty of any kind. We do not guarantee uninterrupted or error-free service.</p>
+
+  <h2>8. Limitation of Liability</h2>
+  <p style="text-transform: uppercase;">To the maximum extent permitted by law, CrewRadr shall not be liable for any indirect, incidental, or consequential damages. Our total liability is limited to the amount you paid us in the 12 months preceding the claim.</p>
+
+  <h2>9. Changes to Terms</h2>
+  <p>We may update these Terms from time to time. We will notify you of material changes.</p>
+
+  <h2>10. Assignment</h2>
+  <p>You may not assign or transfer these Terms without our prior written consent.</p>
+
+  <h2>11. Entire Agreement</h2>
+  <p>These Terms constitute the entire agreement between you and CrewRadr.</p>
+
+  <h2>12. Contact</h2>
+  <p>For questions about these Terms, your data, account issues, or to exercise your rights, please use the Support feature in Settings > Support and Feedback, or email us at <a href="mailto:support@crewradr.app">support@crewradr.app</a>.</p>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="/">CrewRadr</a>. Built for crews, not corporations. &middot; <a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms of Service</a> &middot; <a href="mailto:support@crewradr.app">Contact</a></p>
+</footer>
+
+<script>
+  // ── Theme ────────────────────────────────
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { setTheme(saved); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+
+  toggle.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Nav scroll effect ────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  });
+</script>
+</body>
+</html>
