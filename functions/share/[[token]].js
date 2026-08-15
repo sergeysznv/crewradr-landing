@@ -323,7 +323,10 @@ export async function onRequest(context) {
 
 function htmlResponse(status, title, body, lang) {
   const dir = lang === "ar" ? ' dir="rtl"' : "";
-  const html = `<!DOCTYPE html><html lang="${lang}"${dir}><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>${title}</title><style>body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#1a1a2e;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;box-sizing:border-box}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#aaa}</style></head><body>${body}</body></html>`;
+  const rtlFont = lang === "ar"
+    ? 'html[dir="rtl"]{font-family:"Noto Naskh Arabic",system-ui,-apple-system,sans-serif}'
+    : "";
+  const html = `<!DOCTYPE html><html lang="${lang}"${dir}><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>${title}</title><style>body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#1a1a2e;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;box-sizing:border-box}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#aaa}${rtlFont}</style></head><body>${body}</body></html>`;
   return new Response(html, {
     status,
     headers: {

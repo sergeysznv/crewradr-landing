@@ -25,7 +25,13 @@ export default function LandingPage() {
   );
   useVersionCheck();
 
-  useEffect(() => { setTheme(getTheme()); setMounted(true); }, []);
+  useEffect(() => {
+    setTheme(getTheme());
+    setMounted(true);
+    // Apply persisted locale to <title>/<meta>/dir on first paint.
+    if (locale !== "en") applyLocale(locale);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";

@@ -45,6 +45,22 @@ const strings = {
     en: "Language", es: "Idioma", fr: "Langue",
     ar: "اللغة", zh: "语言", ru: "Язык",
   },
+  documentTitle: {
+    en: "CrewRadr — Coming Soon",
+    es: "CrewRadr — Próximamente",
+    fr: "CrewRadr — Bientôt disponible",
+    ar: "CrewRadr — قريباً",
+    zh: "CrewRadr — 即将上线",
+    ru: "CrewRadr — Уже скоро",
+  },
+  documentDescription: {
+    en: "Real-time location sharing for trusted crews. Coming soon.",
+    es: "Comparte tu ubicación en tiempo real con tu equipo de confianza. Próximamente.",
+    fr: "Partage de position en temps réel pour vos équipes de confiance. Bientôt disponible.",
+    ar: "مشاركة الموقع في الوقت الفعلي لطواقمك الموثوقة. قريباً.",
+    zh: "为值得信赖的团队提供实时位置共享。即将上线。",
+    ru: "Обмен местоположением в реальном времени для надёжных команд. Уже скоро.",
+  },
   privacy: {
     en: "Privacy", es: "Privacidad", fr: "Confidentialité",
     ar: "الخصوصية", zh: "隐私政策", ru: "Конфиденциальность",
@@ -86,5 +102,8 @@ export function resolveLocale(searchParams?: string): LocaleCode {
 export function applyLocale(locale: LocaleCode) {
   document.documentElement.lang = locale;
   document.documentElement.dir = LOCALE_DIRS[locale];
+  document.title = strings.documentTitle[locale];
+  const meta = document.querySelector('meta[name="description"]');
+  if (meta) meta.setAttribute("content", strings.documentDescription[locale]);
   window.localStorage.setItem("lang", locale);
 }

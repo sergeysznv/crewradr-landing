@@ -5,6 +5,24 @@ export const metadata: Metadata = {
   title: "CrewRadr — Coming Soon",
   description: "Real-time location sharing for trusted crews. Coming soon.",
   icons: "/logo-32.png",
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: "/?lang=en",
+      es: "/?lang=es",
+      fr: "/?lang=fr",
+      ar: "/?lang=ar",
+      zh: "/?lang=zh",
+      ru: "/?lang=ru",
+    },
+  },
+  openGraph: {
+    title: "CrewRadr — Coming Soon",
+    description: "Real-time location sharing for trusted crews. Coming soon.",
+    locale: "en_US",
+    siteName: "CrewRadr",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -4,7 +4,16 @@
    theme toggle actually controls Tailwind's dark: variants. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* PT Sans is Latin-only; Arabic uses Noto Naskh Arabic so RTL text
+   renders properly instead of falling back to platform defaults. */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap');
+
 body {
   font-family: 'PT Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+[dir='rtl'] body,
+html[dir='rtl'] {
+  font-family: 'Noto Naskh Arabic', 'PT Sans', system-ui, -apple-system, sans-serif;
 }
