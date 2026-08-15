@@ -7,17 +7,171 @@
 
 const TOKEN_REGEX = /^[a-z2-9]{10,16}$/i;
 
+// ── Locale dictionaries ────────────────────────────────────────────────────
+const STRINGS = {
+  en: {
+    invalidTitle: "Invalid Share Link",
+    invalidBody: "<h1>Invalid link format</h1>",
+    unavailableTitle: "Temporarily Unavailable",
+    unavailableBody: "<h1>502 — Temporarily Unavailable</h1><p>Please try again in a moment.</p>",
+    notFoundTitle: "Link Not Found",
+    notFoundBody: "<h1>This link doesn't exist</h1><p>It may have been revoked or never existed.</p>",
+    expiredH1: "⏰ This link has expired",
+    expiredP: "Location sharing links are temporary for your privacy.",
+    getCrewRadr: "Get CrewRadr",
+    availableOn: "Available on",
+    liveTitle: "Live Location",
+    crewMember: "Crew Member",
+    noCrewLocations: "No members have shared location yet",
+    waitingForLocation: "Waiting for location...",
+    updated: "Updated",
+    viewingCrew: "Viewing crew location via CrewRadr",
+    viewingLive: "Viewing live location via CrewRadr",
+    seeCrew: "See your whole crew on the map",
+    trackLovedOnes: "Track your loved ones",
+    getTheApp: "Get the App",
+  },
+  es: {
+    invalidTitle: "Enlace de compartir no válido",
+    invalidBody: "<h1>Formato de enlace no válido</h1>",
+    unavailableTitle: "No disponible temporalmente",
+    unavailableBody: "<h1>502 — No disponible temporalmente</h1><p>Inténtalo de nuevo en un momento.</p>",
+    notFoundTitle: "Enlace no encontrado",
+    notFoundBody: "<h1>Este enlace no existe</h1><p>Puede haber sido revocado o no haber existido nunca.</p>",
+    expiredH1: "⏰ Este enlace ha caducado",
+    expiredP: "Los enlaces para compartir ubicación son temporales para tu privacidad.",
+    getCrewRadr: "Obtener CrewRadr",
+    availableOn: "Disponible en",
+    liveTitle: "Ubicación en vivo",
+    crewMember: "Miembro del grupo",
+    noCrewLocations: "Aún no hay miembros que compartan ubicación",
+    waitingForLocation: "Esperando ubicación...",
+    updated: "Actualizado",
+    viewingCrew: "Viendo la ubicación del grupo vía CrewRadr",
+    viewingLive: "Viendo la ubicación en vivo vía CrewRadr",
+    seeCrew: "Ve a todo tu grupo en el mapa",
+    trackLovedOnes: "Sigue a tus seres queridos",
+    getTheApp: "Descarga la app",
+  },
+  fr: {
+    invalidTitle: "Lien de partage invalide",
+    invalidBody: "<h1>Format de lien invalide</h1>",
+    unavailableTitle: "Temporairement indisponible",
+    unavailableBody: "<h1>502 — Temporairement indisponible</h1><p>Veuillez réessayer dans un instant.</p>",
+    notFoundTitle: "Lien introuvable",
+    notFoundBody: "<h1>Ce lien n'existe pas</h1><p>Il a peut-être été révoqué ou n'a jamais existé.</p>",
+    expiredH1: "⏰ Ce lien a expiré",
+    expiredP: "Les liens de partage de position sont temporaires pour votre confidentialité.",
+    getCrewRadr: "Télécharger CrewRadr",
+    availableOn: "Disponible sur",
+    liveTitle: "Position en direct",
+    crewMember: "Membre de l'équipe",
+    noCrewLocations: "Aucun membre n'a encore partagé sa position",
+    waitingForLocation: "En attente de la position...",
+    updated: "Mis à jour",
+    viewingCrew: "Position de l'équipe via CrewRadr",
+    viewingLive: "Position en direct via CrewRadr",
+    seeCrew: "Voyez toute votre équipe sur la carte",
+    trackLovedOnes: "Suivez vos proches",
+    getTheApp: "Télécharger l'app",
+  },
+  ar: {
+    invalidTitle: "رابط مشاركة غير صالح",
+    invalidBody: "<h1>صيغة الرابط غير صالحة</h1>",
+    unavailableTitle: "غير متاح مؤقتاً",
+    unavailableBody: "<h1>502 — غير متاح مؤقتاً</h1><p>يرجى المحاولة مرة أخرى بعد لحظة.</p>",
+    notFoundTitle: "الرابط غير موجود",
+    notFoundBody: "<h1>هذا الرابط غير موجود</h1><p>ربما تم إلغاؤه أو لم يكن موجوداً أصلاً.</p>",
+    expiredH1: "⏰ انتهت صلاحية هذا الرابط",
+    expiredP: "روابط مشاركة الموقع مؤقتة لحماية خصوصيتك.",
+    getCrewRadr: "احصل على CrewRadr",
+    availableOn: "متاح على",
+    liveTitle: "الموقع المباشر",
+    crewMember: "عضو في الطاقم",
+    noCrewLocations: "لم يشارك أي عضو موقعه بعد",
+    waitingForLocation: "في انتظار الموقع...",
+    updated: "آخر تحديث",
+    viewingCrew: "عرض موقع الطاقم عبر CrewRadr",
+    viewingLive: "عرض الموقع المباشر عبر CrewRadr",
+    seeCrew: "شاهد طاقمك بالكامل على الخريطة",
+    trackLovedOnes: "تتبع أحباءك",
+    getTheApp: "حمّل التطبيق",
+  },
+  zh: {
+    invalidTitle: "分享链接无效",
+    invalidBody: "<h1>链接格式无效</h1>",
+    unavailableTitle: "暂时不可用",
+    unavailableBody: "<h1>502 — 暂时不可用</h1><p>请稍后重试。</p>",
+    notFoundTitle: "链接不存在",
+    notFoundBody: "<h1>此链接不存在</h1><p>它可能已被撤销或从未存在过。</p>",
+    expiredH1: "⏰ 此链接已过期",
+    expiredP: "为了保护您的隐私，位置共享链接是临时的。",
+    getCrewRadr: "获取 CrewRadr",
+    availableOn: "可在以下平台获取",
+    liveTitle: "实时位置",
+    crewMember: "团队成员",
+    noCrewLocations: "还没有成员共享位置",
+    waitingForLocation: "等待位置信息...",
+    updated: "更新于",
+    viewingCrew: "通过 CrewRadr 查看团队位置",
+    viewingLive: "通过 CrewRadr 查看实时位置",
+    seeCrew: "在地图上查看您的整个团队",
+    trackLovedOnes: "追踪您的家人",
+    getTheApp: "下载应用",
+  },
+  ru: {
+    invalidTitle: "Недействительная ссылка",
+    invalidBody: "<h1>Неверный формат ссылки</h1>",
+    unavailableTitle: "Временно недоступно",
+    unavailableBody: "<h1>502 — Временно недоступно</h1><p>Пожалуйста, повторите попытку через мгновение.</p>",
+    notFoundTitle: "Ссылка не найдена",
+    notFoundBody: "<h1>Эта ссылка не существует</h1><p>Возможно, она была отозвана или никогда не существовала.</p>",
+    expiredH1: "⏰ Срок действия этой ссылки истёк",
+    expiredP: "Ссылки для обмена местоположением временные — ради вашей конфиденциальности.",
+    getCrewRadr: "Скачать CrewRadr",
+    availableOn: "Доступно в",
+    liveTitle: "Живое местоположение",
+    crewMember: "Участник команды",
+    noCrewLocations: "Участники ещё не поделились местоположением",
+    waitingForLocation: "Ожидание местоположения...",
+    updated: "Обновлено",
+    viewingCrew: "Просмотр местоположения команды через CrewRadr",
+    viewingLive: "Просмотр живого местоположения через CrewRadr",
+    seeCrew: "Смотрите всю команду на карте",
+    trackLovedOnes: "Следите за близкими",
+    getTheApp: "Скачать приложение",
+  },
+};
+
+const SUPPORTED = ["en", "es", "fr", "ar", "zh", "ru"];
+
+function resolveLang(url, acceptLanguage) {
+  // ?lang= override wins
+  const q = url.searchParams.get("lang");
+  if (q && SUPPORTED.includes(q)) return q;
+  if (acceptLanguage) {
+    for (const part of acceptLanguage.split(",")) {
+      const code = part.trim().slice(0, 2).toLowerCase();
+      if (SUPPORTED.includes(code)) return code;
+    }
+  }
+  return "en";
+}
+
 export async function onRequest(context) {
   const { request, env, params } = context;
 
   // 1. Extract token from [[token]] catch-all route
   const rawToken = params.token ? params.token[0] : null;
+  const url = new URL(request.url);
+  const lang = resolveLang(url, request.headers.get("accept-language"));
+  const t = STRINGS[lang];
+
   if (!rawToken || !TOKEN_REGEX.test(rawToken)) {
-    return htmlResponse(400, "Invalid Share Link", "<h1>Invalid link format</h1>");
+    return htmlResponse(400, t.invalidTitle, t.invalidBody, lang);
   }
 
   const token = rawToken.toLowerCase();
-  const url = new URL(request.url);
   const isJson = url.searchParams.get("json") === "1";
 
   const supabaseUrl = env.SUPABASE_URL;
@@ -36,7 +190,7 @@ export async function onRequest(context) {
     const shareRes = await fetch(shareUrl, { headers: authHeaders });
     if (!shareRes.ok) {
       console.error(`location_shares query failed: ${shareRes.status}`);
-      return htmlResponse(502, "Temporarily Unavailable", "<h1>502 — Temporarily Unavailable</h1><p>Please try again in a moment.</p>");
+      return htmlResponse(502, t.unavailableTitle, t.unavailableBody, lang);
     }
 
     const shares = await shareRes.json();
@@ -48,9 +202,9 @@ export async function onRequest(context) {
       const allTimeShares = allTimeRes.ok ? await allTimeRes.json() : [];
 
       if (allTimeShares && allTimeShares.length > 0) {
-        return htmlResponse(410, "Link Expired", renderExpiredPage());
+        return htmlResponse(410, t.expiredH1, renderExpiredPage(t), lang);
       }
-      return htmlResponse(404, "Link Not Found", "<h1>This link doesn't exist</h1><p>It may have been revoked or never existed.</p>");
+      return htmlResponse(404, t.notFoundTitle, t.notFoundBody, lang);
     }
 
     const share = shares[0];
@@ -88,7 +242,7 @@ export async function onRequest(context) {
           locations.push({
             latitude: loc.latitude,
             longitude: loc.longitude,
-            display_name: (profiles && profiles.length > 0) ? profiles[0].display_name : "Crew Member",
+            display_name: (profiles && profiles.length > 0) ? profiles[0].display_name : t.crewMember,
             updated_at: loc.created_at,
             avatar_url: (profiles && profiles.length > 0) ? profiles[0].avatar_url : null,
           });
@@ -139,7 +293,7 @@ export async function onRequest(context) {
           locations = latestPerUser.map(loc => ({
             latitude: loc.latitude,
             longitude: loc.longitude,
-            display_name: (profileMap.get(loc.user_id) && profileMap.get(loc.user_id).display_name) || "Crew Member",
+            display_name: (profileMap.get(loc.user_id) && profileMap.get(loc.user_id).display_name) || t.crewMember,
             updated_at: loc.created_at,
             avatar_url: profileMap.get(loc.user_id) ? profileMap.get(loc.user_id).avatar_url : null,
           }));
@@ -158,17 +312,18 @@ export async function onRequest(context) {
       });
     }
 
-    return htmlResponse(200, "Live Location", renderPage(token, locations, share.mode));
+    return htmlResponse(200, t.liveTitle, renderPage(token, locations, share.mode, t, lang), lang);
   } catch (err) {
     console.error("share worker error:", err);
-    return htmlResponse(502, "Temporarily Unavailable", "<h1>502 — Temporarily Unavailable</h1><p>Please try again in a moment.</p>");
+    return htmlResponse(502, t.unavailableTitle, t.unavailableBody, lang);
   }
 }
 
 // --- Response helpers ---
 
-function htmlResponse(status, title, body) {
-  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>${title}</title><style>body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#1a1a2e;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;box-sizing:border-box}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#aaa}</style></head><body>${body}</body></html>`;
+function htmlResponse(status, title, body, lang) {
+  const dir = lang === "ar" ? ' dir="rtl"' : "";
+  const html = `<!DOCTYPE html><html lang="${lang}"${dir}><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>${title}</title><style>body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#1a1a2e;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;box-sizing:border-box}h1{font-size:1.5rem;margin-bottom:0.5rem}p{color:#aaa}</style></head><body>${body}</body></html>`;
   return new Response(html, {
     status,
     headers: {
@@ -180,33 +335,34 @@ function htmlResponse(status, title, body) {
 
 // --- Page templates ---
 
-function renderExpiredPage() {
+function renderExpiredPage(t) {
   return `
-    <h1>⏰ This link has expired</h1>
-    <p>Location sharing links are temporary for your privacy.</p>
+    <h1>${t.expiredH1}</h1>
+    <p>${t.expiredP}</p>
     <div style="margin-top:24px">
-      <a href="https://crewradr.app" style="display:inline-block;padding:12px 24px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Get CrewRadr</a>
+      <a href="https://crewradr.app" style="display:inline-block;padding:12px 24px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">${t.getCrewRadr}</a>
     </div>
     <p style="margin-top:16px;font-size:0.85rem;color:#888">
-      Available on <a href="https://apps.apple.com/app/crewradr/id6743987530" style="color:#4f8cff">App Store</a> and
+      ${t.availableOn} <a href="https://apps.apple.com/app/crewradr/id6743987530" style="color:#4f8cff">App Store</a> ·
       <a href="https://play.google.com/store/apps/details?id=com.CrewRadr.app" style="color:#4f8cff">Google Play</a>
     </p>
   `;
 }
 
-function renderPage(token, locations, mode) {
+function renderPage(token, locations, mode, t, lang) {
   const locJson = JSON.stringify(locations).replace(/</g, '\\u003c');
   const center = locations.length > 0
     ? `[${locations[0].latitude}, ${locations[0].longitude}]`
     : "[40.7128, -74.0060]";
   const zoom = locations.length > 0 ? "15" : "4";
   const noLocationsMessage = locations.length === 0
-    ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:12px 20px;border-radius:8px;z-index:1000;font-size:0.9rem">${mode === 'crew' ? 'No members have shared location yet' : 'Waiting for location...'}</div>`
+    ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:12px 20px;border-radius:8px;z-index:1000;font-size:0.9rem">${mode === 'crew' ? t.noCrewLocations : t.waitingForLocation}</div>`
     : "";
 
+  const updatedLabel = t.updated;
   const markersJs = locations.map((loc, i) => `
     L.marker([${loc.latitude}, ${loc.longitude}])
-      .bindPopup('<b>${escapeHtml(loc.display_name)}</b><br><small>Updated ${new Date(loc.updated_at).toLocaleTimeString()}</small>')
+      .bindPopup('<b>${escapeHtml(loc.display_name)}</b><br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
       .addTo(map);
   `).join("\n");
 
@@ -239,15 +395,17 @@ function renderPage(token, locations, mode) {
     <div id="map"></div>
     ${noLocationsMessage}
     <div id="cta">
-      <div class="badge">📍 Viewing ${mode === 'crew' ? 'crew' : 'live'} location via CrewRadr</div>
-      <div class="title">${mode === 'crew' ? 'See your whole crew on the map' : 'Track your loved ones'}</div>
-      <a href="https://crewradr.app" class="btn">Get the App</a>
+      <div class="badge">📍 ${mode === 'crew' ? t.viewingCrew : t.viewingLive}</div>
+      <div class="title">${mode === 'crew' ? t.seeCrew : t.trackLovedOnes}</div>
+      <a href="https://crewradr.app" class="btn">${t.getTheApp}</a>
       <div class="stores">
         <a href="https://apps.apple.com/app/crewradr/id6743987530">App Store</a> ·
         <a href="https://play.google.com/store/apps/details?id=com.CrewRadr.app">Google Play</a>
       </div>
     </div>
     <script>
+      const UPDATED_LABEL = ${JSON.stringify(updatedLabel)};
+      const LANG = ${JSON.stringify(lang)};
       const locations = ${locJson};
       const map = L.map('map').setView(${center}, ${zoom});
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -274,7 +432,7 @@ function renderPage(token, locations, mode) {
           });
           data.locations.forEach(loc => {
             L.marker([loc.latitude, loc.longitude])
-              .bindPopup('<b>' + loc.escaped_display_name + '</b><br><small>Updated ' + new Date(loc.updated_at).toLocaleTimeString() + '</small>')
+              .bindPopup('<b>' + loc.escaped_display_name + '</b><br><small>' + UPDATED_LABEL + ' ' + new Date(loc.updated_at).toLocaleTimeString(LANG) + '</small>')
               .addTo(map);
           });
         } catch(e) { /* silent — polling is best-effort */ }
