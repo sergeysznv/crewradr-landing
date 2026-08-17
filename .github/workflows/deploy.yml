@@ -30,4 +30,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: 6f87a4634306d0d76554bca8cb178133
-          command: pages deploy out --project-name=crewradr-landing --branch=main
+          command: pages deploy out --project-name=crewradr-landing
