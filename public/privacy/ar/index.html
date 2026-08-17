@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — سياسة الخصوصية. تعرّف على كيفية حمايتنا وتشفيرنا لبيانات سلامة موقعك.">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — سياسة الخصوصية</title>
+<link rel="canonical" href="/privacy/ar/">
+<link rel="alternate" hreflang="en" href="/privacy/">
+<link rel="alternate" hreflang="es" href="/privacy/es/">
+<link rel="alternate" hreflang="fr" href="/privacy/fr/">
+<link rel="alternate" hreflang="ar" href="/privacy/ar/">
+<link rel="alternate" hreflang="zh" href="/privacy/zh/">
+<link rel="alternate" hreflang="ru" href="/privacy/ru/">
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.3);
+    --cream: #F5F4F0;
+    --cream-warm: #EDE8E0;
+    --sand: #D9CDBC;
+    --slate: #1A2327;
+    --slate-container: #242F35;
+    --slate-surface: #2A363D;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --text-muted: #8A9598;
+    --bg: #F5F4F0;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(142, 165, 149, 0.15);
+    --card-shadow: 0 1px 3px rgba(26, 35, 39, 0.06), 0 8px 32px rgba(26, 35, 39, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --cream-warm: #242F35;
+    --sand: #6E8679;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --text-muted: #6A7578;
+    --bg: #1A2327;
+    --card-bg: #242F35;
+    --card-border: rgba(142, 165, 149, 0.1);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+    --sage-glow: rgba(142, 165, 149, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ─────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(245, 244, 240, 0.8);
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  [data-theme="dark"] nav {
+    background: rgba(26, 35, 39, 0.85);
+    border-bottom-color: rgba(142, 165, 149, 0.08);
+  }
+
+  nav.scrolled {
+    border-bottom-color: var(--card-border);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  [data-theme="dark"] nav.scrolled {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.3);
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-primary);
+    font-weight: 700; font-size: 1.25rem;
+  }
+
+  .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    width: 40px; height: 40px; border: 1px solid var(--card-border);
+    border-radius: 10px; background: var(--card-bg);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; transition: all 0.2s ease; color: var(--text-secondary);
+  }
+
+  .theme-toggle:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+  /* ── LANGUAGE SWITCH ──────────────────── */
+  .lang-switch { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .lang-switch a {
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 0.85rem; padding: 4px 8px; border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  .lang-switch a:hover { color: var(--sage-dark); }
+  .lang-switch a.active { color: var(--text-primary); background: var(--sage-glow); font-weight: 700; }
+
+  /* ── GOVERNING CLAUSE ─────────────────── */
+  .governing-clause {
+    margin: 16px 0 24px; padding: 12px 16px;
+    border-left: 3px solid var(--sage);
+    background: var(--card-bg); border-radius: 8px;
+    font-size: 0.95rem; color: var(--text-secondary);
+  }
+
+  /* ── LEGAL PAGE CONTENT ───────────────── */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .last-updated {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    color: var(--sage-dark);
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  ul, ol {
+    margin-bottom: 24px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  /* Tables styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  th {
+    background: var(--cream-warm);
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] th {
+    background: var(--slate-container);
+  }
+
+  /* ── FOOTER ────────────────────────────── */
+  footer {
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  footer a { color: var(--sage-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    nav { padding: 12px 16px; }
+    .container { padding: 100px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-brand">
+    <img src="/logo.png" alt="CrewRadr" width="36" height="36">
+    CrewRadr
+  </a>
+  <div class="nav-actions">
+    <div class="lang-switch" aria-label="اللغة">
+      <a href="/privacy/">EN</a>
+      <a href="/privacy/es/">ES</a>
+      <a href="/privacy/fr/">FR</a>
+      <a href="/privacy/ar/" class="active">ع</a>
+      <a href="/privacy/zh/">中文</a>
+      <a href="/privacy/ru/">РУ</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="تبديل المظهر" title="تبديل الوضع الفاتح/الداكن">☀️</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>سياسة الخصوصية</h1>
+  <div class="last-updated">آخر تحديث: 27 يوليو 2026</div>
+  <p class="governing-clause">اللغة الأصلية المعتمدة: تُقدَّم هذه الوثيقة بعدة لغات لراحتك. وفي حال نشوء أي تعارض أو اختلاف بين النسخ، يبقى النص الإنجليزي هو النص المعتمد.</p>
+
+  <h2>1. المقدمة والنطاق</h2>
+  <p>CrewRadr (يُشار إليها فيما بعد بـ«التطبيق» أو «نحن») منصة لمشاركة الموقع والاستعداد للطوارئ تركّز على السلامة، مخصّصة للمجموعات الموثوقة (الطواقم) — العائلات والفرق الميدانية والمجتمعات المترابطة. توضح سياسة الخصوصية هذه البيانات التي نجمعها، وكيفية استخدامنا لها وحمايتها، وحقوقك المتعلقة ببياناتك.</p>
+  <p><strong>تنطبق هذه السياسة على جميع منصات CrewRadr:</strong></p>
+  <ul>
+    <li><strong>تطبيق iOS</strong> (يُوزَّع عبر Apple App Store)</li>
+    <li><strong>تطبيق Android</strong> (يُوزَّع عبر Google Play Store)</li>
+    <li><strong>البوابة الإلكترونية</strong> (متاحة على crewradr.app)</li>
+  </ul>
+  <p>باستخدامك لـCrewRadr، فإنك تقرّ بسياسة الخصوصية هذه. وإذا لم توافق عليها، فتوقف عن الاستخدام فورًا.</p>
+
+  <h2>2. البيانات التي نجمعها</h2>
+  <h3>2.1 بيانات الموقع</h3>
+  <p>إحداثيات GPS (خط العرض، خط الطول، السرعة، الارتفاع، الاتجاه، الدقة) تُجمع أثناء تفعيل مشاركة الموقع في الخلفية أو في المقدمة. وتُشارَك فقط مع أعضاء الطاقم الذين اخترت التواصل معهم صراحةً.</p>
+  <h3>2.2 معرفات الحساب</h3>
+  <p>عنوان البريد الإلكتروني (لأغراض المصادقة واسترداد الحساب والتحقق من الحذف)، والمفتاح العام ECDH P-256 (للتشفير من طرف إلى طرف)، والاسم الظاهر، وبيانات اعتماد اختيارية عبر مفتاح المرور (passkey).</p>
+  <h3>2.3 معلومات الجهاز</h3>
+  <p>إصدار نظام التشغيل، وطراز الجهاز، ومستوى البطارية وحالة الشحن، وحالة الاتصال بالشبكة (Wi-Fi / شبكة خلوية / دون اتصال)، ورمز إشعارات الدفع FCM.</p>
+  <h3>2.4 عضوية الطواقم</h3>
+  <p>الطواقم التي تنتمي إليها، ودورك داخل كل طاقم (قبطان، نائب قبطان، عضو)، والمستخدمون الذين تشارك موقعك معهم. بيانات العضوية في الطاقم مرئية لأعضاء الطاقم الآخرين.</p>
+  <h3>2.5 بيانات الحركة والنشاط</h3>
+  <p>قراءات مقياس التسارع والجيروسكوب (فقط عند تفعيل كشف الاصطدام أو أتمتة الرحلات)، والتعرف على نشاط الجهاز (المشي، القيادة، ركوب الدراجات، الثبات) لتتبع الرحلات وتحفيز تسجيلات الوصول.</p>
+  <h3>2.6 البيانات التشخيصية</h3>
+  <p>سجلات الأعطال وتتبعات المكدس (عبر Firebase Crashlytics)، وتقارير الأخطاء، ومقاييس الأداء، ومعرّف التثبيت لربط البيانات التشخيصية، وبيانات استخدام الميزات (مجهولة المصدر حيثما أمكن).</p>
+  <h3>2.7 بيانات البطارية عن بُعد</h3>
+  <p>نسبة البطارية وحالة الشحن، تُشارَك مع أعضاء طاقمك لأغراض الوعي بالسلامة. ويرسل التطبيق تنبيهًا تلقائيًا إلى طاقمك عندما تنخفض بطاريتك عن 5%.</p>
+  <h3>2.8 مناطق الهبوط الآمن</h3>
+  <p>المواقع الجغرافية المسوّرة (Geofence) التي تسجّلها كوجهات موثوقة (مثل المنزل أو المكتب أو المدرسة). تُخزَّن على الخادم، وتُستخدم لكتم التنبيهات عند الوصول وتفعيل أتمتة المنزل الذكي.</p>
+  <h3>2.9 تقارير الحوادث</h3>
+  <p>سجلات منظمة لحوادث السلامة تنشئها داخل التطبيق، بما في ذلك صور وأوصاف اختيارية. ويقتصر نطاق رؤيتها على طاقمك.</p>
+  <h3>2.10 الملاحظات الصوتية</h3>
+  <p>تسجيلات صوتية تُرفق بتسجيلات الوصول أو تقارير الحوادث. وتتطلب إذن الميكروفون. وتُخزَّن مشفّرة على الخادم.</p>
+  <h3>2.11 أنصبة السلامة ولوحة الصدارة</h3>
+  <p>مقاييس مجمّعة للتفاعل مع السلامة (انتظام تسجيل الوصول، واستخدام Ghost Watch). مرئية لأعضاء الطاقم وفقًا لإعدادات رؤية لوحة الصدارة في طاقمك.</p>
+  <h3>2.12 بيانات سياسة الطاقم</h3>
+  <p>إعدادات يتحكم فيها قبطان طاقمك: قفل مشاركة الموقع، وقفل تسجيل الخروج، وقفل مغادرة الطاقم، وحالة تدوير مفاتيح التشفير، واسم الطاقم، وتعيينات أدوار الأعضاء.</p>
+  <h3>2.13 بيانات الاشتراك والفوترة</h3>
+  <p>فئة العضوية (Deckhand / First Mate / Captain / Admiral)، وحالة الاشتراك، وفترة الفوترة، وسجل المعاملات. تتم معالجة المدفوعات عبر RevenueCat وStripe — ولا تخزّن CrewRadr أرقام بطاقات الائتمان كاملة.</p>
+  <h3>2.14 خزنة استرداد PIN</h3>
+  <p>نسخة احتياطية مشفّرة من مفاتيح تشفير طاقمك، محمية برقمك السري الأمني PIN. تُخزَّن على الخادم، ولا يمكن فك تشفيرها إلا برقم PIN الخاص بك. ويمكنك أيضًا تصدير ملف نسخ احتياطي محلي محمي بكلمة مرور.</p>
+  <h3>2.15 بيانات لوحة التحكم على الويب</h3>
+  <p>سجلات وصول قائمة على المتصفح، ورموز جلسات، وتفضيلات لوحة تحكم عند الوصول إلى بوابة CrewRadr الإلكترونية. وبيانات إدارة أساطيل لطواقم المؤسسات من فئة Admiral.</p>
+  <h3>2.16 البلوتوث والأجهزة القريبة</h3>
+  <p>بثّ ومسح BLE لمصافحة بروتوكول Matter الخاص بالمنزل الذكي. ولا تُخزَّن أي بيانات بلوتوث دائمة.</p>
+
+  <h2>3. كيف نستخدم بياناتك</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>نوع البيانات</th>
+        <th>الغرض</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>الموقع</strong></td>
+        <td>خريطة الطاقم في الوقت الفعلي، وسجل الرحلات، وكشف الهبوط الآمن، وتنبيهات SOS، وكشف الاصطدام، وتسجيلات الوصول التلقائية، وتقارير سلوك القيادة</td>
+      </tr>
+      <tr>
+        <td><strong>معرفات الحساب</strong></td>
+        <td>المصادقة، واسترداد الحساب، والتحقق من الحذف، ومصافحة التشفير من طرف إلى طرف</td>
+      </tr>
+      <tr>
+        <td><strong>معلومات الجهاز</strong></td>
+        <td>عرض حالة الطاقم (البطارية والاتصال)، وتوصيل إشعارات الدفع، وتحسين الأداء الخاص بالمنصة</td>
+      </tr>
+      <tr>
+        <td><strong>عضوية الطواقم</strong></td>
+        <td>فرض الوصول المقصور على الطاقم، وإدارة الأدوار والصلاحيات</td>
+      </tr>
+      <tr>
+        <td><strong>الحركة والنشاط</strong></td>
+        <td>كشف الاصطدام (عدّ تنازلي 30 ثانية حتى تنبيه SOS)، والتشغيل/الإيقاف التلقائي للرحلات، وتسجيلات الوصول المفعّلة بالنشاط</td>
+      </tr>
+      <tr>
+        <td><strong>البيانات التشخيصية</strong></td>
+        <td>إصلاح الأخطاء، ومراقبة سلامة الخدمة، وتحسين الموثوقية</td>
+      </tr>
+      <tr>
+        <td><strong>بيانات البطارية عن بُعد</strong></td>
+        <td>تنبيهات الطاقم بانخفاض البطارية، وتقدير معدل استنزاف البطارية، وعرض الحالة</td>
+      </tr>
+      <tr>
+        <td><strong>مناطق الهبوط الآمن</strong></td>
+        <td>كشف الوصول، وكتم التنبيهات، وتفعيل المنزل الذكي</td>
+      </tr>
+      <tr>
+        <td><strong>تقارير الحوادث</strong></td>
+        <td>توثيق ومراجعة السلامة الخاصة بالطاقم</td>
+      </tr>
+      <tr>
+        <td><strong>الملاحظات الصوتية</strong></td>
+        <td>سياق إضافي لتسجيلات الوصول وتقارير الحوادث</td>
+      </tr>
+      <tr>
+        <td><strong>أنصبة السلامة</strong></td>
+        <td>التفاعل المحفّز مع السلامة، ولوحة صدارة الطاقم</td>
+      </tr>
+      <tr>
+        <td><strong>سياسة الطاقم</strong></td>
+        <td>فرض القواعد التي يحددها القبطان (القفل، وتدوير المفاتيح، واعتماد المغادرة)</td>
+      </tr>
+      <tr>
+        <td><strong>بيانات الاشتراك</strong></td>
+        <td>توفير الفئات، وتفعيل الميزات، والفوترة، وإدارة التجديد</td>
+      </tr>
+      <tr>
+        <td><strong>خزنة PIN</strong></td>
+        <td>النسخ الاحتياطي المشفّر للمفاتيح واستردادها</td>
+      </tr>
+      <tr>
+        <td><strong>لوحة التحكم على الويب</strong></td>
+        <td>إدارة الأسطول، وسجلات التدقيق، والتحليلات، وتقارير الامتثال</td>
+      </tr>
+      <tr>
+        <td><strong>البلوتوث</strong></td>
+        <td>مصافحة القرب مع المنزل الذكي</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>لا نبيع بياناتك الشخصية أو نؤجرها أو نشاركها مع أطراف ثالثة لأغراض التسويق أو الإعلان أو وساطة البيانات.</strong> بياناتك ملك لك.</p>
+
+  <h2>4. كيف نحمي بياناتك</h2>
+  <ul>
+    <li><strong>التشفير من طرف إلى طرف:</strong> تُشفَّر جميع بيانات الموقع ورسائل الطاقم والتذكيرات والجداول وبيانات تسجيل الوصول وتقارير الحوادث باستخدام AES-256-GCM على جهازك بمفتاح مقصور على الطاقم قبل الإرسال. ولا يُشارَك مفتاح فك التشفير إلا مع أعضاء الطاقم الذين دعوتهم صراحةً عبر رمز QR أو رابط الدعوة. ولا يصل الخادم أبدًا إلى الإحداثيات أو مفاتيح الطاقم بنص صريح.</li>
+    <li><strong>TLS 1.3:</strong> جميع البيانات أثناء النقل محمية ببروتوكول Transport Layer Security 1.3 (TLS 1.3).</li>
+    <li><strong>الأمان على مستوى الصفوف:</strong> تفرض جميع جداول قاعدة البيانات (أكثر من 20 جدولًا) سياسات وصول قائمة على الملكية. وتُقيَّد الاستعلامات بهوية المستخدم المصادَق عليها وعضويته في الطاقم.</li>
+    <li><strong>التجزئة على الجهاز:</strong> تُجزَّأ كلمات مرور الحساب باستخدام PBKDF2 (600,000 تكرار). وتُجزَّأ أرقام PIN الأمنية باستخدام PBKDF2-HMAC-SHA256 (600,000 تكرار) مع ملح عشوائي بطول 16 بايت. ولا تغادر البيانات البيومترية (Face ID / Touch ID / Android Biometrics) جهازك أبدًا.</li>
+    <li><strong>تثبيت الشهادات:</strong> التحقق من بصمة SHA-256 لجميع اتصالات HTTPS.</li>
+    <li><strong>عزل دور الخدمة:</strong> يُقيَّد الوصول المرفوع إلى قاعدة البيانات على وظائف Edge Functions من جانب الخادم فقط — ولا يظهر أبدًا في كود العميل.</li>
+  </ul>
+
+  <h2>5. الاحتفاظ بالبيانات وحذفها</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>البيانات</th>
+        <th>فترة الاحتفاظ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>سجلات الموقع</strong></td>
+        <td>Deckhand: 24 ساعة · First Mate: 7 أيام · Captain: 30 يومًا · Admiral: 90 يومًا. تُحذف تلقائيًا بعد انتهاء الفترة.</td>
+      </tr>
+      <tr>
+        <td><strong>طلبات تسجيل الوصول</strong></td>
+        <td>تنتهي بعد فترة السماح (حوالي دقيقتين)</td>
+      </tr>
+      <tr>
+        <td><strong>التذكيرات</strong></td>
+        <td>تُحذف بعد 24 ساعة من موعدها المحدد</td>
+      </tr>
+      <tr>
+        <td><strong>تقارير الحوادث</strong></td>
+        <td>تبقى حتى حلّ الطاقم أو مغادرة العضو</td>
+      </tr>
+      <tr>
+        <td><strong>درجات السلامة</strong></td>
+        <td>تبقى حتى حلّ الطاقم أو مغادرة العضو</td>
+      </tr>
+      <tr>
+        <td><strong>بيانات الحساب</strong></td>
+        <td>تُحتفظ بها حتى حذف الحساب</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>حذف الحساب فوري ولا رجعة فيه.</strong> عند حذفك لحسابك، تُزال نهائيًا جميع البيانات المخزنة على الخادم — سجل الموقع، وعضويات الطواقم، والروابط، والرسائل، ودرجات السلامة، والجداول، والتذكيرات، وبيانات تسجيل الوصول، وخزنة استرداد PIN، والنسخ الاحتياطية لمفاتيح الطاقم، وجميع المعلومات الشخصية الأخرى. كما تُمسح البيانات المخزنة على الجهاز (المفاتيح، والإعدادات، ومواد الخزنة، والذاكرة المؤقتة).</p>
+  <p><strong>تصدير البيانات:</strong> يحق لأي مستخدم مسجّل تصدير بيانات حسابه الشخصية وسجل موقعه في أي وقت وبالمجان من قائمة الإعدادات في التطبيق (وفقًا للمادة 20 من اللائحة العامة لحماية البيانات GDPR). ويمكن لمستخدمي فئة Captain تصدير بيانات على مستوى الطاقم أيضًا. ويمكنك تصدير مفاتيح تشفير طاقمك في أي وقت عبر الإعدادات ← النسخ الاحتياطي لحفظها بأمان دون اتصال.</p>
+
+  <h2>6. المعالجون الفرعيون من جهات خارجية</h2>
+  <p>تعتمد CrewRadr على الخدمات التابعة لجهات خارجية التالية لتشغيلها. ولكل منها سياسة خصوصية خاصة بها:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>الخدمة</th>
+        <th>الغرض</th>
+        <th>سياسة الخصوصية</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Supabase</strong></td>
+        <td>استضافة قاعدة البيانات، والمصادقة، والمزامنة في الوقت الفعلي، ووظائف Edge Functions</td>
+        <td><a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Firebase Cloud Messaging</strong></td>
+        <td>توزيع إشعارات الدفع لتسجيلات الوصول وكشف الصمت والتنبيهات الطارئة</td>
+        <td><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Google Maps Platform</strong></td>
+        <td>عرض خرائط البلاطات والترميز الجغرافي والترميز الجغرافي العكسي</td>
+        <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>RevenueCat</strong></td>
+        <td>التحقق من عمليات الشراء داخل التطبيق وإدارة دورة حياة الاشتراكات</td>
+        <td><a href="https://www.revenuecat.com/privacy" target="_blank" rel="noopener">revenuecat.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Cloudflare</strong></td>
+        <td>استضافة البوابة الإلكترونية، وشبكة CDN، والحماية من هجمات DDoS</td>
+        <td><a href="https://www.cloudflare.com/privacypolicy" target="_blank" rel="noopener">cloudflare.com/privacy</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>باستخدامك لـCrewRadr، فإنك توافق أيضًا على الشروط والسياسات المعمول بها لدى هؤلاء المزودين.</p>
+
+  <h2>7. حقوقك</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>الحق</th>
+        <th>كيفية ممارسته</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>الوصول</strong></td>
+        <td>عرض بياناتك داخل التطبيق: صفحة الرحلات (سجل الموقع)، والإعدادات (الملف الشخصي)، ولوحة التحكم (العضوية)</td>
+      </tr>
+      <tr>
+        <td><strong>التصدير</strong></td>
+        <td>الإعدادات ← تصدير البيانات. متاح مجانًا لجميع المستخدمين.</td>
+      </tr>
+      <tr>
+        <td><strong>الحذف</strong></td>
+        <td>الإعدادات ← الحساب ← حذف الحساب. فوري ولا رجعة فيه.</td>
+      </tr>
+      <tr>
+        <td><strong>التصحيح</strong></td>
+        <td>حدّث اسمك الظاهر وملفك الشخصي وإعداداتك في أي وقت داخل التطبيق.</td>
+      </tr>
+      <tr>
+        <td><strong>إلغاء الاشتراك</strong></td>
+        <td>عطّل تتبع الموقع في الخلفية أو كشف الاصطدام أو تنبيهات البطارية من الإعدادات. وفعّل الوضع الخفي (Stealth Mode) لإيقاف البث.</td>
+      </tr>
+      <tr>
+        <td><strong>قابلية النقل</strong></td>
+        <td>صدّر بياناتك بصيغة قابلة للقراءة آليًا (المادة 20 من اللائحة العامة لحماية البيانات GDPR).</td>
+      </tr>
+      <tr>
+        <td><strong>CCPA</strong></td>
+        <td>المقيمون في كاليفورنيا: اطلب الكشف عن البيانات، وألغِ الاشتراك في البيع (نحن لا نبيع البيانات)، واطلب الحذف. استخدم الإعدادات ← الدعم أو تواصل عبر privacy@crewradr.app.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8. إخلاء مسؤولية خدمات الطوارئ</h2>
+  <p><strong>ميزات CrewRadr SOS وكشف الاصطدام وGhost Watch هي أدوات إشعارات إضافية من نظير إلى نظير ولا تضمن استجابة خدمات الطوارئ. يجب على المستخدمين الاتصال بخدمات الطوارئ المحلية مباشرة (مثل 911 أو 112) أثناء المواقف التي تهدد الحياة.</strong> وقد لا تعمل هذه الميزات في المناطق التي لا تتوفر فيها تغطية الشبكة، أو على الأجهزة ذات البطاريات المستنزفة، أو عند عدم منح الأذونات المطلوبة. CrewRadr ليست بديلًا عن الرقم 911 أو خدمات الطوارئ الرسمية.</p>
+
+  <h2>9. خصوصية الأطفال</h2>
+  <p>CrewRadr غير موجهة للأطفال دون 13 عامًا (أو 16 عامًا في الاتحاد الأوروبي). لا نجمع عن قصد بيانات شخصية من الأطفال. إذا كنت تعتقد أن طفلًا قد زوّدنا ببيانات شخصية، فتواصل مع privacy@crewradr.app فورًا.</p>
+
+  <h2>10. نقل البيانات الدولي</h2>
+  <p>تُخزَّن بيانات CrewRadr في مراكز بيانات Supabase (منطقتا الولايات المتحدة والاتحاد الأوروبي). وقد تُنقل البيانات إلى البلدان التي يعمل فيها معالجونا الفرعيون وتُعالَج فيها. وتُحمى جميع عمليات النقل بضمانات مناسبة، بما في ذلك البنود التعاقدية القياسية حيثما ينطبق ذلك.</p>
+
+  <h2>11. ملاحظات خاصة بالمنصة</h2>
+  <ul>
+    <li><strong>iOS:</strong> يعرض تتبع الموقع في الخلفية شريطًا أزرق مؤشرًا وفق متطلبات Apple. ويمكنك تعطيل ذلك من إعدادات iOS ← CrewRadr ← الموقع. ويراعي التطبيق خاصية الإيقاف التلقائي في iOS للأجهزة الثابتة.</li>
+    <li><strong>Android:</strong> يستخدم تتبع الموقع في الخلفية إشعار خدمة أمامي دائم وفق متطلبات Google. ويُطلب إعفاء من تحسين استهلاك البطارية أثناء الإعداد لضمان عمل موثوق في الخلفية.</li>
+    <li><strong>البوابة الإلكترونية:</strong> تُعالَج بيانات جلسة المتصفح عبر مصادقة Supabase Auth. ولا توجد ملفات تعريف ارتباط للتتبع تتجاوز تلك المطلوبة للمصادقة وإدارة الجلسات.</li>
+  </ul>
+
+  <h2>12. التغييرات على هذه السياسة</h2>
+  <p>سنُخطر المستخدمين بالتغييرات الجوهرية على هذه السياسة عبر إشعار داخل التطبيق و/أو البريد الإلكتروني. ويُعدّ استمرار استخدام الخدمة بعد التغييرات قبولًا للسياسة المحدّثة.</p>
+
+  <h2>13. التواصل</h2>
+  <p>للاستفسارات المتعلقة بالخصوصية أو طلبات البيانات أو ممارسة حقوقك:</p>
+  <ul>
+    <li><strong>البريد الإلكتروني:</strong> privacy@crewradr.app</li>
+    <li><strong>داخل التطبيق:</strong> الإعدادات ← الدعم والملاحظات</li>
+  </ul>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="/">CrewRadr</a>. صُنع للطواقم، لا للشركات. &middot; <a href="/privacy">سياسة الخصوصية</a> &middot; <a href="/terms">شروط الخدمة</a> &middot; <a href="mailto:support@crewradr.app">اتصل بنا</a></p>
+</footer>
+
+<script>
+  // ── Theme ────────────────────────────────
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { setTheme(saved); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+
+  toggle.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Nav scroll effect ────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  });
+</script>
+</body>
+</html>

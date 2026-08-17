@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — Политика конфиденциальности. Узнайте, как мы защищаем и шифруем данные о вашей безопасности и местоположении.">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — Политика конфиденциальности</title>
+<link rel="canonical" href="/privacy/ru/">
+<link rel="alternate" hreflang="en" href="/privacy/">
+<link rel="alternate" hreflang="es" href="/privacy/es/">
+<link rel="alternate" hreflang="fr" href="/privacy/fr/">
+<link rel="alternate" hreflang="ar" href="/privacy/ar/">
+<link rel="alternate" hreflang="zh" href="/privacy/zh/">
+<link rel="alternate" hreflang="ru" href="/privacy/ru/">
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.3);
+    --cream: #F5F4F0;
+    --cream-warm: #EDE8E0;
+    --sand: #D9CDBC;
+    --slate: #1A2327;
+    --slate-container: #242F35;
+    --slate-surface: #2A363D;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --text-muted: #8A9598;
+    --bg: #F5F4F0;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(142, 165, 149, 0.15);
+    --card-shadow: 0 1px 3px rgba(26, 35, 39, 0.06), 0 8px 32px rgba(26, 35, 39, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --cream-warm: #242F35;
+    --sand: #6E8679;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --text-muted: #6A7578;
+    --bg: #1A2327;
+    --card-bg: #242F35;
+    --card-border: rgba(142, 165, 149, 0.1);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+    --sage-glow: rgba(142, 165, 149, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ─────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(245, 244, 240, 0.8);
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  [data-theme="dark"] nav {
+    background: rgba(26, 35, 39, 0.85);
+    border-bottom-color: rgba(142, 165, 149, 0.08);
+  }
+
+  nav.scrolled {
+    border-bottom-color: var(--card-border);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  [data-theme="dark"] nav.scrolled {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.3);
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-primary);
+    font-weight: 700; font-size: 1.25rem;
+  }
+
+  .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    width: 40px; height: 40px; border: 1px solid var(--card-border);
+    border-radius: 10px; background: var(--card-bg);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; transition: all 0.2s ease; color: var(--text-secondary);
+  }
+
+  .theme-toggle:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+  /* ── LANGUAGE SWITCH ──────────────────── */
+  .lang-switch { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .lang-switch a {
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 0.85rem; padding: 4px 8px; border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  .lang-switch a:hover { color: var(--sage-dark); }
+  .lang-switch a.active { color: var(--text-primary); background: var(--sage-glow); font-weight: 700; }
+
+  /* ── GOVERNING CLAUSE ─────────────────── */
+  .governing-clause {
+    margin: 16px 0 24px; padding: 12px 16px;
+    border-left: 3px solid var(--sage);
+    background: var(--card-bg); border-radius: 8px;
+    font-size: 0.95rem; color: var(--text-secondary);
+  }
+
+  /* ── LEGAL PAGE CONTENT ───────────────── */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .last-updated {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    color: var(--sage-dark);
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  ul, ol {
+    margin-bottom: 24px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  /* Tables styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  th {
+    background: var(--cream-warm);
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] th {
+    background: var(--slate-container);
+  }
+
+  /* ── FOOTER ────────────────────────────── */
+  footer {
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  footer a { color: var(--sage-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    nav { padding: 12px 16px; }
+    .container { padding: 100px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-brand">
+    <img src="/logo.png" alt="CrewRadr" width="36" height="36">
+    CrewRadr
+  </a>
+  <div class="nav-actions">
+    <div class="lang-switch" aria-label="Язык">
+      <a href="/privacy/">EN</a>
+      <a href="/privacy/es/">ES</a>
+      <a href="/privacy/fr/">FR</a>
+      <a href="/privacy/ar/">ع</a>
+      <a href="/privacy/zh/">中文</a>
+      <a href="/privacy/ru/" class="active">РУ</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему" title="Переключить светлую/тёмную тему">☀️</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Политика конфиденциальности</h1>
+  <div class="last-updated">Последнее обновление: 27 июля 2026 г.</div>
+  <p class="governing-clause">Язык регулирования: настоящий документ предоставляется на нескольких языках для вашего удобства. В случае какого-либо противоречия или расхождения преимущественную силу имеет английская версия.</p>
+
+  <h2>1. Введение и сфера применения</h2>
+  <p>CrewRadr («Приложение», «мы», «нам») — ориентированная на безопасность платформа обмена местоположением и обеспечения готовности к чрезвычайным ситуациям для доверенных групп (экипажей): семей, полевых команд и сплочённых сообществ. Настоящая политика конфиденциальности объясняет, какие данные мы собираем, как мы их используем, как защищаем и какие права вы имеете в отношении своих данных.</p>
+  <p><strong>Настоящая политика распространяется на все платформы CrewRadr:</strong></p>
+  <ul>
+    <li><strong>iOS</strong> — приложение (распространяется через Apple App Store)</li>
+    <li><strong>Android</strong> — приложение (распространяется через Google Play Store)</li>
+    <li><strong>веб-портал</strong> (доступен по адресу crewradr.app)</li>
+  </ul>
+  <p>Используя CrewRadr, вы подтверждаете принятие настоящей политики конфиденциальности. Если вы не согласны с ней, немедленно прекратите использование приложения.</p>
+
+  <h2>2. Данные, которые мы собираем</h2>
+  <h3>2.1 Данные о местоположении</h3>
+  <p>Координаты GPS (широта, долгота, скорость, высота, направление, точность), собираемые при включённом обмене местоположением в фоновом или активном режиме. Передаются только участникам экипажа, которым вы явно разрешили подключение.</p>
+  <h3>2.2 Идентификаторы учётной записи</h3>
+  <p>Адрес электронной почты (для аутентификации, восстановления учётной записи и подтверждения удаления), открытый ключ ECDH P-256 (для сквозного шифрования), отображаемое имя и необязательные учётные данные passkey.</p>
+  <h3>2.3 Информация об устройстве</h3>
+  <p>Версия операционной системы, модель устройства, уровень заряда батареи и состояние зарядки, статус сетевого подключения (Wi-Fi / сотовая сеть / офлайн) и токен push-уведомлений FCM.</p>
+  <h3>2.4 Связи с экипажем</h3>
+  <p>Экипажи, в которые вы входите, ваша роль в каждом экипаже (Капитан, Помощник капитана, Участник) и пользователи, с которыми вы делитесь местоположением. Данные о членстве в экипаже видны другим участникам экипажа.</p>
+  <h3>2.5 Данные о движении и активности</h3>
+  <p>Показания акселерометра и гироскопа (только при включённых функциях Crash Detection или Journey Automation), распознавание активности устройства (ходьба, вождение, езда на велосипеде, неподвижное состояние) для отслеживания поездок и автоматических отметок о прибытии.</p>
+  <h3>2.6 Диагностические данные</h3>
+  <p>Журналы сбоев и трассировки стека (через Firebase Crashlytics), отчёты об ошибках, показатели производительности, идентификатор установки для корреляции диагностических данных и телеметрия использования функций (по возможности анонимизированная).</p>
+  <h3>2.7 Телеметрия батареи</h3>
+  <p>Процент заряда батареи и статус зарядки, доступные участникам вашего экипажа для контроля безопасности. Приложение автоматически оповещает ваш экипаж, когда уровень заряда вашей батареи опускается ниже 5%.</p>
+  <h3>2.8 Зоны Safe Landing</h3>
+  <p>Геозоны, которые вы регистрируете как доверенные места назначения (например, дом, офис, школа). Хранятся на сервере; используются для подавления оповещений по прибытии и запуска автоматизаций Smart Home.</p>
+  <h3>2.9 Отчёты об инцидентах</h3>
+  <p>Структурированные журналы инцидентов безопасности, создаваемые вами в приложении, включая необязательные фотографии и описания. Доступ к ним ограничен вашим экипажем.</p>
+  <h3>2.10 Голосовые заметки</h3>
+  <p>Аудиозаписи, прикрепляемые к отметкам о прибытии или отчётам об инцидентах. Требуется разрешение на доступ к микрофону. Хранятся на сервере в зашифрованном виде.</p>
+  <h3>2.11 Серии безопасности и таблица лидеров</h3>
+  <p>Агрегированные показатели вовлечённости в обеспечение безопасности (регулярность отметок о прибытии, использование Ghost Watch). Доступны участникам экипажа в соответствии с настройками видимости таблицы лидеров вашего экипажа.</p>
+  <h3>2.12 Данные политики экипажа</h3>
+  <p>Конфигурация, управляемая капитаном вашего экипажа: блокировка передачи местоположения, блокировка выхода из системы, блокировка выхода из экипажа, состояние ротации ключей шифрования, название экипажа и назначение ролей участников.</p>
+  <h3>2.13 Данные подписки и выставления счетов</h3>
+  <p>Тарифный план (Deckhand / First Mate / Captain / Admiral), статус подписки, расчётный период и история транзакций. Обработка платежей осуществляется через RevenueCat и Stripe — CrewRadr не хранит полные номера банковских карт.</p>
+  <h3>2.14 Хранилище восстановления по PIN-коду</h3>
+  <p>Зашифрованная резервная копия ключей шифрования вашего экипажа, защищённая вашим PIN-кодом безопасности. Хранится на сервере; расшифровать её можно только с помощью вашего PIN-кода. Вы также можете экспортировать локальный файл резервной копии, защищённый паролем.</p>
+  <h3>2.15 Данные веб-панели управления</h3>
+  <p>Журналы доступа через браузер, токены сеансов и настройки панели управления при использовании веб-портала CrewRadr. Данные управления флотом для корпоративных экипажей уровня Admiral.</p>
+  <h3>2.16 Bluetooth и ближайшие устройства</h3>
+  <p>Трансляция и сканирование BLE для рукопожатия протокола Smart Home Matter. Постоянные данные Bluetooth не хранятся.</p>
+
+  <h2>3. Как мы используем ваши данные</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Тип данных</th>
+        <th>Назначение</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Местоположение</strong></td>
+        <td>Карта экипажа в реальном времени, история поездок, обнаружение Safe Landing, оповещения SOS, обнаружение аварий, автоматические отметки о прибытии, отчёты о стиле вождения</td>
+      </tr>
+      <tr>
+        <td><strong>Идентификаторы учётной записи</strong></td>
+        <td>Аутентификация, восстановление учётной записи, подтверждение удаления, рукопожатие сквозного шифрования</td>
+      </tr>
+      <tr>
+        <td><strong>Информация об устройстве</strong></td>
+        <td>Отображение статуса экипажа (батарея, подключение), доставка push-уведомлений, оптимизация под конкретную платформу</td>
+      </tr>
+      <tr>
+        <td><strong>Связи с экипажем</strong></td>
+        <td>Обеспечение доступа в пределах экипажа, управление ролями и разрешениями</td>
+      </tr>
+      <tr>
+        <td><strong>Движение и активность</strong></td>
+        <td>Обнаружение аварий (30-секундный обратный отсчёт до SOS), автоматический запуск и остановка поездок, отметки о прибытии по активности</td>
+      </tr>
+      <tr>
+        <td><strong>Диагностические данные</strong></td>
+        <td>Исправление ошибок, мониторинг работоспособности сервиса, повышение надёжности</td>
+      </tr>
+      <tr>
+        <td><strong>Телеметрия батареи</strong></td>
+        <td>Оповещения экипажа о низком заряде батареи, оценка скорости разряда, отображение статуса</td>
+      </tr>
+      <tr>
+        <td><strong>Зоны Safe Landing</strong></td>
+        <td>Обнаружение прибытия, подавление оповещений, запуск Smart Home</td>
+      </tr>
+      <tr>
+        <td><strong>Отчёты об инцидентах</strong></td>
+        <td>Документирование и анализ инцидентов безопасности экипажа</td>
+      </tr>
+      <tr>
+        <td><strong>Голосовые заметки</strong></td>
+        <td>Контекст для отметок о прибытии и отчётов об инцидентах</td>
+      </tr>
+      <tr>
+        <td><strong>Серии безопасности</strong></td>
+        <td>Игровое вовлечение в безопасность, таблица лидеров экипажа</td>
+      </tr>
+      <tr>
+        <td><strong>Политика экипажа</strong></td>
+        <td>Обеспечение выполнения правил, установленных капитаном (блокировки, ротация ключей, одобрение выхода из экипажа)</td>
+      </tr>
+      <tr>
+        <td><strong>Данные подписки</strong></td>
+        <td>Предоставление тарифных планов, включение функций, выставление счетов, управление продлением</td>
+      </tr>
+      <tr>
+        <td><strong>PIN-хранилище</strong></td>
+        <td>Зашифрованное резервное копирование и восстановление ключей</td>
+      </tr>
+      <tr>
+        <td><strong>Веб-панель управления</strong></td>
+        <td>Управление флотом, журналы аудита, аналитика, отчётность о соответствии</td>
+      </tr>
+      <tr>
+        <td><strong>Bluetooth</strong></td>
+        <td>Рукопожатие близости Smart Home</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Мы НЕ продаём, не сдаём в аренду и не передаём ваши персональные данные третьим лицам для целей маркетинга, рекламы или брокерской продажи данных.</strong> Ваши данные принадлежат вам.</p>
+
+  <h2>4. Как мы защищаем ваши данные</h2>
+  <ul>
+    <li><strong>Сквозное шифрование:</strong> все данные о местоположении, сообщения экипажа, напоминания, расписания, данные отметок о прибытии и отчёты об инцидентах перед передачей шифруются на вашем устройстве алгоритмом AES-256-GCM с использованием ключа экипажа. Ключ дешифрования передаётся только участникам экипажа, которых вы явно пригласили с помощью QR-кода или ссылки-приглашения. Сервер никогда не имеет доступа к координатам в открытом виде или к ключам экипажа.</li>
+    <li><strong>TLS 1.3:</strong> все данные при передаче защищены протоколом Transport Layer Security 1.3.</li>
+    <li><strong>Построчная безопасность:</strong> все 20+ таблиц базы данных применяют политики доступа на основе владения. Запросы ограничиваются вашей аутентифицированной учётной записью и членством в экипаже.</li>
+    <li><strong>Хеширование на устройстве:</strong> пароли учётных записей хешируются с помощью PBKDF2 (600 000 итераций). PIN-коды безопасности хешируются с помощью PBKDF2-HMAC-SHA256 (600 000 итераций) со случайной 16-байтовой солью. Биометрические данные (Face ID / Touch ID / Android Biometrics) никогда не покидают ваше устройство.</li>
+    <li><strong>Привязка сертификатов:</strong> проверка SHA-256-отпечатков для всех HTTPS-соединений.</li>
+    <li><strong>Изоляция служебной роли:</strong> расширенный доступ к базе данных предоставляется только серверным Edge Functions — и никогда клиентскому коду.</li>
+  </ul>
+
+  <h2>5. Хранение и удаление данных</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Данные</th>
+        <th>Срок хранения</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Журналы местоположения</strong></td>
+        <td>Deckhand: 24 часа · First Mate: 7 дней · Captain: 30 дней · Admiral: 90 дней. Автоматически удаляются после истечения срока.</td>
+      </tr>
+      <tr>
+        <td><strong>Запросы на отметку о прибытии</strong></td>
+        <td>Истекают после льготного периода (около 2 минут)</td>
+      </tr>
+      <tr>
+        <td><strong>Напоминания</strong></td>
+        <td>Удаляются через 24 часа после запланированного времени</td>
+      </tr>
+      <tr>
+        <td><strong>Отчёты об инцидентах</strong></td>
+        <td>Хранятся до расформирования экипажа или выхода участника</td>
+      </tr>
+      <tr>
+        <td><strong>Показатели безопасности</strong></td>
+        <td>Хранятся до расформирования экипажа или выхода участника</td>
+      </tr>
+      <tr>
+        <td><strong>Данные учётной записи</strong></td>
+        <td>Хранятся до удаления учётной записи</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>Удаление учётной записи происходит немедленно и необратимо.</strong> При удалении учётной записи все серверные данные — история местоположения, членство в экипажах, связи, сообщения, показатели безопасности, расписания, напоминания, данные отметок о прибытии, хранилище восстановления по PIN-коду, резервные копии ключей экипажа и все прочие персональные данные — удаляются безвозвратно. Локальные данные устройства (ключи, настройки, материалы хранилища, кэши) также стираются.</p>
+  <p><strong>Экспорт данных:</strong> любой зарегистрированный пользователь может в любое время бесплатно экспортировать собственные персональные данные учётной записи и историю местоположения из меню «Настройки» приложения (соответствует ст. 20 GDPR). Пользователи уровня Captain также могут экспортировать данные на уровне экипажа. Вы можете в любое время экспортировать ключи шифрования вашего экипажа через «Настройки» → «Резервные копии» для их хранения в офлайн-режиме.</p>
+
+  <h2>6. Сторонние субподрядчики</h2>
+  <p>Для работы CrewRadr использует следующие сторонние сервисы. У каждого из них действует собственная политика конфиденциальности:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Сервис</th>
+        <th>Назначение</th>
+        <th>Политика конфиденциальности</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Supabase</strong></td>
+        <td>Хостинг базы данных, аутентификация, синхронизация в реальном времени, Edge Functions</td>
+        <td><a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Firebase Cloud Messaging</strong></td>
+        <td>Доставка push-уведомлений для отметок о прибытии, обнаружения бездействия и экстренных оповещений</td>
+        <td><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Google Maps Platform</strong></td>
+        <td>Отрисовка тайлов карты, геокодирование и обратное геокодирование</td>
+        <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>RevenueCat</strong></td>
+        <td>Проверка внутриприложенных покупок и управление жизненным циклом подписок</td>
+        <td><a href="https://www.revenuecat.com/privacy" target="_blank" rel="noopener">revenuecat.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Cloudflare</strong></td>
+        <td>Хостинг веб-портала, CDN и защита от DDoS-атак</td>
+        <td><a href="https://www.cloudflare.com/privacypolicy" target="_blank" rel="noopener">cloudflare.com/privacy</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Используя CrewRadr, вы также соглашаетесь с применимыми условиями и политиками этих поставщиков.</p>
+
+  <h2>7. Ваши права</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Право</th>
+        <th>Как осуществить</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Доступ</strong></td>
+        <td>Просмотр ваших данных в приложении: страница «Поездки» (история местоположения), «Настройки» (профиль), «Панель управления» (членство)</td>
+      </tr>
+      <tr>
+        <td><strong>Экспорт</strong></td>
+        <td>«Настройки» → «Экспорт данных». Доступно бесплатно всем пользователям.</td>
+      </tr>
+      <tr>
+        <td><strong>Удаление</strong></td>
+        <td>«Настройки» → «Учётная запись» → «Удалить учётную запись». Немедленно и необратимо.</td>
+      </tr>
+      <tr>
+        <td><strong>Исправление</strong></td>
+        <td>Обновляйте отображаемое имя, профиль и настройки в любое время в приложении.</td>
+      </tr>
+      <tr>
+        <td><strong>Отказ</strong></td>
+        <td>Отключите фоновое отслеживание местоположения, обнаружение аварий или оповещения о заряде батареи в «Настройках». Включите Stealth Mode, чтобы прекратить передачу данных.</td>
+      </tr>
+      <tr>
+        <td><strong>Переносимость</strong></td>
+        <td>Экспортируйте свои данные в машиночитаемом формате (ст. 20 GDPR).</td>
+      </tr>
+      <tr>
+        <td><strong>CCPA</strong></td>
+        <td>Жители Калифорнии: запросить раскрытие данных, отказаться от продажи данных (мы не продаём данные) и потребовать удаления. Используйте «Настройки» → «Поддержка» или свяжитесь с нами по адресу privacy@crewradr.app.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8. Отказ от ответственности за экстренные службы</h2>
+  <p><strong>Функции SOS, Crash Detection и Ghost Watch в CrewRadr являются дополнительными инструментами уведомления между пользователями и не гарантируют вызов экстренных служб. При угрозе жизни необходимо напрямую звонить в местные экстренные службы (например, 911 или 112).</strong> Эти функции могут не работать в местах без покрытия сети, на устройствах с разряженной батареей или при отсутствии необходимых разрешений. CrewRadr не заменяет службу 911 или официальные экстренные службы.</p>
+
+  <h2>9. Конфиденциальность детей</h2>
+  <p>CrewRadr не предназначено для детей младше 13 лет (или 16 лет в ЕС). Мы не собираем персональные данные детей заведомо. Если вы считаете, что ребёнок предоставил нам персональные данные, немедленно свяжитесь с нами по адресу privacy@crewradr.app.</p>
+
+  <h2>10. Международная передача данных</h2>
+  <p>Данные CrewRadr хранятся в центрах обработки данных Supabase (регионы США и ЕС). Данные могут передаваться и обрабатываться в странах, где работают наши субподрядчики по обработке данных. Все передачи защищены надлежащими гарантиями, включая типовые договорные условия (Standard Contractual Clauses) там, где это применимо.</p>
+
+  <h2>11. Особенности по платформам</h2>
+  <ul>
+    <li><strong>iOS:</strong> при фоновом отслеживании местоположения отображается синяя индикаторная полоса в соответствии с требованиями Apple. Вы можете отключить её в «Настройках» iOS → CrewRadr → «Местоположение». Приложение соблюдает автоматическую паузу iOS для неподвижных устройств.</li>
+    <li><strong>Android:</strong> фоновое отслеживание местоположения использует постоянное уведомление фонового сервиса в соответствии с требованиями Google. Во время настройки запрашивается исключение из оптимизации энергопотребления для обеспечения надёжной фоновой работы.</li>
+    <li><strong>Веб-портал:</strong> данные браузерных сеансов обрабатываются через Supabase Auth. Файлы cookie для отслеживания не используются, за исключением тех, что необходимы для аутентификации и управления сеансами.</li>
+  </ul>
+
+  <h2>12. Изменения настоящей политики</h2>
+  <p>Мы уведомим пользователей о существенных изменениях настоящей политики через уведомление в приложении и/или по электронной почте. Продолжение использования сервиса после внесения изменений означает принятие обновлённой политики.</p>
+
+  <h2>13. Контакты</h2>
+  <p>По вопросам конфиденциальности, запросам о данных или для реализации ваших прав:</p>
+  <ul>
+    <li><strong>Электронная почта:</strong> privacy@crewradr.app</li>
+    <li><strong>В приложении:</strong> «Настройки» → «Поддержка и обратная связь»</li>
+  </ul>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="/">CrewRadr</a>. Создано для экипажей, а не для корпораций. &middot; <a href="/privacy">Политика конфиденциальности</a> &middot; <a href="/terms">Условия предоставления услуг</a> &middot; <a href="mailto:support@crewradr.app">Контакты</a></p>
+</footer>
+
+<script>
+  // ── Theme ────────────────────────────────
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { setTheme(saved); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+
+  toggle.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Nav scroll effect ────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  });
+</script>
+</body>
+</html>

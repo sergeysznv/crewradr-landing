@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — 隐私政策。了解我们如何保护并加密您的位置安全数据。">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — 隐私政策</title>
+<link rel="canonical" href="/privacy/zh/">
+<link rel="alternate" hreflang="en" href="/privacy/">
+<link rel="alternate" hreflang="es" href="/privacy/es/">
+<link rel="alternate" hreflang="fr" href="/privacy/fr/">
+<link rel="alternate" hreflang="ar" href="/privacy/ar/">
+<link rel="alternate" hreflang="zh" href="/privacy/zh/">
+<link rel="alternate" hreflang="ru" href="/privacy/ru/">
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.3);
+    --cream: #F5F4F0;
+    --cream-warm: #EDE8E0;
+    --sand: #D9CDBC;
+    --slate: #1A2327;
+    --slate-container: #242F35;
+    --slate-surface: #2A363D;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --text-muted: #8A9598;
+    --bg: #F5F4F0;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(142, 165, 149, 0.15);
+    --card-shadow: 0 1px 3px rgba(26, 35, 39, 0.06), 0 8px 32px rgba(26, 35, 39, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --cream-warm: #242F35;
+    --sand: #6E8679;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --text-muted: #6A7578;
+    --bg: #1A2327;
+    --card-bg: #242F35;
+    --card-border: rgba(142, 165, 149, 0.1);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+    --sage-glow: rgba(142, 165, 149, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ─────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(245, 244, 240, 0.8);
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  [data-theme="dark"] nav {
+    background: rgba(26, 35, 39, 0.85);
+    border-bottom-color: rgba(142, 165, 149, 0.08);
+  }
+
+  nav.scrolled {
+    border-bottom-color: var(--card-border);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  [data-theme="dark"] nav.scrolled {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.3);
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-primary);
+    font-weight: 700; font-size: 1.25rem;
+  }
+
+  .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    width: 40px; height: 40px; border: 1px solid var(--card-border);
+    border-radius: 10px; background: var(--card-bg);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; transition: all 0.2s ease; color: var(--text-secondary);
+  }
+
+  .theme-toggle:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+  /* ── LANGUAGE SWITCH ──────────────────── */
+  .lang-switch { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .lang-switch a {
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 0.85rem; padding: 4px 8px; border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  .lang-switch a:hover { color: var(--sage-dark); }
+  .lang-switch a.active { color: var(--text-primary); background: var(--sage-glow); font-weight: 700; }
+
+  /* ── GOVERNING CLAUSE ─────────────────── */
+  .governing-clause {
+    margin: 16px 0 24px; padding: 12px 16px;
+    border-left: 3px solid var(--sage);
+    background: var(--card-bg); border-radius: 8px;
+    font-size: 0.95rem; color: var(--text-secondary);
+  }
+
+  /* ── LEGAL PAGE CONTENT ───────────────── */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .last-updated {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    color: var(--sage-dark);
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  ul, ol {
+    margin-bottom: 24px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  /* Tables styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  th {
+    background: var(--cream-warm);
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] th {
+    background: var(--slate-container);
+  }
+
+  /* ── FOOTER ────────────────────────────── */
+  footer {
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  footer a { color: var(--sage-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    nav { padding: 12px 16px; }
+    .container { padding: 100px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-brand">
+    <img src="/logo.png" alt="CrewRadr" width="36" height="36">
+    CrewRadr
+  </a>
+  <div class="nav-actions">
+    <div class="lang-switch" aria-label="语言">
+      <a href="/privacy/">EN</a>
+      <a href="/privacy/es/">ES</a>
+      <a href="/privacy/fr/">FR</a>
+      <a href="/privacy/ar/">ع</a>
+      <a href="/privacy/zh/" class="active">中文</a>
+      <a href="/privacy/ru/">РУ</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="切换主题" title="切换浅色／深色模式">☀️</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>隐私政策</h1>
+  <div class="last-updated">最后更新日期：2026年7月27日</div>
+  <p class="governing-clause">管辖语言：本文件以多种语言提供，仅为方便您阅读。如各语言版本之间存在任何冲突或不一致之处，以英文版本为准。</p>
+
+  <h2>1. 简介与适用范围</h2>
+  <p>CrewRadr（「本应用」、「我们」）是一个以安全为核心的定位共享与应急准备平台，服务于值得信赖的群组（crew）——家人、外勤团队和关系紧密的社群。本隐私政策说明我们收集哪些数据、如何使用和保护这些数据，以及您对自己的数据享有的权利。</p>
+  <p><strong>本政策适用于 CrewRadr 的所有平台：</strong></p>
+  <ul>
+    <li><strong>iOS</strong> 应用（通过 Apple App Store 分发）</li>
+    <li><strong>Android</strong> 应用（通过 Google Play Store 分发）</li>
+    <li><strong>Web 门户</strong>（可通过 crewradr.app 访问）</li>
+  </ul>
+  <p>使用 CrewRadr 即表示您知悉并接受本隐私政策。如您不同意，请立即停止使用。</p>
+
+  <h2>2. 我们收集的数据</h2>
+  <h3>2.1 位置数据</h3>
+  <p>在后台或前台定位共享功能开启期间收集的 GPS 坐标（纬度、经度、速度、海拔、方位、精度）。该数据仅与您明确选择连接的群组成员共享。</p>
+  <h3>2.2 账户标识信息</h3>
+  <p>电子邮件地址（用于身份验证、账户恢复和删除核验）、ECDH P-256 公钥（用于端到端加密）、显示名称，以及可选的通行密钥凭证。</p>
+  <h3>2.3 设备信息</h3>
+  <p>操作系统版本、设备型号、电池电量和充电状态、网络连接状态（Wi-Fi／蜂窝网络／离线），以及 FCM 推送通知令牌。</p>
+  <h3>2.4 群组关联信息</h3>
+  <p>您所属的群组、您在各群组中的角色（船长、副船长、成员），以及您与哪些用户共享位置。群组成员关系数据对群组内的其他成员可见。</p>
+  <h3>2.5 运动与活动数据</h3>
+  <p>加速度计和陀螺仪读数（仅在开启碰撞检测或行程自动化时采集）、设备活动识别（步行、驾车、骑行、静止）数据，用于行程跟踪和签到触发。</p>
+  <h3>2.6 诊断数据</h3>
+  <p>崩溃日志和堆栈跟踪（通过 Firebase Crashlytics）、错误报告、性能指标、用于诊断关联的安装 ID，以及功能使用遥测数据（在可能的情况下进行匿名化处理）。</p>
+  <h3>2.7 电量遥测数据</h3>
+  <p>电量百分比和充电状态，与您的群组成员共享以提升安全意识。当您的电量低于 5% 时，应用会自动向您的群组发出提醒。</p>
+  <h3>2.8 安全降落区</h3>
+  <p>您登记为可信目的地的地理围栏位置（例如：家、办公室、学校）。该数据存储于服务器端，用于在到达时抑制提醒并触发智能家居自动化。</p>
+  <h3>2.9 事件报告</h3>
+  <p>您在应用内创建的结构化安全事件记录，包括可选的图片和描述。其可见范围仅限于您的群组。</p>
+  <h3>2.10 语音备注</h3>
+  <p>附加到位置签到或事件报告的音频录音。需要麦克风权限。录音以加密方式存储于服务器端。</p>
+  <h3>2.11 安全连续记录与排行榜</h3>
+  <p>汇总的安全参与度指标（签到一致性、幽灵守望（Ghost Watch）使用情况）。根据您所在群组的排行榜可见性设置，向群组成员展示。</p>
+  <h3>2.12 群组策略数据</h3>
+  <p>由群组船长（Crew Captain）控制的配置：定位共享锁定、退出登录锁定、退出群组锁定、加密密钥轮换状态、群组名称及成员角色分配。</p>
+  <h3>2.13 订阅与计费数据</h3>
+  <p>会员等级（甲板水手 Deckhand／大副 First Mate／船长 Captain／舰队司令 Admiral）、订阅状态、计费周期和交易记录。支付处理由 RevenueCat 和 Stripe 负责——CrewRadr 不存储完整的信用卡卡号。</p>
+  <h3>2.14 PIN 恢复保险库</h3>
+  <p>群组加密密钥的加密备份，受您的安全 PIN 保护。该备份存储于服务器端，仅能凭您的 PIN 解密。您也可以导出受密码保护的本地备份文件。</p>
+  <h3>2.15 Web 仪表板数据</h3>
+  <p>访问 CrewRadr Web 门户时产生的基于浏览器的访问日志、会话令牌和仪表板偏好设置。以及面向舰队司令（Admiral）等级企业群组的车队管理数据。</p>
+  <h3>2.16 蓝牙与附近设备</h3>
+  <p>用于智能家居 Matter 协议握手的 BLE 广播与扫描。不存储任何持久性蓝牙数据。</p>
+
+  <h2>3. 我们如何使用您的数据</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>数据类型</th>
+        <th>用途</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>位置数据</strong></td>
+        <td>实时群组地图、行程历史、安全降落检测、SOS 警报、碰撞检测、自动签到、驾驶行为报告</td>
+      </tr>
+      <tr>
+        <td><strong>账户标识信息</strong></td>
+        <td>身份验证、账户恢复、删除核验、E2E 加密握手</td>
+      </tr>
+      <tr>
+        <td><strong>设备信息</strong></td>
+        <td>群组状态展示（电量、连接状态）、推送通知投递、平台专项优化</td>
+      </tr>
+      <tr>
+        <td><strong>群组关联信息</strong></td>
+        <td>执行群组范围内的访问控制、管理角色与权限</td>
+      </tr>
+      <tr>
+        <td><strong>运动与活动数据</strong></td>
+        <td>碰撞检测（触发 SOS 前 30 秒倒计时）、行程自动开始／结束、活动触发的签到</td>
+      </tr>
+      <tr>
+        <td><strong>诊断数据</strong></td>
+        <td>修复缺陷、监控服务运行状况、提升可靠性</td>
+      </tr>
+      <tr>
+        <td><strong>电量遥测数据</strong></td>
+        <td>群组低电量提醒、电量消耗速率估算、状态展示</td>
+      </tr>
+      <tr>
+        <td><strong>安全降落区</strong></td>
+        <td>到达检测、提醒抑制、智能家居触发</td>
+      </tr>
+      <tr>
+        <td><strong>事件报告</strong></td>
+        <td>群组安全记录与审查</td>
+      </tr>
+      <tr>
+        <td><strong>语音备注</strong></td>
+        <td>为位置签到和事件报告提供背景信息</td>
+      </tr>
+      <tr>
+        <td><strong>安全连续记录</strong></td>
+        <td>游戏化的安全参与激励、群组排行榜</td>
+      </tr>
+      <tr>
+        <td><strong>群组策略</strong></td>
+        <td>执行船长制定的规则（锁定、密钥轮换、退组审批）</td>
+      </tr>
+      <tr>
+        <td><strong>订阅数据</strong></td>
+        <td>等级配置、功能开关、计费、续订管理</td>
+      </tr>
+      <tr>
+        <td><strong>PIN 保险库</strong></td>
+        <td>加密密钥备份与恢复</td>
+      </tr>
+      <tr>
+        <td><strong>Web 仪表板</strong></td>
+        <td>车队管理、审计日志、数据分析、合规报告</td>
+      </tr>
+      <tr>
+        <td><strong>蓝牙</strong></td>
+        <td>智能家居近距离握手</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>我们不会为营销、广告或数据经纪之目的向第三方出售、出租或共享您的个人信息。您的数据归您所有。</strong></p>
+
+  <h2>4. 我们如何保护您的数据</h2>
+  <ul>
+    <li><strong>端到端加密：</strong>所有位置数据、群组消息、提醒、日程、签到数据和事件报告在传输前均在您的设备上使用群组范围内的密钥以 AES-256-GCM 算法加密。解密密钥仅与您通过二维码或邀请链接明确邀请的群组成员共享。服务器永远无法访问明文坐标或群组密钥。</li>
+    <li><strong>TLS 1.3：</strong>所有传输中的数据均受传输层安全协议 1.3（TLS 1.3）保护。</li>
+    <li><strong>行级安全：</strong>全部 20 余张数据库表均强制执行基于所有权的访问策略。查询范围限定于您已认证的用户身份和群组成员关系。</li>
+    <li><strong>设备端哈希处理：</strong>账户密码使用 PBKDF2（600,000 次迭代）进行哈希处理。安全 PIN 使用 PBKDF2-HMAC-SHA256（600,000 次迭代）并附加随机 16 字节盐值进行哈希处理。生物识别数据（Face ID／Touch ID／Android 生物识别）永远不会离开您的设备。</li>
+    <li><strong>证书固定：</strong>对所有 HTTPS 连接进行 SHA-256 指纹校验。</li>
+    <li><strong>服务角色隔离：</strong>高权限数据库访问仅限服务端 Edge Functions 使用——绝不出现在客户端代码中。</li>
+  </ul>
+
+  <h2>5. 数据保留与删除</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>数据</th>
+        <th>保留期限</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>位置日志</strong></td>
+        <td>甲板水手：24 小时 · 大副：7 天 · 船长：30 天 · 舰队司令：90 天。超过期限后自动清除。</td>
+      </tr>
+      <tr>
+        <td><strong>签到请求</strong></td>
+        <td>宽限期（约 2 分钟）后过期</td>
+      </tr>
+      <tr>
+        <td><strong>提醒</strong></td>
+        <td>预定时间 24 小时后删除</td>
+      </tr>
+      <tr>
+        <td><strong>事件报告</strong></td>
+        <td>保存至群组解散或成员退出</td>
+      </tr>
+      <tr>
+        <td><strong>安全评分</strong></td>
+        <td>保存至群组解散或成员退出</td>
+      </tr>
+      <tr>
+        <td><strong>账户数据</strong></td>
+        <td>保留至账户删除</td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>账户删除即时生效且不可撤销。</strong>删除账户后，所有服务器端数据——位置历史、群组成员关系、绑定关系、消息、安全评分、日程、提醒、签到数据、PIN 恢复保险库、群组密钥备份以及其他所有个人信息——将被永久删除。设备本地数据（密钥、设置、保险库资料、缓存）也将一并清除。</p>
+  <p><strong>数据导出：</strong>任何注册用户均可随时通过应用「设置」菜单免费导出自己的个人账户数据和位置历史（符合 GDPR 第 20 条）。船长等级用户还可导出群组级数据。您可以随时通过「设置 → 备份」导出群组加密密钥，以便离线妥善保管。</p>
+
+  <h2>6. 第三方子处理者</h2>
+  <p>CrewRadr 的运营依赖以下第三方服务。各项服务均有其自身的隐私政策：</p>
+  <table>
+    <thead>
+      <tr>
+        <th>服务</th>
+        <th>用途</th>
+        <th>隐私政策</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Supabase</strong></td>
+        <td>数据库托管、身份验证、实时同步、Edge Functions</td>
+        <td><a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Firebase Cloud Messaging</strong></td>
+        <td>签到、静默检测和紧急警报的推送通知分发</td>
+        <td><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Google Maps Platform</strong></td>
+        <td>地图瓦片渲染、地理编码和反向地理编码</td>
+        <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>RevenueCat</strong></td>
+        <td>应用内购买校验与订阅生命周期管理</td>
+        <td><a href="https://www.revenuecat.com/privacy" target="_blank" rel="noopener">revenuecat.com/privacy</a></td>
+      </tr>
+      <tr>
+        <td><strong>Cloudflare</strong></td>
+        <td>Web 门户托管、CDN 和 DDoS 防护</td>
+        <td><a href="https://www.cloudflare.com/privacypolicy" target="_blank" rel="noopener">cloudflare.com/privacy</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>使用 CrewRadr 即表示您同时同意上述服务商适用的条款和政策。</p>
+
+  <h2>7. 您的权利</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>权利</th>
+        <th>行使方式</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>访问权</strong></td>
+        <td>在应用内查看您的数据：「行程」页面（位置历史）、「设置」（个人资料）、「仪表板」（成员关系）</td>
+      </tr>
+      <tr>
+        <td><strong>导出权</strong></td>
+        <td>「设置 → 数据导出」。所有用户均可免费使用。</td>
+      </tr>
+      <tr>
+        <td><strong>删除权</strong></td>
+        <td>「设置 → 账户 → 删除账户」。即时生效且不可撤销。</td>
+      </tr>
+      <tr>
+        <td><strong>更正权</strong></td>
+        <td>可随时在应用内更新您的显示名称、个人资料和设置。</td>
+      </tr>
+      <tr>
+        <td><strong>退出权</strong></td>
+        <td>在「设置」中关闭后台定位跟踪、碰撞检测或电量提醒。开启「隐身模式」以停止位置广播。</td>
+      </tr>
+      <tr>
+        <td><strong>可携带权</strong></td>
+        <td>以机器可读格式导出您的数据（GDPR 第 20 条）。</td>
+      </tr>
+      <tr>
+        <td><strong>CCPA</strong></td>
+        <td>加利福尼亚州居民：可请求数据披露、选择退出数据出售（我们不出售数据）并请求删除。请通过「设置 → 支持」或联系 privacy@crewradr.app。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8. 紧急服务免责声明</h2>
+  <p><strong>CrewRadr SOS、碰撞检测和幽灵守望功能属于补充性的点对点通知工具，不保证会派遣紧急救援人员。在危及生命的情况下，用户必须直接拨打当地紧急服务电话（如 911、112）。</strong>在无网络覆盖的区域、设备电量耗尽或未授予所需权限时，这些功能可能无法运行。CrewRadr 不能替代 911 或官方紧急服务。</p>
+
+  <h2>9. 儿童隐私</h2>
+  <p>CrewRadr 不面向 13 周岁以下（在欧盟为 16 周岁以下）的儿童。我们不会在知情的情况下收集儿童的个人信息。如您认为有儿童向我们提供了个人信息，请立即联系 privacy@crewradr.app。</p>
+
+  <h2>10. 国际数据传输</h2>
+  <p>CrewRadr 的数据存储于 Supabase 数据中心（美国及欧盟区域）。数据可能被传输至我们子处理者运营所在的国家并进行处理。所有传输均受适当的保障措施保护，包括在适用情况下采用标准合同条款。</p>
+
+  <h2>11. 平台专项说明</h2>
+  <ul>
+    <li><strong>iOS：</strong>根据 Apple 的要求，后台定位跟踪会显示蓝色指示条。您可以在「iOS 设置 → CrewRadr → 定位」中将其关闭。对于静止设备，应用遵循 iOS 的自动暂停机制。</li>
+    <li><strong>Android：</strong>根据 Google 的要求，后台定位使用常驻前台服务通知。在设置过程中会请求电池优化豁免，以确保后台运行的可靠性。</li>
+    <li><strong>Web 门户：</strong>浏览器会话数据通过 Supabase Auth 处理。除身份验证和会话管理所需的 Cookie 外，不使用任何跟踪 Cookie。</li>
+  </ul>
+
+  <h2>12. 本政策的变更</h2>
+  <p>我们将通过应用内通知和／或电子邮件就本政策的重大变更通知用户。变更后继续使用本应用即构成对更新后政策的接受。</p>
+
+  <h2>13. 联系方式</h2>
+  <p>如您对隐私有任何疑问、需要提出数据请求或行使您的权利：</p>
+  <ul>
+    <li><strong>电子邮件：</strong>privacy@crewradr.app</li>
+    <li><strong>应用内：</strong>「设置 → 支持与反馈」</li>
+  </ul>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="/">CrewRadr</a>. 为群组而建，而非为公司而建。 &middot; <a href="/privacy">隐私政策</a> &middot; <a href="/terms">服务条款</a> &middot; <a href="mailto:support@crewradr.app">联系我们</a></p>
+</footer>
+
+<script>
+  // ── Theme ────────────────────────────────
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { setTheme(saved); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+
+  toggle.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Nav scroll effect ────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  });
+</script>
+</body>
+</html>

@@ -6,6 +6,13 @@
 <meta name="description" content="CrewRadr — Privacy Policy. Learn how we protect and encrypt your location safety data.">
 <meta name="theme-color" content="#8EA595">
 <title>CrewRadr — Privacy Policy</title>
+<link rel="canonical" href="/privacy/">
+<link rel="alternate" hreflang="en" href="/privacy/">
+<link rel="alternate" hreflang="es" href="/privacy/es/">
+<link rel="alternate" hreflang="fr" href="/privacy/fr/">
+<link rel="alternate" hreflang="ar" href="/privacy/ar/">
+<link rel="alternate" hreflang="zh" href="/privacy/zh/">
+<link rel="alternate" hreflang="ru" href="/privacy/ru/">
 <link rel="icon" type="image/png" href="/logo.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
@@ -101,6 +108,24 @@
   }
 
   .theme-toggle:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+  /* ── LANGUAGE SWITCH ──────────────────── */
+  .lang-switch { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .lang-switch a {
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 0.85rem; padding: 4px 8px; border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  .lang-switch a:hover { color: var(--sage-dark); }
+  .lang-switch a.active { color: var(--text-primary); background: var(--sage-glow); font-weight: 700; }
+
+  /* ── GOVERNING CLAUSE ─────────────────── */
+  .governing-clause {
+    margin: 16px 0 24px; padding: 12px 16px;
+    border-left: 3px solid var(--sage);
+    background: var(--card-bg); border-radius: 8px;
+    font-size: 0.95rem; color: var(--text-secondary);
+  }
 
   /* ── LEGAL PAGE CONTENT ───────────────── */
   .container {
@@ -208,6 +233,14 @@
     CrewRadr
   </a>
   <div class="nav-actions">
+    <div class="lang-switch" aria-label="Language">
+      <a href="/privacy/" class="active">EN</a>
+      <a href="/privacy/es/">ES</a>
+      <a href="/privacy/fr/">FR</a>
+      <a href="/privacy/ar/">ع</a>
+      <a href="/privacy/zh/">中文</a>
+      <a href="/privacy/ru/">РУ</a>
+    </div>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">☀️</button>
   </div>
 </nav>
@@ -215,6 +248,7 @@
 <div class="container">
   <h1>Privacy Policy</h1>
   <div class="last-updated">Last Updated: July 27, 2026</div>
+  <p class="governing-clause">Governing Language: This document is provided in multiple languages for your convenience. In the event of any conflict or discrepancy, the English version prevails.</p>
 
   <h2>1. Introduction & Scope</h2>
   <p>CrewRadr ("the App," "we," "us") is a safety-focused location-sharing and emergency-preparedness platform for trusted groups (crews) — families, field teams, and close-knit communities. This Privacy Policy explains what data we collect, how we use it, how we protect it, and your rights regarding your data.</p>

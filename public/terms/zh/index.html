@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — 服务条款。用户协议、订阅及责任规则。">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — 服务条款</title>
+<link rel="canonical" href="/terms/zh/">
+<link rel="alternate" hreflang="en" href="/terms/">
+<link rel="alternate" hreflang="es" href="/terms/es/">
+<link rel="alternate" hreflang="fr" href="/terms/fr/">
+<link rel="alternate" hreflang="ar" href="/terms/ar/">
+<link rel="alternate" hreflang="zh" href="/terms/zh/">
+<link rel="alternate" hreflang="ru" href="/terms/ru/">
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.3);
+    --cream: #F5F4F0;
+    --cream-warm: #EDE8E0;
+    --sand: #D9CDBC;
+    --slate: #1A2327;
+    --slate-container: #242F35;
+    --slate-surface: #2A363D;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --text-muted: #8A9598;
+    --bg: #F5F4F0;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(142, 165, 149, 0.15);
+    --card-shadow: 0 1px 3px rgba(26, 35, 39, 0.06), 0 8px 32px rgba(26, 35, 39, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --cream-warm: #242F35;
+    --sand: #6E8679;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --text-muted: #6A7578;
+    --bg: #1A2327;
+    --card-bg: #242F35;
+    --card-border: rgba(142, 165, 149, 0.1);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+    --sage-glow: rgba(142, 165, 149, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ─────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(245, 244, 240, 0.8);
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  [data-theme="dark"] nav {
+    background: rgba(26, 35, 39, 0.85);
+    border-bottom-color: rgba(142, 165, 149, 0.08);
+  }
+
+  nav.scrolled {
+    border-bottom-color: var(--card-border);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  [data-theme="dark"] nav.scrolled {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.3);
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-primary);
+    font-weight: 700; font-size: 1.25rem;
+  }
+
+  .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    width: 40px; height: 40px; border: 1px solid var(--card-border);
+    border-radius: 10px; background: var(--card-bg);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; transition: all 0.2s ease; color: var(--text-secondary);
+  }
+
+  .theme-toggle:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+  /* ── LANGUAGE SWITCH ──────────────────── */
+  .lang-switch { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .lang-switch a {
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 0.85rem; padding: 4px 8px; border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  .lang-switch a:hover { color: var(--sage-dark); }
+  .lang-switch a.active { color: var(--text-primary); background: var(--sage-glow); font-weight: 700; }
+
+  /* ── GOVERNING CLAUSE ─────────────────── */
+  .governing-clause {
+    margin: 16px 0 24px; padding: 12px 16px;
+    border-left: 3px solid var(--sage);
+    background: var(--card-bg); border-radius: 8px;
+    font-size: 0.95rem; color: var(--text-secondary);
+  }
+
+  /* ── LEGAL PAGE CONTENT ───────────────── */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .last-updated {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    color: var(--sage-dark);
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  ul {
+    margin-bottom: 24px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  /* ── FOOTER ────────────────────────────── */
+  footer {
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  footer a { color: var(--sage-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    nav { padding: 12px 16px; }
+    .container { padding: 100px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-brand">
+    <img src="/logo.png" alt="CrewRadr" width="36" height="36">
+    CrewRadr
+  </a>
+  <div class="nav-actions">
+    <div class="lang-switch" aria-label="语言">
+      <a href="/terms/">EN</a>
+      <a href="/terms/es/">ES</a>
+      <a href="/terms/fr/">FR</a>
+      <a href="/terms/ar/">ع</a>
+      <a href="/terms/zh/" class="active">中文</a>
+      <a href="/terms/ru/">РУ</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="切换主题" title="切换浅色／深色模式">☀️</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>服务条款</h1>
+  <div class="last-updated">最后更新日期：2026年7月27日</div>
+  <p class="governing-clause">管辖语言：本文件以多种语言提供，仅为方便您阅读。如各语言版本之间存在任何冲突或不一致之处，以英文版本为准。</p>
+
+  <h2>1. 简介</h2>
+  <p>欢迎使用 CrewRadr。使用我们的服务即表示您同意本服务条款。请在使用本应用前仔细阅读本条款。</p>
+
+  <h2>2. 使用资格</h2>
+  <p>使用 CrewRadr 须满足以下条件：</p>
+  <ul>
+    <li>您必须年满 13 周岁。</li>
+    <li>您必须提供准确的账户信息。</li>
+    <li>您有责任维护账户安全。</li>
+    <li>您必须遵守所有适用法律。</li>
+    <li>您不得将本服务用于非法目的。</li>
+  </ul>
+
+  <h2>3. 服务说明</h2>
+  <p>CrewRadr 提供位置共享、行程跟踪和群组安全功能。具体功能可能因您的订阅等级而异。</p>
+
+  <h2>4. 您的数据</h2>
+  <p>您的数据归您所有。我们的处理方式如下：</p>
+  <ul>
+    <li>您保留对自身数据的所有权。</li>
+    <li>您授予我们处理您的数据以提供本服务的许可。</li>
+    <li>群组内的位置数据采用端到端加密。</li>
+    <li>我们不出售您的个人信息。</li>
+    <li>您可以随时导出或删除您的数据。</li>
+  </ul>
+  <p>如需完整详情，请参阅我们的<a href="/privacy">隐私政策</a>。</p>
+
+  <h2>5. 可接受的使用行为</h2>
+  <p>为保障所有用户安全使用 CrewRadr，您同意遵守以下规则。违反规则可能导致账户被暂停或终止：</p>
+  <ul>
+    <li>仅按预期用途使用本服务。</li>
+    <li>不得跟踪、骚扰或伤害他人。</li>
+    <li>不得试图规避安全功能。</li>
+    <li>不得使用自动化工具访问本服务。</li>
+    <li>不得冒用他人身份。</li>
+    <li>如发现任何安全隐患，请立即报告。</li>
+  </ul>
+
+  <h2>6. 订阅与支付</h2>
+  <p>部分功能需要付费订阅：</p>
+  <ul>
+    <li>您可以随时取消订阅。</li>
+    <li>付费订阅将自动续订，除非您已取消。</li>
+    <li>退款按应用商店政策处理。</li>
+    <li>免费功能可能随时间变化。</li>
+    <li>订阅条款通过您的应用商店账户管理。</li>
+    <li>价格可能因地区而异，并可能发生变动。</li>
+  </ul>
+
+  <h2>7. 保证的排除（免责声明）</h2>
+  <p style="text-transform: uppercase;">本服务按「现状」提供，不作任何形式的保证。我们不保证服务不会中断或不存在错误。</p>
+
+  <h2>8. 责任限制</h2>
+  <p style="text-transform: uppercase;">在法律允许的最大范围内，CrewRadr 不对任何间接、附带或后果性损害承担责任。我们的赔偿责任总额以您在索赔发生前 12 个月内向我们支付的金额为限。</p>
+
+  <h2>9. 条款变更</h2>
+  <p>我们可能不时更新本条款，并将就重大变更通知您。</p>
+
+  <h2>10. 转让</h2>
+  <p>未经我们事先书面同意，您不得转让或转移本条款。</p>
+
+  <h2>11. 完整协议</h2>
+  <p>本条款构成您与 CrewRadr 之间的完整协议。</p>
+
+  <h2>12. 联系方式</h2>
+  <p>如对本条款、您的数据、账户问题有疑问，或需要行使您的权利，请使用「设置 > 支持与反馈」中的支持功能，或发送电子邮件至 <a href="mailto:support@crewradr.app">support@crewradr.app</a>。</p>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="/">CrewRadr</a>. 为群组而建，而非为公司而建。 &middot; <a href="/privacy">隐私政策</a> &middot; <a href="/terms">服务条款</a> &middot; <a href="mailto:support@crewradr.app">联系我们</a></p>
+</footer>
+
+<script>
+  // ── Theme ────────────────────────────────
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { setTheme(saved); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+
+  toggle.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Nav scroll effect ────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  });
+</script>
+</body>
+</html>
