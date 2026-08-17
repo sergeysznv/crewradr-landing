@@ -20,17 +20,19 @@ function getTheme(): "light" | "dark" {
 export default function LandingPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
-  const [locale, setLocale] = useState<LocaleCode>(() =>
-    typeof window === "undefined" ? "en" : resolveLocale(window.location.search),
-  );
+  // First render must stay English: the static export prerenders "en", and a
+  // client-side locale resolution here would mismatch every text node, fail
+  // hydration (React #418), and wipe the theme class set by the flash script.
+  // Resolve and apply the real locale after mount instead.
+  const [locale, setLocale] = useState<LocaleCode>("en");
   useVersionCheck();
 
   useEffect(() => {
     setTheme(getTheme());
     setMounted(true);
-    // Apply persisted locale to <title>/<meta>/dir on first paint.
-    if (locale !== "en") applyLocale(locale);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const resolved = resolveLocale(window.location.search);
+    setLocale(resolved);
+    if (resolved !== "en") applyLocale(resolved);
   }, []);
 
   function toggleTheme() {
@@ -85,7 +87,6 @@ export default function LandingPage() {
         src="/logo-96.png" alt="CrewRadr" width={96} height={96}
         className="relative z-10 mb-9 rounded-[22px]"
         style={{ boxShadow: "0 8px 40px rgba(142,165,149,0.25)" }}
-        priority
       />
 
       {/* Heading */}
