@@ -30,6 +30,8 @@ const STRINGS = {
     seeCrew: "See your whole crew on the map",
     trackLovedOnes: "Track your loved ones",
     getTheApp: "Get the App",
+    speedMph: "{s} mph",
+    speedKmh: "{s} km/h",
   },
   es: {
     invalidTitle: "Enlace de compartir no válido",
@@ -52,6 +54,8 @@ const STRINGS = {
     seeCrew: "Ve a todo tu grupo en el mapa",
     trackLovedOnes: "Sigue a tus seres queridos",
     getTheApp: "Descarga la app",
+    speedMph: "{s} mph",
+    speedKmh: "{s} km/h",
   },
   fr: {
     invalidTitle: "Lien de partage invalide",
@@ -74,6 +78,8 @@ const STRINGS = {
     seeCrew: "Voyez toute votre équipe sur la carte",
     trackLovedOnes: "Suivez vos proches",
     getTheApp: "Télécharger l'app",
+    speedMph: "{s} mph",
+    speedKmh: "{s} km/h",
   },
   ar: {
     invalidTitle: "رابط مشاركة غير صالح",
@@ -96,6 +102,8 @@ const STRINGS = {
     seeCrew: "شاهد طاقمك بالكامل على الخريطة",
     trackLovedOnes: "تتبع أحباءك",
     getTheApp: "حمّل التطبيق",
+    speedMph: "{s} ميل/س",
+    speedKmh: "{s} كم/س",
   },
   zh: {
     invalidTitle: "分享链接无效",
@@ -118,6 +126,8 @@ const STRINGS = {
     seeCrew: "在地图上查看您的整个团队",
     trackLovedOnes: "追踪您的家人",
     getTheApp: "下载应用",
+    speedMph: "{s} 英里/小时",
+    speedKmh: "{s} 公里/小时",
   },
   ru: {
     invalidTitle: "Недействительная ссылка",
@@ -140,6 +150,8 @@ const STRINGS = {
     seeCrew: "Смотрите всю команду на карте",
     trackLovedOnes: "Следите за близкими",
     getTheApp: "Скачать приложение",
+    speedMph: "{s} миль/ч",
+    speedKmh: "{s} км/ч",
   },
 };
 
@@ -158,6 +170,23 @@ function resolveLang(url, acceptLanguage) {
   return "en";
 }
 
+const IMPERIAL_COUNTRIES = new Set(["US", "GB", "LR", "MM"]);
+
+function resolveUnits(url, request) {
+  const q = url.searchParams.get("units");
+  if (q === "metric" || q === "imperial") return q;
+  const cfCountry = (request.cf && request.cf.country) ? request.cf.country.toUpperCase() : null;
+  if (cfCountry && IMPERIAL_COUNTRIES.has(cfCountry)) return "imperial";
+  const acceptLang = request.headers.get("accept-language");
+  if (acceptLang) {
+    const match = acceptLang.match(/[-_]([A-Za-z]{2})/);
+    if (match && match[1] && IMPERIAL_COUNTRIES.has(match[1].toUpperCase())) {
+      return "imperial";
+    }
+  }
+  return "metric";
+}
+
 export async function onRequest(context) {
   const { request, env, params } = context;
 
@@ -166,6 +195,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const lang = resolveLang(url, request.headers.get("accept-language"));
   const t = STRINGS[lang];
+  const viewerUnits = resolveUnits(url, request);
 
   if (!rawToken || !TOKEN_REGEX.test(rawToken)) {
     return htmlResponse(400, t.invalidTitle, t.invalidBody, lang);
@@ -214,7 +244,7 @@ export async function onRequest(context) {
 
     if (share.mode === "single") {
       // Latest location for the creator
-      const locUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(share.creator_id)}&order=created_at.desc&limit=1&select=latitude,longitude,created_at,encrypted_payload`;
+      const locUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(share.creator_id)}&order=created_at.desc&limit=1&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
       const locRes = await fetch(locUrl, { headers: authHeaders });
       if (!locRes.ok) {
         const errText = await locRes.text();
@@ -232,19 +262,33 @@ export async function onRequest(context) {
             const payload = JSON.parse(loc.encrypted_payload);
             loc.latitude = payload.lat ?? payload.latitude ?? null;
             loc.longitude = payload.lng ?? payload.longitude ?? null;
+            if (loc.speed_ms == null && payload.speed != null) loc.speed_ms = payload.speed;
           } catch (_) { /* encrypted ciphertext — skip */ }
         }
         if (loc.latitude != null && loc.longitude != null) {
-          const profileUrl = `${supabaseUrl}/rest/v1/profiles?user_id=eq.${encodeURIComponent(share.creator_id)}&select=display_name,avatar_url`;
+          const profileUrl = `${supabaseUrl}/rest/v1/profiles?user_id=eq.${encodeURIComponent(share.creator_id)}&select=display_name,avatar_url,measurement_system`;
           const profileRes = await fetch(profileUrl, { headers: authHeaders });
           const profiles = profileRes.ok ? await profileRes.json() : [];
+          const prof = (profiles && profiles.length > 0) ? profiles[0] : null;
+          const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
+          const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
+          let speedDisplay = null;
+          if (speedMs != null && speedMs >= 0) {
+            const isImp = memberUnits === "imperial";
+            const sNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
+            const tpl = isImp ? t.speedMph : t.speedKmh;
+            speedDisplay = tpl.replace("{s}", Math.round(sNum));
+          }
 
           locations.push({
             latitude: loc.latitude,
             longitude: loc.longitude,
-            display_name: (profiles && profiles.length > 0) ? profiles[0].display_name : t.crewMember,
+            display_name: (prof && prof.display_name) || t.crewMember,
             updated_at: loc.created_at,
-            avatar_url: (profiles && profiles.length > 0) ? profiles[0].avatar_url : null,
+            avatar_url: prof ? prof.avatar_url : null,
+            speed_ms: speedMs,
+            speed_display: speedDisplay,
+            units: memberUnits,
           });
         }
       }
@@ -259,7 +303,7 @@ export async function onRequest(context) {
 
         // Get latest location for each crew member (fetch enough rows to cover all users)
         const userIn = userIds.map(id => encodeURIComponent(id)).join(",");
-        const locsUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=in.(${userIn})&order=created_at.desc&limit=${members.length * 5}&select=latitude,longitude,created_at,user_id,encrypted_payload`;
+        const locsUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=in.(${userIn})&order=created_at.desc&limit=${members.length * 5}&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload`;
         const locsRes = await fetch(locsUrl, { headers: authHeaders });
         const locs = locsRes.ok ? await locsRes.json() : [];
 
@@ -273,6 +317,7 @@ export async function onRequest(context) {
               const payload = JSON.parse(loc.encrypted_payload);
               loc.latitude = payload.lat ?? payload.latitude ?? null;
               loc.longitude = payload.lng ?? payload.longitude ?? null;
+              if (loc.speed_ms == null && payload.speed != null) loc.speed_ms = payload.speed;
             } catch (_) { /* encrypted — skip */ }
           }
           if (!seen.has(loc.user_id) && loc.latitude != null && loc.longitude != null) {
@@ -284,19 +329,35 @@ export async function onRequest(context) {
         if (latestPerUser.length > 0) {
           // Fetch profiles using PostgREST in operator
           const profileIn = userIds.map(id => encodeURIComponent(id)).join(",");
-          const profilesUrl = `${supabaseUrl}/rest/v1/profiles?user_id=in.(${profileIn})&select=user_id,display_name,avatar_url`;
+          const profilesUrl = `${supabaseUrl}/rest/v1/profiles?user_id=in.(${profileIn})&select=user_id,display_name,avatar_url,measurement_system`;
           const profilesRes = await fetch(profilesUrl, { headers: authHeaders });
           const profiles = profilesRes.ok ? await profilesRes.json() : [];
 
           const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
 
-          locations = latestPerUser.map(loc => ({
-            latitude: loc.latitude,
-            longitude: loc.longitude,
-            display_name: (profileMap.get(loc.user_id) && profileMap.get(loc.user_id).display_name) || t.crewMember,
-            updated_at: loc.created_at,
-            avatar_url: profileMap.get(loc.user_id) ? profileMap.get(loc.user_id).avatar_url : null,
-          }));
+          locations = latestPerUser.map(loc => {
+            const prof = profileMap.get(loc.user_id);
+            const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
+            const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
+            let speedDisplay = null;
+            if (speedMs != null && speedMs >= 0) {
+              const isImp = memberUnits === "imperial";
+              const sNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
+              const tpl = isImp ? t.speedMph : t.speedKmh;
+              speedDisplay = tpl.replace("{s}", Math.round(sNum));
+            }
+
+            return {
+              latitude: loc.latitude,
+              longitude: loc.longitude,
+              display_name: (prof && prof.display_name) || t.crewMember,
+              updated_at: loc.created_at,
+              avatar_url: prof ? prof.avatar_url : null,
+              speed_ms: speedMs,
+              speed_display: speedDisplay,
+              units: memberUnits,
+            };
+          });
         }
       }
     }
@@ -363,11 +424,13 @@ function renderPage(token, locations, mode, t, lang) {
     : "";
 
   const updatedLabel = t.updated;
-  const markersJs = locations.map((loc, i) => `
+  const markersJs = locations.map((loc, i) => {
+    const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
+    return `
     L.marker([${loc.latitude}, ${loc.longitude}])
-      .bindPopup('<b>${escapeHtml(loc.display_name)}</b><br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
+      .bindPopup('<b>${escapeHtml(loc.display_name)}</b>${spText}<br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
       .addTo(map);
-  `).join("\n");
+  `;}).join("\n");
 
   return `
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -426,7 +489,7 @@ function renderPage(token, locations, mode, t, lang) {
       // Auto-refresh every 15 seconds
       setInterval(async () => {
         try {
-          const resp = await fetch('?json=1');
+          const resp = await fetch('?json=1&units=' + encodeURIComponent(${JSON.stringify(viewerUnits)}) + '&lang=' + encodeURIComponent(LANG));
           if (!resp.ok) return;
           const data = await resp.json();
           if (!data.locations || data.locations.length === 0) return;
@@ -434,8 +497,9 @@ function renderPage(token, locations, mode, t, lang) {
             if (layer instanceof L.Marker) map.removeLayer(layer);
           });
           data.locations.forEach(loc => {
+            const spText = loc.speed_display ? ' &middot; &#128663; ' + loc.speed_display : '';
             L.marker([loc.latitude, loc.longitude])
-              .bindPopup('<b>' + loc.escaped_display_name + '</b><br><small>' + UPDATED_LABEL + ' ' + new Date(loc.updated_at).toLocaleTimeString(LANG) + '</small>')
+              .bindPopup('<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + new Date(loc.updated_at).toLocaleTimeString(LANG) + '</small>')
               .addTo(map);
           });
         } catch(e) { /* silent — polling is best-effort */ }

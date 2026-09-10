@@ -1,7 +1,6 @@
 const TOKEN_REGEX = /^[a-z2-9]{10,16}$/i;
 
-// Simple in-memory rate limiter for invalid token attempts.
-// Resets on worker cold start — backed by Cloudflare DDoS protection at scale.
+// ── Rate Limiter ─────────────────────────────────────────────────────────────
 const RL_WINDOW_MS = 60000;  // 1 minute
 const RL_MAX_FAILS = 10;     // 10 failed attempts per window
 var rlMap = new Map();       // IP → {count, resetTime}
@@ -15,6 +14,216 @@ function rateLimit(ip) {
   }
   entry.count++;
   return entry.count > RL_MAX_FAILS;
+}
+
+// ── Multi-Language Dictionaries ──────────────────────────────────────────────
+const STRINGS = {
+  en: {
+    invalidTitle: "Invalid Share Link",
+    invalidHeading: "🔗 Invalid Link",
+    invalidBody: "This share link doesn't exist or has been revoked.",
+    expiredTitle: "Link Expired",
+    expiredHeading: "⏰ This link has expired",
+    expiredBody: "Location sharing links are temporary for your privacy.",
+    unavailableTitle: "Temporarily Unavailable",
+    unavailableHeading: "502 — Temporarily Unavailable",
+    unavailableBody: "Please try again in a moment.",
+    liveTitle: "Live Location — CrewRadr",
+    crewMember: "Crew Member",
+    waitingForLocation: "Waiting for location...",
+    noCrewLocations: "No members have shared location yet",
+    justNow: "Just now",
+    minAgo: "{m}m",
+    hoursAgo: "{h}h {m}m",
+    updated: "Updated",
+    staleWarning: "⚠️ Location may have changed. Last updated {t} ago.",
+    googleMaps: "Google Maps",
+    appleMaps: "Apple Maps",
+    viewingCrew: "Viewing crew location via CrewRadr",
+    viewingLive: "Viewing live location via CrewRadr",
+    encrypted: "Encrypted",
+    autoExpires: "Auto-expires",
+    getTheApp: "Get CrewRadr Free",
+    speedMph: "{s} mph",
+    speedKmh: "{s} km/h",
+  },
+  es: {
+    invalidTitle: "Enlace de compartir no válido",
+    invalidHeading: "🔗 Enlace no válido",
+    invalidBody: "Este enlace de compartir no existe o ha sido revocado.",
+    expiredTitle: "Enlace caducado",
+    expiredHeading: "⏰ Este enlace ha caducado",
+    expiredBody: "Los enlaces para compartir ubicación son temporales para tu privacidad.",
+    unavailableTitle: "No disponible temporalmente",
+    unavailableHeading: "502 — No disponible temporalmente",
+    unavailableBody: "Inténtalo de nuevo en un momento.",
+    liveTitle: "Ubicación en vivo — CrewRadr",
+    crewMember: "Miembro del grupo",
+    waitingForLocation: "Esperando ubicación...",
+    noCrewLocations: "Aún no hay miembros que compartan ubicación",
+    justNow: "Justo ahora",
+    minAgo: "{m}m",
+    hoursAgo: "{h}h {m}m",
+    updated: "Actualizado",
+    staleWarning: "⚠️ La ubicación puede haber cambiado. Actualizado hace {t}.",
+    googleMaps: "Google Maps",
+    appleMaps: "Apple Maps",
+    viewingCrew: "Viendo la ubicación del grupo vía CrewRadr",
+    viewingLive: "Viendo la ubicación en vivo vía CrewRadr",
+    encrypted: "Cifrado",
+    autoExpires: "Caduca automáticamente",
+    getTheApp: "Descarga CrewRadr Gratis",
+    speedMph: "{s} mph",
+    speedKmh: "{s} km/h",
+  },
+  fr: {
+    invalidTitle: "Lien de partage invalide",
+    invalidHeading: "🔗 Lien invalide",
+    invalidBody: "Ce lien de partage n'existe pas ou a été révoqué.",
+    expiredTitle: "Lien expiré",
+    expiredHeading: "⏰ Ce lien a expiré",
+    expiredBody: "Les liens de partage de position sont temporaires pour votre confidentialité.",
+    unavailableTitle: "Temporairement indisponible",
+    unavailableHeading: "502 — Temporairement indisponible",
+    unavailableBody: "Veuillez réessayer dans un instant.",
+    liveTitle: "Position en direct — CrewRadr",
+    crewMember: "Membre de l'équipe",
+    waitingForLocation: "En attente de la position...",
+    noCrewLocations: "Aucun membre n'a encore partagé sa position",
+    justNow: "À l'instant",
+    minAgo: "{m}m",
+    hoursAgo: "{h}h {m}m",
+    updated: "Mis à jour",
+    staleWarning: "⚠️ La position a pu changer. Mis à jour il y a {t}.",
+    googleMaps: "Google Maps",
+    appleMaps: "Apple Maps",
+    viewingCrew: "Position de l'équipe via CrewRadr",
+    viewingLive: "Position en direct via CrewRadr",
+    encrypted: "Chiffré",
+    autoExpires: "Expire automatiquement",
+    getTheApp: "Obtenir CrewRadr Gratuitement",
+    speedMph: "{s} mph",
+    speedKmh: "{s} km/h",
+  },
+  ar: {
+    invalidTitle: "رابط مشاركة غير صالح",
+    invalidHeading: "🔗 رابط غير صالح",
+    invalidBody: "رابط المشاركة هذا غير موجود أو تم إلغاؤه.",
+    expiredTitle: "انتهت صلاحية الرابط",
+    expiredHeading: "⏰ انتهت صلاحية هذا الرابط",
+    expiredBody: "روابط مشاركة الموقع مؤقتة لحماية خصوصيتك.",
+    unavailableTitle: "غير متاح مؤقتاً",
+    unavailableHeading: "502 — غير متاح مؤقتاً",
+    unavailableBody: "يرجى المحاولة مرة أخرى بعد لحظة.",
+    liveTitle: "الموقع المباشر — CrewRadr",
+    crewMember: "عضو في الطاقم",
+    waitingForLocation: "في انتظار الموقع...",
+    noCrewLocations: "لم يشارك أي عضو موقعه بعد",
+    justNow: "الآن",
+    minAgo: "{m} د",
+    hoursAgo: "{h} س {m} د",
+    updated: "آخر تحديث",
+    staleWarning: "⚠️ قد يكون الموقع قد تغير. آخر تحديث منذ {t}.",
+    googleMaps: "خرائط Google",
+    appleMaps: "خرائط Apple",
+    viewingCrew: "عرض موقع الطاقم عبر CrewRadr",
+    viewingLive: "عرض الموقع المباشر عبر CrewRadr",
+    encrypted: "مشفر",
+    autoExpires: "ينتهي تلقائياً",
+    getTheApp: "احصل على CrewRadr مجاناً",
+    speedMph: "{s} ميل/س",
+    speedKmh: "{s} كم/س",
+  },
+  zh: {
+    invalidTitle: "分享链接无效",
+    invalidHeading: "🔗 链接无效",
+    invalidBody: "此分享链接不存在或已被撤销。",
+    expiredTitle: "链接已过期",
+    expiredHeading: "⏰ 此链接已过期",
+    expiredBody: "为了保护您的隐私，位置共享链接是临时的。",
+    unavailableTitle: "暂时不可用",
+    unavailableHeading: "502 — 暂时不可用",
+    unavailableBody: "请稍后重试。",
+    liveTitle: "实时位置 — CrewRadr",
+    crewMember: "团队成员",
+    waitingForLocation: "等待位置信息...",
+    noCrewLocations: "还没有成员共享位置",
+    justNow: "刚刚",
+    minAgo: "{m}分钟",
+    hoursAgo: "{h}小时{m}分",
+    updated: "更新于",
+    staleWarning: "⚠️ 位置可能已改变。最后更新于 {t} 前。",
+    googleMaps: "谷歌地图",
+    appleMaps: "苹果地图",
+    viewingCrew: "通过 CrewRadr 查看团队位置",
+    viewingLive: "通过 CrewRadr 查看实时位置",
+    encrypted: "已加密",
+    autoExpires: "自动过期",
+    getTheApp: "免费下载 CrewRadr",
+    speedMph: "{s} 英里/小时",
+    speedKmh: "{s} 公里/小时",
+  },
+  ru: {
+    invalidTitle: "Недействительная ссылка",
+    invalidHeading: "🔗 Неверная ссылка",
+    invalidBody: "Эта ссылка не существует или была отозвана.",
+    expiredTitle: "Срок действия истёк",
+    expiredHeading: "⏰ Срок действия этой ссылки истёк",
+    expiredBody: "Ссылки для обмена местоположением временные — ради вашей конфиденциальности.",
+    unavailableTitle: "Временно недоступно",
+    unavailableHeading: "502 — Временно недоступно",
+    unavailableBody: "Пожалуйста, повторите попытку через мгновение.",
+    liveTitle: "Живое местоположение — CrewRadr",
+    crewMember: "Участник команды",
+    waitingForLocation: "Ожидание местоположения...",
+    noCrewLocations: "Участники ещё не поделились местоположением",
+    justNow: "Только что",
+    minAgo: "{m} мин",
+    hoursAgo: "{h} ч {m} мин",
+    updated: "Обновлено",
+    staleWarning: "⚠️ Местоположение могло измениться. Обновлено {t} назад.",
+    googleMaps: "Google Карты",
+    appleMaps: "Apple Карты",
+    viewingCrew: "Просмотр местоположения команды через CrewRadr",
+    viewingLive: "Просмотр живого местоположения через CrewRadr",
+    encrypted: "Зашифровано",
+    autoExpires: "Автоматически истекает",
+    getTheApp: "Скачать CrewRadr бесплатно",
+    speedMph: "{s} миль/ч",
+    speedKmh: "{s} км/ч",
+  },
+};
+
+const SUPPORTED_LANGS = ["en", "es", "fr", "ar", "zh", "ru"];
+const IMPERIAL_COUNTRIES = new Set(["US", "GB", "LR", "MM"]);
+
+function resolveLang(url, acceptLanguage) {
+  var q = url.searchParams.get("lang");
+  if (q && SUPPORTED_LANGS.includes(q.toLowerCase())) return q.toLowerCase();
+  if (acceptLanguage) {
+    var parts = acceptLanguage.split(",");
+    for (var i = 0; i < parts.length; i++) {
+      var code = parts[i].trim().slice(0, 2).toLowerCase();
+      if (SUPPORTED_LANGS.includes(code)) return code;
+    }
+  }
+  return "en";
+}
+
+function resolveUnits(url, request, profileUnits) {
+  var q = url.searchParams.get("units");
+  if (q === "metric" || q === "imperial") return q;
+  if (profileUnits === "metric" || profileUnits === "imperial") return profileUnits;
+  var cfCountry = (request.cf && request.cf.country) ? request.cf.country.toUpperCase() : null;
+  if (cfCountry && IMPERIAL_COUNTRIES.has(cfCountry)) return "imperial";
+  var acceptLang = request.headers.get("accept-language");
+  if (acceptLang) {
+    var match = acceptLang.match(/[-_]([A-Za-z]{2})/);
+    if (match && match[1] && IMPERIAL_COUNTRIES.has(match[1].toUpperCase())) {
+      return "imperial";
+    }
+  }
+  return "metric";
 }
 
 export default {
@@ -32,11 +241,13 @@ export default {
 
 async function handleShare(request, env, url) {
   var clientIP = request.headers.get("CF-Connecting-IP") || "unknown";
+  var lang = resolveLang(url, request.headers.get("accept-language"));
+  var t = STRINGS[lang] || STRINGS.en;
 
   const match = url.pathname.match(/\/share\/([a-z2-9]+)$/i);
   if (!match) {
     rateLimit(clientIP);
-    return htmlRes(404, "Invalid Link", INVALID_LINK);
+    return htmlRes(404, t.invalidTitle, t.invalidHeading, t.invalidBody, t, lang);
   }
 
   const token = match[1].toLowerCase();
@@ -44,7 +255,7 @@ async function handleShare(request, env, url) {
 
   if (!TOKEN_REGEX.test(token)) {
     rateLimit(clientIP);
-    return htmlRes(400, "Invalid Link", INVALID_LINK);
+    return htmlRes(400, t.invalidTitle, t.invalidHeading, t.invalidBody, t, lang);
   }
 
   if (rateLimit(clientIP)) {
@@ -62,7 +273,9 @@ async function handleShare(request, env, url) {
       base + "/rest/v1/location_shares?token=eq." + encodeURIComponent(token) + "&expires_at=gt." + encodeURIComponent(now) + "&select=*",
       { headers: auth }
     );
-    if (!shareRes.ok) return htmlRes(502, "Unavailable", "<h1>502 — Temporarily Unavailable</h1>");
+    if (!shareRes.ok) {
+      return htmlRes(502, t.unavailableTitle, t.unavailableHeading, t.unavailableBody, t, lang);
+    }
 
     const shares = await shareRes.json();
     if (!shares || shares.length === 0) {
@@ -73,12 +286,13 @@ async function handleShare(request, env, url) {
       const all = allRes.ok ? await allRes.json() : [];
       rateLimit(clientIP);
       return (all && all.length > 0)
-        ? htmlRes(410, "Link Expired", EXPIRED)
-        : htmlRes(404, "Invalid Link", INVALID_LINK);
+        ? htmlRes(410, t.expiredTitle, t.expiredHeading, t.expiredBody, t, lang)
+        : htmlRes(404, t.invalidTitle, t.invalidHeading, t.invalidBody, t, lang);
     }
 
     const share = shares[0];
-    const locations = (await fetchLocations(base, auth, share)).map(function(l) {
+    const viewerUnits = resolveUnits(url, request, null);
+    const locations = (await fetchLocations(base, auth, share, viewerUnits, t)).map(function(l) {
       return {
         latitude: l.latitude,
         longitude: l.longitude,
@@ -86,13 +300,19 @@ async function handleShare(request, env, url) {
         updated_at: l.updated_at,
         avatar_url: l.avatar_url,
         escaped_display_name: esc(l.display_name),
-        speed: l.speed || null,
+        speed: l.speed != null ? l.speed : null,
+        speed_ms: l.speed_ms != null ? l.speed_ms : null,
+        speed_display: l.speed_display || null,
+        units: l.units || viewerUnits,
       };
     });
 
     if (isJson) {
       return new Response(JSON.stringify({
-        locations: locations, mode: share.mode
+        locations: locations,
+        mode: share.mode,
+        units: viewerUnits,
+        lang: lang,
       }), { headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-store",
@@ -100,7 +320,7 @@ async function handleShare(request, env, url) {
       }});
     }
 
-    var html = renderPage(locations, share.mode, mapsKey);
+    var html = renderPage(locations, share.mode, mapsKey, t, lang, viewerUnits);
     return new Response(html, {
       status: 200,
       headers: {
@@ -111,11 +331,11 @@ async function handleShare(request, env, url) {
       },
     });
   } catch (e) {
-    return htmlRes(502, "Unavailable", "<h1>502 — Temporarily Unavailable</h1>");
+    return htmlRes(502, t.unavailableTitle, t.unavailableHeading, t.unavailableBody, t, lang);
   }
 }
 
-async function fetchLocations(base, auth, share) {
+async function fetchLocations(base, auth, share, viewerUnits, t) {
   var locs = [];
 
   if (share.mode === "single") {
@@ -137,17 +357,31 @@ async function fetchLocations(base, auth, share) {
       }
       if (d.latitude != null && d.longitude != null) {
         var pr = await fetch(
-          base + "/rest/v1/profiles?user_id=eq." + encodeURIComponent(share.creator_id) + "&select=display_name,avatar_url",
+          base + "/rest/v1/profiles?user_id=eq." + encodeURIComponent(share.creator_id) + "&select=display_name,avatar_url,measurement_system",
           { headers: auth }
         );
         var p = pr.ok ? await pr.json() : [];
+        var prof = (p && p[0]) || null;
+        var memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
+        var speedMs = d.speed_ms != null ? d.speed_ms : null;
+        var speedDisplay = null;
+        var speedNum = null;
+        if (speedMs != null && speedMs >= 0) {
+          var isImp = memberUnits === "imperial";
+          speedNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
+          var tpl = isImp ? t.speedMph : t.speedKmh;
+          speedDisplay = tpl.replace("{s}", Math.round(speedNum));
+        }
         locs.push({
           latitude: d.latitude,
           longitude: d.longitude,
-          display_name: (p && p[0] && p[0].display_name) || "Crew Member",
+          display_name: (prof && prof.display_name) || t.crewMember,
           updated_at: d.created_at,
-          avatar_url: (p && p[0] && p[0].avatar_url) || null,
-          speed: d.speed_ms != null ? (d.speed_ms * 2.23694) : null,
+          avatar_url: prof ? prof.avatar_url : null,
+          speed: speedNum,
+          speed_ms: speedMs,
+          speed_display: speedDisplay,
+          units: memberUnits,
         });
       }
     }
@@ -185,21 +419,34 @@ async function fetchLocations(base, auth, share) {
       }
       if (deduped.length > 0) {
         var pr2 = await fetch(
-          base + "/rest/v1/profiles?user_id=in.(" + inClause + ")&select=user_id,display_name,avatar_url",
+          base + "/rest/v1/profiles?user_id=in.(" + inClause + ")&select=user_id,display_name,avatar_url,measurement_system",
           { headers: auth }
         );
         var profiles = pr2.ok ? await pr2.json() : [];
         var profileMap = new Map((profiles || []).map(function(p) { return [p.user_id, p]; }));
         for (var j = 0; j < deduped.length; j++) {
           var dloc = deduped[j];
-          var prof = profileMap.get(dloc.user_id);
+          var profM = profileMap.get(dloc.user_id);
+          var mUnits = (profM && profM.measurement_system) ? profM.measurement_system : viewerUnits;
+          var sMs = dloc.speed_ms != null ? dloc.speed_ms : null;
+          var sDisplay = null;
+          var sNum = null;
+          if (sMs != null && sMs >= 0) {
+            var isImpM = mUnits === "imperial";
+            sNum = isImpM ? (sMs * 2.23694) : (sMs * 3.6);
+            var tplM = isImpM ? t.speedMph : t.speedKmh;
+            sDisplay = tplM.replace("{s}", Math.round(sNum));
+          }
           locs.push({
             latitude: dloc.latitude,
             longitude: dloc.longitude,
-            display_name: (prof && prof.display_name) || "Crew Member",
+            display_name: (profM && profM.display_name) || t.crewMember,
             updated_at: dloc.created_at,
-            avatar_url: prof ? prof.avatar_url : null,
-            speed: dloc.speed_ms != null ? (dloc.speed_ms * 2.23694) : null,
+            avatar_url: profM ? profM.avatar_url : null,
+            speed: sNum,
+            speed_ms: sMs,
+            speed_display: sDisplay,
+            units: mUnits,
           });
         }
       }
@@ -208,8 +455,9 @@ async function fetchLocations(base, auth, share) {
   return locs;
 }
 
-function htmlRes(status, title, body) {
-  var html = "<!DOCTYPE html><html lang=en><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1,user-scalable=no'><meta name=robots content='noindex,nofollow'><title>" + title + "</title><style>body{font-family:system-ui,sans-serif;margin:0;padding:0;background:#1a1a2e;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;box-sizing:border-box}h1{font-size:1.5rem;margin-bottom:.5rem}p{color:#aaa}</style></head><body>" + body + "</body></html>";
+function htmlRes(status, title, heading, body, t, lang) {
+  var dir = lang === "ar" ? ' dir="rtl"' : ' dir="ltr"';
+  var html = "<!DOCTYPE html><html lang=" + lang + dir + "><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1,user-scalable=no'><meta name=robots content='noindex,nofollow'><title>" + esc(title) + "</title><style>body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#1a1a2e;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;box-sizing:border-box}h1{font-size:1.5rem;margin-bottom:.5rem}p{color:#aaa}</style></head><body><h1>" + heading + "</h1><p>" + body + "</p><div style=margin-top:24px><a href=https://crewradr.app style='display:inline-block;padding:12px 24px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600'>" + esc(t.getTheApp) + "</a></div></body></html>";
   return new Response(html, {
     status: status,
     headers: {
@@ -221,12 +469,9 @@ function htmlRes(status, title, body) {
   });
 }
 
-var EXPIRED = "<h1>⏰ This link has expired</h1><p>Location sharing links are temporary for your privacy.</p><div style=margin-top:24px><a href=https://crewradr.app style='display:inline-block;padding:12px 24px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600'>Get CrewRadr</a></div>";
-
-var INVALID_LINK = "<h1>🔗 Invalid Link</h1><p>This share link doesn't exist or has been revoked.</p><div style=margin-top:24px><a href=https://crewradr.app style='display:inline-block;padding:12px 24px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600'>Get CrewRadr</a></div>";
-
-function renderPage(locations, mode, mapsKey) {
+function renderPage(locations, mode, mapsKey, t, lang, viewerUnits) {
   var locJson = JSON.stringify(locations).replace(/</g, '\\u003c');
+  var tJson = JSON.stringify(t).replace(/</g, '\\u003c');
   var centerLat, centerLng, zoom;
   if (locations.length > 0) {
     centerLat = locations[0].latitude;
@@ -239,20 +484,26 @@ function renderPage(locations, mode, mapsKey) {
   }
   var noLocationsMessage = "";
   if (locations.length === 0) {
-    noLocationsMessage = "<div id=noloc style='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.7);color:#fff;padding:12px 20px;border-radius:8px;z-index:1000;font-size:.9rem;pointer-events:none'>" + (mode === "crew" ? "No members have shared location yet" : "Waiting for location...") + "</div>";
+    noLocationsMessage = "<div id=noloc style='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;padding:12px 20px;border-radius:8px;z-index:1000;font-size:.9rem;pointer-events:none'>" + esc(mode === "crew" ? t.noCrewLocations : t.waitingForLocation) + "</div>";
   }
 
-  var modeLabel = (mode === "crew" ? "crew" : "live");
+  var modeLabel = (mode === "crew" ? t.viewingCrew : t.viewingLive);
+  var dir = lang === "ar" ? ' dir="rtl"' : ' dir="ltr"';
 
-  var head = "<!DOCTYPE html><html lang=en><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1,user-scalable=no'><meta name=robots content='noindex,nofollow'><title>Live Location — CrewRadr</title><style>body,html{height:100%;width:100%;margin:0;padding:0;font-family:system-ui,sans-serif}#map{height:100%;width:100%}#cta{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,transparent,rgba(26,26,46,.95) 30%);padding:12px 16px 16px;z-index:1001;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .3s ease}#cta.collapsed{transform:translateY(100%)}#cta .badge{font-size:.75rem;color:#888}#cta .features{font-size:.7rem;color:#666;margin-bottom:4px}#cta .btn{display:inline-block;padding:10px 28px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:.9rem}#action-card{position:fixed;bottom:80px;left:12px;right:12px;background:rgba(26,26,46,.96);border-radius:16px;padding:16px;z-index:1000;display:none;box-shadow:0 -4px 24px rgba(0,0,0,.4);backdrop-filter:blur(10px)}#action-card.visible{display:block}#action-card .name{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px}#action-card .meta{font-size:.8rem;color:#aaa;margin-bottom:10px}#action-card .nav-btns{display:flex;gap:8px;margin-bottom:8px}#action-card .nav-btns a{flex:1;display:block;text-align:center;padding:8px;border-radius:8px;text-decoration:none;font-size:.8rem;font-weight:600}#action-card .nav-gmaps{background:#4285f4;color:#fff}#action-card .nav-amaps{background:#000;color:#fff;border:1px solid #333}#action-card .stale-warning{font-size:.75rem;color:#f0a030;margin-bottom:8px;display:none}#action-card .stale-warning.visible{display:block}</style></head><body><div id=map></div>" + noLocationsMessage + "<div id=action-card><div class=name id=ac-name></div><div class=meta id=ac-meta></div><div class=stale-warning id=ac-stale>&#9888;&#65039; Location may have changed. Last updated <span id=ac-stale-time></span> ago.</div><div class=nav-btns><a href=# class='nav-gmaps' target=_blank rel='noopener noreferrer' id=ac-gmaps>&#128652; Google Maps</a><a href=# class='nav-amaps' target=_blank rel='noopener noreferrer' id=ac-amaps>&#127822; Apple Maps</a></div></div><div id=cta><div class=badge>&#128205; Viewing " + modeLabel + " location via CrewRadr</div><div class=features>&#128274; Encrypted &nbsp;&#183;&nbsp; &#9200; Auto-expires</div><a href=https://crewradr.app class=btn rel=noopener>Get CrewRadr Free</a></div>";
+  var head = "<!DOCTYPE html><html lang=" + lang + dir + "><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1,user-scalable=no'><meta name=robots content='noindex,nofollow'><title>" + esc(t.liveTitle) + "</title><style>body,html{height:100%;width:100%;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}#map{height:100%;width:100%}#cta{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,transparent,rgba(26,26,46,.95) 30%);padding:12px 16px 16px;z-index:1001;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .3s ease}#cta.collapsed{transform:translateY(100%)}#cta .badge{font-size:.75rem;color:#888}#cta .features{font-size:.7rem;color:#666;margin-bottom:4px}#cta .btn{display:inline-block;padding:10px 28px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:.9rem}#action-card{position:fixed;bottom:80px;left:12px;right:12px;background:rgba(26,26,46,.96);border-radius:16px;padding:16px;z-index:1000;display:none;box-shadow:0 -4px 24px rgba(0,0,0,.4);backdrop-filter:blur(10px)}#action-card.visible{display:block}#action-card .name{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px}#action-card .meta{font-size:.8rem;color:#aaa;margin-bottom:10px}#action-card .nav-btns{display:flex;gap:8px;margin-bottom:8px}#action-card .nav-btns a{flex:1;display:block;text-align:center;padding:8px;border-radius:8px;text-decoration:none;font-size:.8rem;font-weight:600}#action-card .nav-gmaps{background:#4285f4;color:#fff}#action-card .nav-amaps{background:#000;color:#fff;border:1px solid #333}#action-card .stale-warning{font-size:.75rem;color:#f0a030;margin-bottom:8px;display:none}#action-card .stale-warning.visible{display:block}</style></head><body><div id=map></div>" + noLocationsMessage + "<div id=action-card><div class=name id=ac-name></div><div class=meta id=ac-meta></div><div class=stale-warning id=ac-stale></div><div class=nav-btns><a href=# class='nav-gmaps' target=_blank rel='noopener noreferrer' id=ac-gmaps>&#128652; " + esc(t.googleMaps) + "</a><a href=# class='nav-amaps' target=_blank rel='noopener noreferrer' id=ac-amaps>&#127822; " + esc(t.appleMaps) + "</a></div></div><div id=cta><div class=badge>&#128205; " + esc(modeLabel) + "</div><div class=features>&#128274; " + esc(t.encrypted) + " &nbsp;&#183;&nbsp; &#9200; " + esc(t.autoExpires) + "</div><a href=https://crewradr.app class=btn rel=noopener>" + esc(t.getTheApp) + "</a></div>";
 
   var mapsScript = "<script src='https://maps.googleapis.com/maps/api/js?key=" + mapsKey + "&callback=initMap' async defer><\/script>";
 
-  var initScript = "<script>var _locations=" + locJson + ";var _mode='" + mode + "';var map,markers=[],activeLocIdx=-1;function initMap(){map=new google.maps.Map(document.getElementById('map'),{center:{lat:" + centerLat + ",lng:" + centerLng + "},zoom:" + zoom + ",streetViewControl:false,mapTypeControl:true,fullscreenControl:false});drawMarkers(_locations)}function minAgo(ts){var s=(Date.now()-new Date(ts).getTime())/1000;if(s<60)return 'Just now';if(s<3600)return Math.floor(s/60)+'m';return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m';}function showCard(idx){activeLocIdx=idx;var l=_locations[idx];if(!l)return;var card=document.getElementById('action-card');card.classList.add('visible');document.getElementById('ac-name').textContent=l.display_name;var meta=(l.speed!=null?'&#128663; '+Math.round(l.speed)+' mph':'')+' &middot; Updated '+minAgo(l.updated_at);document.getElementById('ac-meta').innerHTML=meta;var stale=document.getElementById('ac-stale');var mins=(Date.now()-new Date(l.updated_at).getTime())/60000;if(mins>5){stale.classList.add('visible');document.getElementById('ac-stale-time').textContent=Math.round(mins)+' min';}else{stale.classList.remove('visible')}document.getElementById('ac-gmaps').href='https://www.google.com/maps/dir/?api=1&destination='+l.latitude+','+l.longitude;document.getElementById('ac-amaps').href='https://maps.apple.com/?daddr='+l.latitude+','+l.longitude;var cta=document.getElementById('cta');cta.classList.add('collapsed')}function hideCard(){activeLocIdx=-1;document.getElementById('action-card').classList.remove('visible');var cta=document.getElementById('cta');cta.classList.remove('collapsed')}function drawMarkers(locs){if(!map)return;markers.forEach(function(m){m.setMap(null)});markers=[];var bounds=new google.maps.LatLngBounds;locs.forEach(function(l,i){var pos={lat:l.latitude,lng:l.longitude};bounds.extend(pos);var m=new google.maps.Marker({position:pos,map:map,title:l.display_name,label:locs.length>1?String(i+1):'',animation:google.maps.Animation.DROP});m.addListener('click',function(){showCard(i)});markers.push(m)});if(locs.length>1)map.fitBounds(bounds,{top:60,bottom:200,left:30,right:30});var nel=document.getElementById('noloc');if(nel&&locs.length)nel.remove();google.maps.event.addListener(map,'click',function(){if(activeLocIdx>=0)hideCard()})}setInterval(function(){try{fetch('?json=1').then(function(r){if(!r.ok)return;r.json().then(function(d){if(!d.locations||!d.locations.length)return;drawMarkers(d.locations)})})}catch(e){}},15000);<\/script>";
+  var initScript = "<script>var _locations=" + locJson + ";var _t=" + tJson + ";var _units='" + viewerUnits + "';var _mode='" + mode + "';var map,markers=[],activeLocIdx=-1;function initMap(){map=new google.maps.Map(document.getElementById('map'),{center:{lat:" + centerLat + ",lng:" + centerLng + "},zoom:" + zoom + ",streetViewControl:false,mapTypeControl:true,fullscreenControl:false});drawMarkers(_locations)}function minAgo(ts){var s=(Date.now()-new Date(ts).getTime())/1000;if(s<60)return _t.justNow;if(s<3600)return _t.minAgo.replace('{m}',Math.floor(s/60));return _t.hoursAgo.replace('{h}',Math.floor(s/3600)).replace('{m}',Math.floor((s%3600)/60));}function formatSpeed(l){if(l.speed_display)return l.speed_display;if(l.speed_ms==null)return '';var isImp=_units==='imperial';var val=Math.round(l.speed_ms*(isImp?2.23694:3.6));var tpl=isImp?_t.speedMph:_t.speedKmh;return tpl.replace('{s}',val);}function showCard(idx){activeLocIdx=idx;var l=_locations[idx];if(!l)return;var card=document.getElementById('action-card');card.classList.add('visible');document.getElementById('ac-name').textContent=l.display_name;var sp=formatSpeed(l);var meta=(sp?'&#128663; '+sp+' &middot; ':'')+_t.updated+' '+minAgo(l.updated_at);document.getElementById('ac-meta').innerHTML=meta;var stale=document.getElementById('ac-stale');var mins=(Date.now()-new Date(l.updated_at).getTime())/60000;if(mins>5){stale.classList.add('visible');var timeStr=mins<60?_t.minAgo.replace('{m}',Math.round(mins)):_t.hoursAgo.replace('{h}',Math.floor(mins/60)).replace('{m}',Math.round(mins%60));stale.textContent=_t.staleWarning.replace('{t}',timeStr);}else{stale.classList.remove('visible')}document.getElementById('ac-gmaps').href='https://www.google.com/maps/dir/?api=1&destination='+l.latitude+','+l.longitude;document.getElementById('ac-amaps').href='https://maps.apple.com/?daddr='+l.latitude+','+l.longitude;var cta=document.getElementById('cta');cta.classList.add('collapsed')}function hideCard(){activeLocIdx=-1;document.getElementById('action-card').classList.remove('visible');var cta=document.getElementById('cta');cta.classList.remove('collapsed')}function drawMarkers(locs){if(!map)return;markers.forEach(function(m){m.setMap(null)});markers=[];var bounds=new google.maps.LatLngBounds;locs.forEach(function(l,i){var pos={lat:l.latitude,lng:l.longitude};bounds.extend(pos);var m=new google.maps.Marker({position:pos,map:map,title:l.display_name,label:locs.length>1?String(i+1):'',animation:google.maps.Animation.DROP});m.addListener('click',function(){showCard(i)});markers.push(m)});if(locs.length>1)map.fitBounds(bounds,{top:60,bottom:200,left:30,right:30});var nel=document.getElementById('noloc');if(nel&&locs.length)nel.remove();google.maps.event.addListener(map,'click',function(){if(activeLocIdx>=0)hideCard()})}setInterval(function(){try{fetch('?json=1&units='+encodeURIComponent(_units)+'&lang='+encodeURIComponent('" + lang + "')).then(function(r){if(!r.ok)return;r.json().then(function(d){if(!d.locations||!d.locations.length)return;_locations=d.locations;drawMarkers(d.locations);if(activeLocIdx>=0)showCard(activeLocIdx);})})}catch(e){}},15000);<\/script>";
 
   return head + mapsScript + initScript + "</body></html>";
 }
 
 function esc(t) {
-  return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  return String(t || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
