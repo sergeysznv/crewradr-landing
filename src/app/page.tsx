@@ -47,6 +47,10 @@ export default function LandingPage() {
     applyLocale(code);
   }
 
+  // Legal pages are prebuilt per locale under /privacy/<code>/ (English lives
+  // at the root), so the footer has to carry the active locale across.
+  const legalPrefix = locale === "en" ? "" : `/${locale}`;
+
   return (
     <div
       dir={LOCALE_DIRS[locale]}
@@ -103,9 +107,9 @@ export default function LandingPage() {
       {/* Footer */}
       <div className="fixed bottom-6 flex items-center gap-4 text-sm text-[#5A6568] dark:text-[#9AA5A8]">
         <span>&copy; {new Date().getFullYear()} CrewRadr</span>
-        <a href="/privacy" className="hover:text-[#6E8679]">{t(locale, "privacy")}</a>
+        <a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "privacy")}</a>
         <span aria-hidden>·</span>
-        <a href="/terms" className="hover:text-[#6E8679]">{t(locale, "terms")}</a>
+        <a href={`/terms${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "terms")}</a>
       </div>
     </div>
   );

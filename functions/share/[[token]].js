@@ -156,6 +156,8 @@ const STRINGS = {
 };
 
 const SUPPORTED = ["en", "es", "fr", "ar", "zh", "ru"];
+// Open Graph locales — used for the unfurl tags on share pages.
+const OG_LOCALES = { en: "en_US", es: "es_ES", fr: "fr_FR", ar: "ar_AR", zh: "zh_CN", ru: "ru_RU" };
 
 function resolveLang(url, acceptLanguage) {
   // ?lang= override wins
@@ -213,130 +215,136 @@ export async function onRequest(context) {
   };
 
   try {
-    // 2. Look up share — filter expiry at database level
-    const now = new Date().toISOString();
-    const shareUrl = `${supabaseUrl}/rest/v1/location_shares?token=eq.${encodeURIComponent(token)}&expires_at=gt.${encodeURIComponent(now)}&select=*`;
-
-    const shareRes = await fetch(shareUrl, { headers: authHeaders });
-    if (!shareRes.ok) {
-      console.error(`location_shares query failed: ${shareRes.status}`);
-      return htmlResponse(502, t.unavailableTitle, t.unavailableBody, lang);
-    }
-
-    const shares = await shareRes.json();
-
-    if (!shares || shares.length === 0) {
-      // Distinguish 404 vs 410: check if token exists at all (ignoring expiry)
-      const allTimeUrl = `${supabaseUrl}/rest/v1/location_shares?token=eq.${encodeURIComponent(token)}&select=id,expires_at`;
-      const allTimeRes = await fetch(allTimeUrl, { headers: authHeaders });
-      const allTimeShares = allTimeRes.ok ? await allTimeRes.json() : [];
-
-      if (allTimeShares && allTimeShares.length > 0) {
-        return htmlResponse(410, t.expiredH1, renderExpiredPage(t), lang);
-      }
-      return htmlResponse(404, t.notFoundTitle, t.notFoundBody, lang);
-    }
-
-    const share = shares[0];
-
-    // 3. Fetch location data
+    // 2a. Primary: Try get_shared_location RPC (SECURITY DEFINER — works with publishable/anon or service key)
+    let rpcSucceeded = false;
+    let shareMode = "single";
     let locations = [];
 
-    if (share.mode === "single") {
-      // Latest location for the creator
-      const locUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(share.creator_id)}&order=created_at.desc&limit=1&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
-      const locRes = await fetch(locUrl, { headers: authHeaders });
-      if (!locRes.ok) {
-        const errText = await locRes.text();
-        return new Response(JSON.stringify({ error: `Supabase query failed: ${locRes.status}`, detail: errText.substring(0, 200), url: locUrl }), {
-          status: 500, headers: { "Content-Type": "application/json" },
-        });
-      }
-      const locs = await locRes.json();
+    try {
+      const rpcUrl = `${supabaseUrl}/rest/v1/rpc/get_shared_location`;
+      const rpcRes = await fetch(rpcUrl, {
+        method: "POST",
+        headers: {
+          ...authHeaders,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ p_token: token }),
+      });
 
-      if (locs && locs.length > 0) {
-        // Fallback: if lat/lng are NULL (pre-backfill rows), try encrypted_payload
-        let loc = locs[0];
-        if ((loc.latitude == null || loc.longitude == null) && loc.encrypted_payload) {
-          try {
-            const payload = JSON.parse(loc.encrypted_payload);
-            loc.latitude = payload.lat ?? payload.latitude ?? null;
-            loc.longitude = payload.lng ?? payload.longitude ?? null;
-            if (loc.speed_ms == null && payload.speed != null) loc.speed_ms = payload.speed;
-          } catch (_) { /* encrypted ciphertext — skip */ }
+      if (rpcRes.ok) {
+        const rpcData = await rpcRes.json();
+        if (rpcData && rpcData.status === "not_found") {
+          return htmlResponse(404, t.notFoundTitle, t.notFoundBody, lang);
         }
-        if (loc.latitude != null && loc.longitude != null) {
-          const profileUrl = `${supabaseUrl}/rest/v1/profiles?user_id=eq.${encodeURIComponent(share.creator_id)}&select=display_name,avatar_url,measurement_system`;
-          const profileRes = await fetch(profileUrl, { headers: authHeaders });
-          const profiles = profileRes.ok ? await profileRes.json() : [];
-          const prof = (profiles && profiles.length > 0) ? profiles[0] : null;
-          const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
-          const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
-          let speedDisplay = null;
-          if (speedMs != null && speedMs >= 0) {
-            const isImp = memberUnits === "imperial";
-            const sNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
-            const tpl = isImp ? t.speedMph : t.speedKmh;
-            speedDisplay = tpl.replace("{s}", Math.round(sNum));
-          }
-
-          locations.push({
-            latitude: loc.latitude,
-            longitude: loc.longitude,
-            display_name: (prof && prof.display_name) || t.crewMember,
-            updated_at: loc.created_at,
-            avatar_url: prof ? prof.avatar_url : null,
-            speed_ms: speedMs,
-            speed_display: speedDisplay,
-            units: memberUnits,
+        if (rpcData && rpcData.status === "expired") {
+          return htmlResponse(410, t.expiredH1, renderExpiredPage(t), lang);
+        }
+        if (rpcData && rpcData.status === "ok") {
+          rpcSucceeded = true;
+          shareMode = rpcData.mode || "single";
+          locations = (rpcData.locations || []).map(loc => {
+            const memberUnits = loc.units || viewerUnits;
+            const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
+            let speedDisplay = loc.speed_display;
+            if (!speedDisplay && speedMs != null && speedMs >= 0) {
+              const isImp = memberUnits === "imperial";
+              const sNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
+              const tpl = isImp ? t.speedMph : t.speedKmh;
+              speedDisplay = tpl.replace("{s}", Math.round(sNum));
+            }
+            return {
+              latitude: loc.latitude,
+              longitude: loc.longitude,
+              display_name: loc.display_name || t.crewMember,
+              updated_at: loc.updated_at,
+              avatar_url: loc.avatar_url || null,
+              profile_emoji: loc.profile_emoji || null,
+              speed_ms: speedMs,
+              speed_display: speedDisplay,
+              units: memberUnits,
+            };
           });
         }
       }
-    } else if (share.mode === "crew" && share.crew_id) {
-      // Get crew members
-      const membersUrl = `${supabaseUrl}/rest/v1/crew_members?crew_id=eq.${encodeURIComponent(share.crew_id)}&select=user_id`;
-      const membersRes = await fetch(membersUrl, { headers: authHeaders });
-      const members = membersRes.ok ? await membersRes.json() : [];
+    } catch (rpcErr) {
+      console.warn("get_shared_location RPC attempt failed, falling back to PostgREST:", rpcErr);
+    }
 
-      if (members && members.length > 0) {
-        const userIds = members.map(m => m.user_id);
+    if (!rpcSucceeded) {
+      // 2b. Fallback: Look up share via PostgREST — filter expiry at database level
+      const now = new Date().toISOString();
+      const shareUrl = `${supabaseUrl}/rest/v1/location_shares?token=eq.${encodeURIComponent(token)}&expires_at=gt.${encodeURIComponent(now)}&select=*`;
 
-        // Get latest location for each crew member (fetch enough rows to cover all users)
-        const userIn = userIds.map(id => encodeURIComponent(id)).join(",");
-        const locsUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=in.(${userIn})&order=created_at.desc&limit=${members.length * 5}&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload`;
-        const locsRes = await fetch(locsUrl, { headers: authHeaders });
-        const locs = locsRes.ok ? await locsRes.json() : [];
+      const shareRes = await fetch(shareUrl, { headers: authHeaders });
+      if (!shareRes.ok) {
+        console.error(`location_shares query failed: ${shareRes.status}`);
+        return htmlResponse(502, t.unavailableTitle, t.unavailableBody, lang);
+      }
 
-        // Deduplicate — keep only latest per user, skip null coordinates
-        const seen = new Set();
-        const latestPerUser = [];
-        for (const loc of (locs || [])) {
-          // Fallback: if lat/lng are NULL, try encrypted_payload
+      const shares = await shareRes.json();
+
+      if (!shares || shares.length === 0) {
+        // Distinguish 404 vs 410: check if token exists at all (ignoring expiry)
+        const allTimeUrl = `${supabaseUrl}/rest/v1/location_shares?token=eq.${encodeURIComponent(token)}&select=id,expires_at`;
+        const allTimeRes = await fetch(allTimeUrl, { headers: authHeaders });
+        const allTimeShares = allTimeRes.ok ? await allTimeRes.json() : [];
+
+        if (allTimeShares && allTimeShares.length > 0) {
+          return htmlResponse(410, t.expiredH1, renderExpiredPage(t), lang);
+        }
+        return htmlResponse(404, t.notFoundTitle, t.notFoundBody, lang);
+      }
+
+      const share = shares[0];
+      shareMode = share.mode || "single";
+
+      // 3. Fetch location data
+      if (share.mode === "single") {
+        // Latest location for the creator with non-null coordinates
+        let locUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(share.creator_id)}&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
+        let locRes = await fetch(locUrl, { headers: authHeaders });
+        let locs = locRes.ok ? await locRes.json() : [];
+
+        if (!locs || locs.length === 0) {
+          // Fallback: check location_logs by user_id alone
+          const fallbackUrl = `${supabaseUrl}/rest/v1/location_logs?user_id=eq.${encodeURIComponent(share.creator_id)}&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
+          const fallbackRes = await fetch(fallbackUrl, { headers: authHeaders });
+          if (fallbackRes.ok) locs = await fallbackRes.json();
+        }
+
+        // Fallback: direct coordinates stored on the share itself
+        if ((!locs || locs.length === 0) && share.latitude != null && share.longitude != null) {
+          locs = [{
+            latitude: share.latitude,
+            longitude: share.longitude,
+            created_at: share.updated_at || share.created_at,
+            speed_ms: share.speed_ms,
+          }];
+        }
+
+        // If still no locs, try without null filter in case pre-backfill rows need encrypted_payload parsing
+        if (!locs || locs.length === 0) {
+          const anyUrl = `${supabaseUrl}/rest/v1/location_logs?user_id=eq.${encodeURIComponent(share.creator_id)}&order=created_at.desc&limit=3&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
+          const anyRes = await fetch(anyUrl, { headers: authHeaders });
+          if (anyRes.ok) locs = await anyRes.json();
+        }
+
+        if (locs && locs.length > 0) {
+          // Fallback: if lat/lng are NULL (pre-backfill rows), try encrypted_payload
+          let loc = locs[0];
           if ((loc.latitude == null || loc.longitude == null) && loc.encrypted_payload) {
             try {
               const payload = JSON.parse(loc.encrypted_payload);
               loc.latitude = payload.lat ?? payload.latitude ?? null;
               loc.longitude = payload.lng ?? payload.longitude ?? null;
               if (loc.speed_ms == null && payload.speed != null) loc.speed_ms = payload.speed;
-            } catch (_) { /* encrypted — skip */ }
+            } catch (_) { /* encrypted ciphertext — skip */ }
           }
-          if (!seen.has(loc.user_id) && loc.latitude != null && loc.longitude != null) {
-            seen.add(loc.user_id);
-            latestPerUser.push(loc);
-          }
-        }
-
-        if (latestPerUser.length > 0) {
-          // Fetch profiles using PostgREST in operator
-          const profileIn = userIds.map(id => encodeURIComponent(id)).join(",");
-          const profilesUrl = `${supabaseUrl}/rest/v1/profiles?user_id=in.(${profileIn})&select=user_id,display_name,avatar_url,measurement_system`;
-          const profilesRes = await fetch(profilesUrl, { headers: authHeaders });
-          const profiles = profilesRes.ok ? await profilesRes.json() : [];
-
-          const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-
-          locations = latestPerUser.map(loc => {
-            const prof = profileMap.get(loc.user_id);
+          if (loc.latitude != null && loc.longitude != null) {
+            const profileUrl = `${supabaseUrl}/rest/v1/profiles?user_id=eq.${encodeURIComponent(share.creator_id)}&select=display_name,avatar_url,profile_emoji,measurement_system`;
+            const profileRes = await fetch(profileUrl, { headers: authHeaders });
+            const profiles = profileRes.ok ? await profileRes.json() : [];
+            const prof = (profiles && profiles.length > 0) ? profiles[0] : null;
             const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
             const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
             let speedDisplay = null;
@@ -347,17 +355,99 @@ export async function onRequest(context) {
               speedDisplay = tpl.replace("{s}", Math.round(sNum));
             }
 
-            return {
+            locations.push({
               latitude: loc.latitude,
               longitude: loc.longitude,
               display_name: (prof && prof.display_name) || t.crewMember,
               updated_at: loc.created_at,
               avatar_url: prof ? prof.avatar_url : null,
+              profile_emoji: prof ? prof.profile_emoji : null,
               speed_ms: speedMs,
               speed_display: speedDisplay,
               units: memberUnits,
-            };
-          });
+            });
+          }
+        }
+      } else if (share.mode === "crew" && share.crew_id) {
+        // Get crew members
+        const membersUrl = `${supabaseUrl}/rest/v1/crew_members?crew_id=eq.${encodeURIComponent(share.crew_id)}&select=user_id`;
+        const membersRes = await fetch(membersUrl, { headers: authHeaders });
+        const members = membersRes.ok ? await membersRes.json() : [];
+
+        if (members && members.length > 0) {
+          const userIds = members.map(m => m.user_id);
+
+          // Get latest location for each crew member (fetch enough rows to cover all users)
+          const userIn = userIds.map(id => encodeURIComponent(id)).join(",");
+          const locsUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=in.(${userIn})&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=${Math.max(members.length * 5, 25)}&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload`;
+          const locsRes = await fetch(locsUrl, { headers: authHeaders });
+          const locs = locsRes.ok ? await locsRes.json() : [];
+
+          // Deduplicate — keep only latest per user, skip null coordinates
+          const seen = new Set();
+          const latestPerUser = [];
+          for (const loc of (locs || [])) {
+            // Fallback: if lat/lng are NULL, try encrypted_payload
+            if ((loc.latitude == null || loc.longitude == null) && loc.encrypted_payload) {
+              try {
+                const payload = JSON.parse(loc.encrypted_payload);
+                loc.latitude = payload.lat ?? payload.latitude ?? null;
+                loc.longitude = payload.lng ?? payload.longitude ?? null;
+                if (loc.speed_ms == null && payload.speed != null) loc.speed_ms = payload.speed;
+              } catch (_) { /* encrypted — skip */ }
+            }
+            if (!seen.has(loc.user_id) && loc.latitude != null && loc.longitude != null) {
+              seen.add(loc.user_id);
+              latestPerUser.push(loc);
+            }
+          }
+
+          // Also check if creator had direct coordinates on share and isn't yet in latestPerUser
+          if (!seen.has(share.creator_id) && share.latitude != null && share.longitude != null) {
+            seen.add(share.creator_id);
+            latestPerUser.push({
+              user_id: share.creator_id,
+              latitude: share.latitude,
+              longitude: share.longitude,
+              created_at: share.updated_at || share.created_at,
+              speed_ms: share.speed_ms,
+            });
+          }
+
+          if (latestPerUser.length > 0) {
+            // Fetch profiles using PostgREST in operator
+            const profileIn = userIds.map(id => encodeURIComponent(id)).join(",");
+            const profilesUrl = `${supabaseUrl}/rest/v1/profiles?user_id=in.(${profileIn})&select=user_id,display_name,avatar_url,profile_emoji,measurement_system`;
+            const profilesRes = await fetch(profilesUrl, { headers: authHeaders });
+            const profiles = profilesRes.ok ? await profilesRes.json() : [];
+
+            const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
+
+            locations = latestPerUser.map(loc => {
+              const prof = profileMap.get(loc.user_id);
+              const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
+              const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
+              let speedDisplay = null;
+              if (speedMs != null && speedMs >= 0) {
+                const isImp = memberUnits === "imperial";
+                const sNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
+                const tpl = isImp ? t.speedMph : t.speedKmh;
+                speedDisplay = tpl.replace("{s}", Math.round(sNum));
+              }
+
+              return {
+                latitude: loc.latitude,
+                longitude: loc.longitude,
+                display_name: (prof && prof.display_name) || t.crewMember,
+                updated_at: loc.created_at,
+                avatar_url: prof ? prof.avatar_url : null,
+                profile_emoji: prof ? prof.profile_emoji : null,
+                speed_ms: speedMs,
+                speed_display: speedDisplay,
+                units: memberUnits,
+              };
+            });
+          }
         }
       }
     }
@@ -368,12 +458,12 @@ export async function onRequest(context) {
         ...loc,
         escaped_display_name: escapeHtml(loc.display_name),
       }));
-      return new Response(JSON.stringify({ locations: escapedLocations, mode: share.mode, debug: { supabaseUrl, hasServiceKey: !!serviceKey, token } }), {
+      return new Response(JSON.stringify({ locations: escapedLocations, mode: shareMode }), {
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
       });
     }
 
-    return htmlResponse(200, t.liveTitle, renderPage(token, locations, share.mode, t, lang), lang);
+    return htmlResponse(200, t.liveTitle, renderPage(token, locations, shareMode, t, lang, viewerUnits), lang);
   } catch (err) {
     console.error("share worker error:", err);
     return htmlResponse(502, t.unavailableTitle, t.unavailableBody, lang);
@@ -413,26 +503,44 @@ function renderExpiredPage(t) {
   `;
 }
 
-function renderPage(token, locations, mode, t, lang) {
+function renderPage(token, locations, mode, t, lang, viewerUnits) {
   const locJson = JSON.stringify(locations).replace(/</g, '\\u003c');
   const center = locations.length > 0
     ? `[${locations[0].latitude}, ${locations[0].longitude}]`
     : "[40.7128, -74.0060]";
   const zoom = locations.length > 0 ? "15" : "4";
   const noLocationsMessage = locations.length === 0
-    ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:12px 20px;border-radius:8px;z-index:1000;font-size:0.9rem">${mode === 'crew' ? t.noCrewLocations : t.waitingForLocation}</div>`
+    ? `<div id="noloc" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:12px 20px;border-radius:8px;z-index:1000;font-size:0.9rem">${mode === 'crew' ? t.noCrewLocations : t.waitingForLocation}</div>`
     : "";
 
   const updatedLabel = t.updated;
   const markersJs = locations.map((loc, i) => {
     const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
+    const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
     return `
     L.marker([${loc.latitude}, ${loc.longitude}])
-      .bindPopup('<b>${escapeHtml(loc.display_name)}</b>${spText}<br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
+      .bindPopup('${emojiPrefix}<b>${escapeHtml(loc.display_name)}</b>${spText}<br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
       .addTo(map);
   `;}).join("\n");
 
-  return `
+  // Unfurl metadata — the map is client-rendered, so crawlers only ever see
+  // this markup; it has to carry the resolved locale.
+  const unfurlDesc = mode === "crew" ? t.viewingCrew : t.viewingLive;
+  const unfurlTags = `<meta name="description" content="${escapeHtml(unfurlDesc)}">
+    <meta property="og:title" content="${escapeHtml(t.liveTitle)}">
+    <meta property="og:description" content="${escapeHtml(unfurlDesc)}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CrewRadr">
+    <meta property="og:locale" content="${OG_LOCALES[lang] || "en_US"}">
+    <meta property="og:image" content="https://crewradr.app/logo-512.png">
+    <meta name="twitter:card" content="summary">`;
+
+  return `<!DOCTYPE html><html lang="${lang}"${lang === "ar" ? ' dir="rtl"' : ""}><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex,nofollow">
+    <title>${escapeHtml(t.liveTitle)}</title>
+    ${unfurlTags}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -458,6 +566,7 @@ function renderPage(token, locations, mode, t, lang) {
       #cta .stores a { color: #4f8cff; text-decoration: none; }
       .leaflet-popup-content { font-family: system-ui, -apple-system, sans-serif; font-size: 0.9rem; }
     </style>
+    </head><body>
     <div id="map"></div>
     ${noLocationsMessage}
     <div id="cta">
@@ -493,18 +602,30 @@ function renderPage(token, locations, mode, t, lang) {
           if (!resp.ok) return;
           const data = await resp.json();
           if (!data.locations || data.locations.length === 0) return;
+          const noloc = document.getElementById('noloc');
+          if (noloc) noloc.remove();
           map.eachLayer(layer => {
             if (layer instanceof L.Marker) map.removeLayer(layer);
           });
           data.locations.forEach(loc => {
             const spText = loc.speed_display ? ' &middot; &#128663; ' + loc.speed_display : '';
+            const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
             L.marker([loc.latitude, loc.longitude])
-              .bindPopup('<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + new Date(loc.updated_at).toLocaleTimeString(LANG) + '</small>')
+              .bindPopup(emojiPrefix + '<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + new Date(loc.updated_at).toLocaleTimeString(LANG) + '</small>')
               .addTo(map);
           });
+          if (locations.length === 0 && data.locations.length > 0) {
+            if (data.locations.length === 1) {
+              map.setView([data.locations[0].latitude, data.locations[0].longitude], 15);
+            } else {
+              const bounds = L.latLngBounds(data.locations.map(l => [l.latitude, l.longitude]));
+              map.fitBounds(bounds.pad(0.1));
+            }
+          }
         } catch(e) { /* silent — polling is best-effort */ }
       }, 15000);
     <\/script>
+    </body></html>
   `;
 }
 

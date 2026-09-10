@@ -69,6 +69,22 @@ const strings = {
     en: "Terms", es: "Términos", fr: "Conditions",
     ar: "الشروط", zh: "服务条款", ru: "Условия",
   },
+  notFoundTitle: {
+    en: "Page not found", es: "Página no encontrada", fr: "Page introuvable",
+    ar: "الصفحة غير موجودة", zh: "页面未找到", ru: "Страница не найдена",
+  },
+  notFoundBody: {
+    en: "The page you're looking for doesn't exist or has moved.",
+    es: "La página que buscas no existe o se ha movido.",
+    fr: "La page que vous recherchez n'existe pas ou a été déplacée.",
+    ar: "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    zh: "您要查找的页面不存在或已被移动。",
+    ru: "Страница, которую вы ищете, не существует или была перемещена.",
+  },
+  backHome: {
+    en: "Back to home", es: "Volver al inicio", fr: "Retour à l'accueil",
+    ar: "العودة إلى الرئيسية", zh: "返回首页", ru: "Вернуться на главную",
+  },
 } as const;
 
 export type MessageKey = keyof typeof strings;

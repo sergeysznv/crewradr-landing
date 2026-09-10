@@ -20,6 +20,10 @@ export const metadata: Metadata = {
     title: "CrewRadr — Coming Soon",
     description: "Real-time location sharing for trusted crews. Coming soon.",
     locale: "en_US",
+    // The static export is prerendered in English and switches locale on the
+    // client, so crawlers always read the English tags — declare the other
+    // supported locales here so unfurls can at least pick the right variant.
+    alternateLocale: ["es_ES", "fr_FR", "ar_AR", "zh_CN", "ru_RU"],
     siteName: "CrewRadr",
     type: "website",
   },

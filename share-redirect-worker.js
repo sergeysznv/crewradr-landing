@@ -28,6 +28,9 @@ const STRINGS = {
     unavailableTitle: "Temporarily Unavailable",
     unavailableHeading: "502 — Temporarily Unavailable",
     unavailableBody: "Please try again in a moment.",
+    tooManyTitle: "Too Many Requests",
+    tooManyHeading: "🚦 Too Many Requests",
+    tooManyBody: "Too many requests in a short time. Please wait a minute and try again.",
     liveTitle: "Live Location — CrewRadr",
     crewMember: "Crew Member",
     waitingForLocation: "Waiting for location...",
@@ -57,6 +60,9 @@ const STRINGS = {
     unavailableTitle: "No disponible temporalmente",
     unavailableHeading: "502 — No disponible temporalmente",
     unavailableBody: "Inténtalo de nuevo en un momento.",
+    tooManyTitle: "Demasiadas solicitudes",
+    tooManyHeading: "🚦 Demasiadas solicitudes",
+    tooManyBody: "Demasiadas solicitudes en poco tiempo. Espera un minuto e inténtalo de nuevo.",
     liveTitle: "Ubicación en vivo — CrewRadr",
     crewMember: "Miembro del grupo",
     waitingForLocation: "Esperando ubicación...",
@@ -86,6 +92,9 @@ const STRINGS = {
     unavailableTitle: "Temporairement indisponible",
     unavailableHeading: "502 — Temporairement indisponible",
     unavailableBody: "Veuillez réessayer dans un instant.",
+    tooManyTitle: "Trop de requêtes",
+    tooManyHeading: "🚦 Trop de requêtes",
+    tooManyBody: "Trop de requêtes en peu de temps. Veuillez patienter une minute et réessayer.",
     liveTitle: "Position en direct — CrewRadr",
     crewMember: "Membre de l'équipe",
     waitingForLocation: "En attente de la position...",
@@ -115,6 +124,9 @@ const STRINGS = {
     unavailableTitle: "غير متاح مؤقتاً",
     unavailableHeading: "502 — غير متاح مؤقتاً",
     unavailableBody: "يرجى المحاولة مرة أخرى بعد لحظة.",
+    tooManyTitle: "طلبات كثيرة جداً",
+    tooManyHeading: "🚦 طلبات كثيرة جداً",
+    tooManyBody: "طلبات كثيرة جداً في وقت قصير. يرجى الانتظار دقيقة ثم المحاولة مجدداً.",
     liveTitle: "الموقع المباشر — CrewRadr",
     crewMember: "عضو في الطاقم",
     waitingForLocation: "في انتظار الموقع...",
@@ -144,6 +156,9 @@ const STRINGS = {
     unavailableTitle: "暂时不可用",
     unavailableHeading: "502 — 暂时不可用",
     unavailableBody: "请稍后重试。",
+    tooManyTitle: "请求过多",
+    tooManyHeading: "🚦 请求过多",
+    tooManyBody: "短时间内请求过多。请等待一分钟后再试。",
     liveTitle: "实时位置 — CrewRadr",
     crewMember: "团队成员",
     waitingForLocation: "等待位置信息...",
@@ -173,6 +188,9 @@ const STRINGS = {
     unavailableTitle: "Временно недоступно",
     unavailableHeading: "502 — Временно недоступно",
     unavailableBody: "Пожалуйста, повторите попытку через мгновение.",
+    tooManyTitle: "Слишком много запросов",
+    tooManyHeading: "🚦 Слишком много запросов",
+    tooManyBody: "Слишком много запросов за короткое время. Подождите минуту и попробуйте снова.",
     liveTitle: "Живое местоположение — CrewRadr",
     crewMember: "Участник команды",
     waitingForLocation: "Ожидание местоположения...",
@@ -196,6 +214,8 @@ const STRINGS = {
 
 const SUPPORTED_LANGS = ["en", "es", "fr", "ar", "zh", "ru"];
 const IMPERIAL_COUNTRIES = new Set(["US", "GB", "LR", "MM"]);
+// Open Graph locales — used for the unfurl tags on share pages.
+const OG_LOCALES = { en: "en_US", es: "es_ES", fr: "fr_FR", ar: "ar_AR", zh: "zh_CN", ru: "ru_RU" };
 
 function resolveLang(url, acceptLanguage) {
   var q = url.searchParams.get("lang");
@@ -259,7 +279,7 @@ async function handleShare(request, env, url) {
   }
 
   if (rateLimit(clientIP)) {
-    return new Response("Too many requests", { status: 429 });
+    return htmlRes(429, t.tooManyTitle, t.tooManyHeading, t.tooManyBody, t, lang);
   }
 
   const base = env.SUPABASE_URL;
@@ -268,6 +288,85 @@ async function handleShare(request, env, url) {
   const auth = { "apikey": key, "Authorization": "Bearer " + key };
 
   try {
+    // 1. Primary: Try get_shared_location RPC (SECURITY DEFINER — works with publishable/anon or service key)
+    try {
+      const rpcUrl = base + "/rest/v1/rpc/get_shared_location";
+      const rpcRes = await fetch(rpcUrl, {
+        method: "POST",
+        headers: Object.assign({}, auth, { "Content-Type": "application/json" }),
+        body: JSON.stringify({ p_token: token }),
+      });
+
+      if (rpcRes.ok) {
+        const rpcData = await rpcRes.json();
+        if (rpcData) {
+          if (rpcData.status === "not_found") {
+            rateLimit(clientIP);
+            return htmlRes(404, t.invalidTitle, t.invalidHeading, t.invalidBody, t, lang);
+          }
+          if (rpcData.status === "expired") {
+            rateLimit(clientIP);
+            return htmlRes(410, t.expiredTitle, t.expiredHeading, t.expiredBody, t, lang);
+          }
+          if (rpcData.status === "ok") {
+            const viewerUnits = resolveUnits(url, request, null);
+            const rpcLocs = (rpcData.locations || []).map(function(l) {
+              const mUnits = l.units || viewerUnits;
+              const sMs = l.speed_ms != null ? l.speed_ms : null;
+              let sDisplay = l.speed_display;
+              if (!sDisplay && sMs != null && sMs >= 0) {
+                const isImp = mUnits === "imperial";
+                const sNum = isImp ? (sMs * 2.23694) : (sMs * 3.6);
+                const tpl = isImp ? t.speedMph : t.speedKmh;
+                sDisplay = tpl.replace("{s}", Math.round(sNum));
+              }
+              return {
+                latitude: l.latitude,
+                longitude: l.longitude,
+                display_name: l.display_name || t.crewMember,
+                updated_at: l.updated_at,
+                avatar_url: l.avatar_url || null,
+                profile_emoji: l.profile_emoji || null,
+                escaped_display_name: esc(l.display_name || t.crewMember),
+                speed: sMs != null ? Math.round(mUnits === "imperial" ? sMs * 2.23694 : sMs * 3.6) : null,
+                speed_ms: sMs,
+                speed_display: sDisplay,
+                units: mUnits,
+              };
+            });
+
+            if (isJson) {
+              return new Response(JSON.stringify({
+                locations: rpcLocs,
+                mode: rpcData.mode,
+                units: viewerUnits,
+                lang: lang,
+                expires_at: rpcData.expires_at,
+              }), { headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store",
+                "X-Robots-Tag": "noindex, nofollow",
+              }});
+            }
+
+            var html = renderPage(rpcLocs, rpcData.mode, mapsKey, t, lang, viewerUnits);
+            return new Response(html, {
+              status: 200,
+              headers: {
+                "Content-Type": "text/html; charset=utf-8",
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Referrer-Policy": "no-referrer",
+                "X-Content-Type-Options": "nosniff",
+              },
+            });
+          }
+        }
+      }
+    } catch (rpcErr) {
+      // Fall through to PostgREST query
+    }
+
+    // 2. Fallback: Direct PostgREST queries
     const now = new Date().toISOString();
     const shareRes = await fetch(
       base + "/rest/v1/location_shares?token=eq." + encodeURIComponent(token) + "&expires_at=gt." + encodeURIComponent(now) + "&select=*",
@@ -299,6 +398,7 @@ async function handleShare(request, env, url) {
         display_name: l.display_name,
         updated_at: l.updated_at,
         avatar_url: l.avatar_url,
+        profile_emoji: l.profile_emoji || null,
         escaped_display_name: esc(l.display_name),
         speed: l.speed != null ? l.speed : null,
         speed_ms: l.speed_ms != null ? l.speed_ms : null,
@@ -339,11 +439,33 @@ async function fetchLocations(base, auth, share, viewerUnits, t) {
   var locs = [];
 
   if (share.mode === "single") {
-    var r = await fetch(
-      base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=eq." + encodeURIComponent(share.creator_id) + "&order=created_at.desc&limit=1&select=latitude,longitude,created_at,speed_ms,encrypted_payload",
-      { headers: auth }
-    );
+    var locUrl = base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=eq." + encodeURIComponent(share.creator_id) + "&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload";
+    var r = await fetch(locUrl, { headers: auth });
     var data = r.ok ? await r.json() : [];
+
+    if (!data || data.length === 0) {
+      // Fallback: check location_logs by user_id alone
+      var fallbackUrl = base + "/rest/v1/location_logs?user_id=eq." + encodeURIComponent(share.creator_id) + "&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload";
+      var fallbackR = await fetch(fallbackUrl, { headers: auth });
+      if (fallbackR.ok) data = await fallbackR.json();
+    }
+
+    // Fallback: direct coordinates stored on the share itself
+    if ((!data || data.length === 0) && share.latitude != null && share.longitude != null) {
+      data = [{
+        latitude: share.latitude,
+        longitude: share.longitude,
+        created_at: share.updated_at || share.created_at,
+        speed_ms: share.speed_ms,
+      }];
+    }
+
+    if (!data || data.length === 0) {
+      var anyUrl = base + "/rest/v1/location_logs?user_id=eq." + encodeURIComponent(share.creator_id) + "&order=created_at.desc&limit=3&select=latitude,longitude,created_at,speed_ms,encrypted_payload";
+      var anyR = await fetch(anyUrl, { headers: auth });
+      if (anyR.ok) data = await anyR.json();
+    }
+
     if (data && data[0]) {
       var d = data[0];
       // Fallback: try encrypted_payload if lat/lng are NULL (pre-backfill rows)
@@ -395,7 +517,7 @@ async function fetchLocations(base, auth, share, viewerUnits, t) {
       var ids = members.map(function(m) { return m.user_id; });
       var inClause = ids.map(function(id) { return encodeURIComponent(id); }).join(",");
       var lr = await fetch(
-        base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=in.(" + inClause + ")&order=created_at.desc&limit=" + (ids.length * 5) + "&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload",
+        base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=in.(" + inClause + ")&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=" + Math.max(ids.length * 5, 25) + "&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload",
         { headers: auth }
       );
       var raw = lr.ok ? await lr.json() : [];
@@ -490,11 +612,22 @@ function renderPage(locations, mode, mapsKey, t, lang, viewerUnits) {
   var modeLabel = (mode === "crew" ? t.viewingCrew : t.viewingLive);
   var dir = lang === "ar" ? ' dir="rtl"' : ' dir="ltr"';
 
-  var head = "<!DOCTYPE html><html lang=" + lang + dir + "><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1,user-scalable=no'><meta name=robots content='noindex,nofollow'><title>" + esc(t.liveTitle) + "</title><style>body,html{height:100%;width:100%;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}#map{height:100%;width:100%}#cta{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,transparent,rgba(26,26,46,.95) 30%);padding:12px 16px 16px;z-index:1001;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .3s ease}#cta.collapsed{transform:translateY(100%)}#cta .badge{font-size:.75rem;color:#888}#cta .features{font-size:.7rem;color:#666;margin-bottom:4px}#cta .btn{display:inline-block;padding:10px 28px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:.9rem}#action-card{position:fixed;bottom:80px;left:12px;right:12px;background:rgba(26,26,46,.96);border-radius:16px;padding:16px;z-index:1000;display:none;box-shadow:0 -4px 24px rgba(0,0,0,.4);backdrop-filter:blur(10px)}#action-card.visible{display:block}#action-card .name{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px}#action-card .meta{font-size:.8rem;color:#aaa;margin-bottom:10px}#action-card .nav-btns{display:flex;gap:8px;margin-bottom:8px}#action-card .nav-btns a{flex:1;display:block;text-align:center;padding:8px;border-radius:8px;text-decoration:none;font-size:.8rem;font-weight:600}#action-card .nav-gmaps{background:#4285f4;color:#fff}#action-card .nav-amaps{background:#000;color:#fff;border:1px solid #333}#action-card .stale-warning{font-size:.75rem;color:#f0a030;margin-bottom:8px;display:none}#action-card .stale-warning.visible{display:block}</style></head><body><div id=map></div>" + noLocationsMessage + "<div id=action-card><div class=name id=ac-name></div><div class=meta id=ac-meta></div><div class=stale-warning id=ac-stale></div><div class=nav-btns><a href=# class='nav-gmaps' target=_blank rel='noopener noreferrer' id=ac-gmaps>&#128652; " + esc(t.googleMaps) + "</a><a href=# class='nav-amaps' target=_blank rel='noopener noreferrer' id=ac-amaps>&#127822; " + esc(t.appleMaps) + "</a></div></div><div id=cta><div class=badge>&#128205; " + esc(modeLabel) + "</div><div class=features>&#128274; " + esc(t.encrypted) + " &nbsp;&#183;&nbsp; &#9200; " + esc(t.autoExpires) + "</div><a href=https://crewradr.app class=btn rel=noopener>" + esc(t.getTheApp) + "</a></div>";
+  // Unfurl metadata — link previews are rendered by crawlers that never run
+  // the map JS, so they have to carry the resolved locale in the markup.
+  var unfurlTags = "<meta name=description content='" + esc(modeLabel) + "'>" +
+    "<meta property=og:title content='" + esc(t.liveTitle) + "'>" +
+    "<meta property=og:description content='" + esc(modeLabel) + "'>" +
+    "<meta property=og:type content='website'>" +
+    "<meta property=og:site_name content='CrewRadr'>" +
+    "<meta property=og:locale content='" + (OG_LOCALES[lang] || "en_US") + "'>" +
+    "<meta property=og:image content='https://crewradr.app/logo-512.png'>" +
+    "<meta name=twitter:card content='summary'>";
+
+  var head = "<!DOCTYPE html><html lang=" + lang + dir + "><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1,user-scalable=no'><meta name=robots content='noindex,nofollow'><title>" + esc(t.liveTitle) + "</title>" + unfurlTags + "<style>body,html{height:100%;width:100%;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}#map{height:100%;width:100%}#cta{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,transparent,rgba(26,26,46,.95) 30%);padding:12px 16px 16px;z-index:1001;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .3s ease}#cta.collapsed{transform:translateY(100%)}#cta .badge{font-size:.75rem;color:#888}#cta .features{font-size:.7rem;color:#666;margin-bottom:4px}#cta .btn{display:inline-block;padding:10px 28px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:.9rem}#action-card{position:fixed;bottom:80px;left:12px;right:12px;background:rgba(26,26,46,.96);border-radius:16px;padding:16px;z-index:1000;display:none;box-shadow:0 -4px 24px rgba(0,0,0,.4);backdrop-filter:blur(10px)}#action-card.visible{display:block}#action-card .name{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px}#action-card .meta{font-size:.8rem;color:#aaa;margin-bottom:10px}#action-card .nav-btns{display:flex;gap:8px;margin-bottom:8px}#action-card .nav-btns a{flex:1;display:block;text-align:center;padding:8px;border-radius:8px;text-decoration:none;font-size:.8rem;font-weight:600}#action-card .nav-gmaps{background:#4285f4;color:#fff}#action-card .nav-amaps{background:#000;color:#fff;border:1px solid #333}#action-card .stale-warning{font-size:.75rem;color:#f0a030;margin-bottom:8px;display:none}#action-card .stale-warning.visible{display:block}</style></head><body><div id=map></div>" + noLocationsMessage + "<div id=action-card><div class=name id=ac-name></div><div class=meta id=ac-meta></div><div class=stale-warning id=ac-stale></div><div class=nav-btns><a href=# class='nav-gmaps' target=_blank rel='noopener noreferrer' id=ac-gmaps>&#128652; " + esc(t.googleMaps) + "</a><a href=# class='nav-amaps' target=_blank rel='noopener noreferrer' id=ac-amaps>&#127822; " + esc(t.appleMaps) + "</a></div></div><div id=cta><div class=badge>&#128205; " + esc(modeLabel) + "</div><div class=features>&#128274; " + esc(t.encrypted) + " &nbsp;&#183;&nbsp; &#9200; " + esc(t.autoExpires) + "</div><a href=https://crewradr.app class=btn rel=noopener>" + esc(t.getTheApp) + "</a></div>";
 
   var mapsScript = "<script src='https://maps.googleapis.com/maps/api/js?key=" + mapsKey + "&callback=initMap' async defer><\/script>";
 
-  var initScript = "<script>var _locations=" + locJson + ";var _t=" + tJson + ";var _units='" + viewerUnits + "';var _mode='" + mode + "';var map,markers=[],activeLocIdx=-1;function initMap(){map=new google.maps.Map(document.getElementById('map'),{center:{lat:" + centerLat + ",lng:" + centerLng + "},zoom:" + zoom + ",streetViewControl:false,mapTypeControl:true,fullscreenControl:false});drawMarkers(_locations)}function minAgo(ts){var s=(Date.now()-new Date(ts).getTime())/1000;if(s<60)return _t.justNow;if(s<3600)return _t.minAgo.replace('{m}',Math.floor(s/60));return _t.hoursAgo.replace('{h}',Math.floor(s/3600)).replace('{m}',Math.floor((s%3600)/60));}function formatSpeed(l){if(l.speed_display)return l.speed_display;if(l.speed_ms==null)return '';var isImp=_units==='imperial';var val=Math.round(l.speed_ms*(isImp?2.23694:3.6));var tpl=isImp?_t.speedMph:_t.speedKmh;return tpl.replace('{s}',val);}function showCard(idx){activeLocIdx=idx;var l=_locations[idx];if(!l)return;var card=document.getElementById('action-card');card.classList.add('visible');document.getElementById('ac-name').textContent=l.display_name;var sp=formatSpeed(l);var meta=(sp?'&#128663; '+sp+' &middot; ':'')+_t.updated+' '+minAgo(l.updated_at);document.getElementById('ac-meta').innerHTML=meta;var stale=document.getElementById('ac-stale');var mins=(Date.now()-new Date(l.updated_at).getTime())/60000;if(mins>5){stale.classList.add('visible');var timeStr=mins<60?_t.minAgo.replace('{m}',Math.round(mins)):_t.hoursAgo.replace('{h}',Math.floor(mins/60)).replace('{m}',Math.round(mins%60));stale.textContent=_t.staleWarning.replace('{t}',timeStr);}else{stale.classList.remove('visible')}document.getElementById('ac-gmaps').href='https://www.google.com/maps/dir/?api=1&destination='+l.latitude+','+l.longitude;document.getElementById('ac-amaps').href='https://maps.apple.com/?daddr='+l.latitude+','+l.longitude;var cta=document.getElementById('cta');cta.classList.add('collapsed')}function hideCard(){activeLocIdx=-1;document.getElementById('action-card').classList.remove('visible');var cta=document.getElementById('cta');cta.classList.remove('collapsed')}function drawMarkers(locs){if(!map)return;markers.forEach(function(m){m.setMap(null)});markers=[];var bounds=new google.maps.LatLngBounds;locs.forEach(function(l,i){var pos={lat:l.latitude,lng:l.longitude};bounds.extend(pos);var m=new google.maps.Marker({position:pos,map:map,title:l.display_name,label:locs.length>1?String(i+1):'',animation:google.maps.Animation.DROP});m.addListener('click',function(){showCard(i)});markers.push(m)});if(locs.length>1)map.fitBounds(bounds,{top:60,bottom:200,left:30,right:30});var nel=document.getElementById('noloc');if(nel&&locs.length)nel.remove();google.maps.event.addListener(map,'click',function(){if(activeLocIdx>=0)hideCard()})}setInterval(function(){try{fetch('?json=1&units='+encodeURIComponent(_units)+'&lang='+encodeURIComponent('" + lang + "')).then(function(r){if(!r.ok)return;r.json().then(function(d){if(!d.locations||!d.locations.length)return;_locations=d.locations;drawMarkers(d.locations);if(activeLocIdx>=0)showCard(activeLocIdx);})})}catch(e){}},15000);<\/script>";
+  var initScript = "<script>var _locations=" + locJson + ";var _t=" + tJson + ";var _units='" + viewerUnits + "';var _mode='" + mode + "';var map,markers=[],activeLocIdx=-1;function initMap(){map=new google.maps.Map(document.getElementById('map'),{center:{lat:" + centerLat + ",lng:" + centerLng + "},zoom:" + zoom + ",streetViewControl:false,mapTypeControl:true,fullscreenControl:false});drawMarkers(_locations)}function minAgo(ts){var s=(Date.now()-new Date(ts).getTime())/1000;if(s<60)return _t.justNow;if(s<3600)return _t.minAgo.replace('{m}',Math.floor(s/60));return _t.hoursAgo.replace('{h}',Math.floor(s/3600)).replace('{m}',Math.floor((s%3600)/60));}function formatSpeed(l){if(l.speed_display)return l.speed_display;if(l.speed_ms==null)return '';var isImp=_units==='imperial';var val=Math.round(l.speed_ms*(isImp?2.23694:3.6));var tpl=isImp?_t.speedMph:_t.speedKmh;return tpl.replace('{s}',val);}function showCard(idx){activeLocIdx=idx;var l=_locations[idx];if(!l)return;var card=document.getElementById('action-card');card.classList.add('visible');document.getElementById('ac-name').textContent=(l.profile_emoji?l.profile_emoji+' ':'')+l.display_name;var sp=formatSpeed(l);var meta=(sp?'&#128663; '+sp+' &middot; ':'')+_t.updated+' '+minAgo(l.updated_at);document.getElementById('ac-meta').innerHTML=meta;var stale=document.getElementById('ac-stale');var mins=(Date.now()-new Date(l.updated_at).getTime())/60000;if(mins>5){stale.classList.add('visible');var timeStr=mins<60?_t.minAgo.replace('{m}',Math.round(mins)):_t.hoursAgo.replace('{h}',Math.floor(mins/60)).replace('{m}',Math.round(mins%60));stale.textContent=_t.staleWarning.replace('{t}',timeStr);}else{stale.classList.remove('visible')}document.getElementById('ac-gmaps').href='https://www.google.com/maps/dir/?api=1&destination='+l.latitude+','+l.longitude;document.getElementById('ac-amaps').href='https://maps.apple.com/?daddr='+l.latitude+','+l.longitude;var cta=document.getElementById('cta');cta.classList.add('collapsed')}function hideCard(){activeLocIdx=-1;document.getElementById('action-card').classList.remove('visible');var cta=document.getElementById('cta');cta.classList.remove('collapsed')}function drawMarkers(locs){if(!map)return;markers.forEach(function(m){m.setMap(null)});markers=[];var bounds=new google.maps.LatLngBounds;locs.forEach(function(l,i){var pos={lat:l.latitude,lng:l.longitude};bounds.extend(pos);var m=new google.maps.Marker({position:pos,map:map,title:l.display_name,label:locs.length>1?String(i+1):'',animation:google.maps.Animation.DROP});m.addListener('click',function(){showCard(i)});markers.push(m)});if(locs.length>1)map.fitBounds(bounds,{top:60,bottom:200,left:30,right:30});var nel=document.getElementById('noloc');if(nel&&locs.length)nel.remove();google.maps.event.addListener(map,'click',function(){if(activeLocIdx>=0)hideCard()})}setInterval(function(){try{fetch('?json=1&units='+encodeURIComponent(_units)+'&lang='+encodeURIComponent('" + lang + "')).then(function(r){if(!r.ok)return;r.json().then(function(d){if(!d.locations||!d.locations.length)return;_locations=d.locations;drawMarkers(d.locations);if(activeLocIdx>=0)showCard(activeLocIdx);})})}catch(e){}},15000);<\/script>";
 
   return head + mapsScript + initScript + "</body></html>";
 }
