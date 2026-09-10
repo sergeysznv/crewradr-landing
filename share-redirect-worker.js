@@ -120,7 +120,7 @@ async function fetchLocations(base, auth, share) {
 
   if (share.mode === "single") {
     var r = await fetch(
-      base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=eq." + encodeURIComponent(share.creator_id) + "&order=created_at.desc&limit=1&select=latitude,longitude,created_at,speed,encrypted_payload",
+      base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=eq." + encodeURIComponent(share.creator_id) + "&order=created_at.desc&limit=1&select=latitude,longitude,created_at,speed_ms,encrypted_payload",
       { headers: auth }
     );
     var data = r.ok ? await r.json() : [];
@@ -132,6 +132,7 @@ async function fetchLocations(base, auth, share) {
           var p = JSON.parse(d.encrypted_payload);
           d.latitude = p.lat != null ? p.lat : (p.latitude != null ? p.latitude : null);
           d.longitude = p.lng != null ? p.lng : (p.longitude != null ? p.longitude : null);
+          if (d.speed_ms == null && p.speed != null) d.speed_ms = p.speed;
         } catch (_) { /* encrypted — skip */ }
       }
       if (d.latitude != null && d.longitude != null) {
@@ -146,7 +147,7 @@ async function fetchLocations(base, auth, share) {
           display_name: (p && p[0] && p[0].display_name) || "Crew Member",
           updated_at: d.created_at,
           avatar_url: (p && p[0] && p[0].avatar_url) || null,
-          speed: d.speed || null,
+          speed: d.speed_ms != null ? (d.speed_ms * 2.23694) : null,
         });
       }
     }
@@ -160,7 +161,7 @@ async function fetchLocations(base, auth, share) {
       var ids = members.map(function(m) { return m.user_id; });
       var inClause = ids.map(function(id) { return encodeURIComponent(id); }).join(",");
       var lr = await fetch(
-        base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=in.(" + inClause + ")&order=created_at.desc&limit=" + (ids.length * 5) + "&select=latitude,longitude,created_at,speed,user_id,encrypted_payload",
+        base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=in.(" + inClause + ")&order=created_at.desc&limit=" + (ids.length * 5) + "&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload",
         { headers: auth }
       );
       var raw = lr.ok ? await lr.json() : [];
@@ -174,6 +175,7 @@ async function fetchLocations(base, auth, share) {
             var pl = JSON.parse(loc.encrypted_payload);
             loc.latitude = pl.lat != null ? pl.lat : (pl.latitude != null ? pl.latitude : null);
             loc.longitude = pl.lng != null ? pl.lng : (pl.longitude != null ? pl.longitude : null);
+            if (loc.speed_ms == null && pl.speed != null) loc.speed_ms = pl.speed;
           } catch (_) { /* encrypted — skip */ }
         }
         if (!seen.has(loc.user_id) && loc.latitude != null && loc.longitude != null) {
@@ -197,7 +199,7 @@ async function fetchLocations(base, auth, share) {
             display_name: (prof && prof.display_name) || "Crew Member",
             updated_at: dloc.created_at,
             avatar_url: prof ? prof.avatar_url : null,
-            speed: dloc.speed || null,
+            speed: dloc.speed_ms != null ? (dloc.speed_ms * 2.23694) : null,
           });
         }
       }
