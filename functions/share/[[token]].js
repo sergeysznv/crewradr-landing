@@ -517,14 +517,6 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
     : "";
 
   const updatedLabel = t.updated;
-  const markersJs = pinnable.map((loc, i) => {
-    const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
-    const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + escapeHtml(loc.profile_emoji) + '</span>' : '';
-    return `
-    L.marker([${loc.latitude}, ${loc.longitude}], { icon: profileIcon(${JSON.stringify(loc.display_name || "")}, ${JSON.stringify(loc.profile_emoji || null)}) })
-      .bindPopup('${emojiPrefix}<b>${escapeHtml(loc.display_name)}</b>${spText}<br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
-      .addTo(map);
-  `;}).join("\n");
 
   // Unfurl metadata — the map is client-rendered, so crawlers only ever see
   // this markup; it has to carry the resolved locale.
@@ -624,7 +616,43 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         maxZoom: 20,
       }).addTo(map);
 
-      ${markersJs}
+      function popupHtml(loc) {
+        const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
+        const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + escapeHtml(loc.profile_emoji) + '</span>' : '';
+        return emojiPrefix + '<b>' + escapeHtml(loc.display_name) + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + (loc.updated_at ? new Date(loc.updated_at).toLocaleTimeString(LANG) : '') + '</small>';
+      }
+
+      // Marker sync: update in place so open popups survive the 15-second
+      // poll — no churn, no flicker, markers keep their identity.
+      const markers = new Map();
+      function markerKey(loc) { return loc.user_id || loc.display_name; }
+
+      function syncMarkers(list) {
+        const seen = new Set();
+        list.forEach(loc => {
+          if (loc.latitude == null || loc.longitude == null) return;
+          const key = markerKey(loc);
+          seen.add(key);
+          const latlng = [loc.latitude, loc.longitude];
+          const html = popupHtml(loc);
+          const existing = markers.get(key);
+          if (existing) {
+            const wasOpen = existing.isPopupOpen();
+            existing.setLatLng(latlng);
+            existing.setPopupContent(html);
+            if (wasOpen) { existing.closePopup(); existing.openPopup(); }
+          } else {
+            markers.set(key, L.marker(latlng, { icon: profileIcon(loc.display_name || '', loc.profile_emoji || null) })
+              .bindPopup(html)
+              .addTo(map));
+          }
+        });
+        for (const [key, m] of markers) {
+          if (!seen.has(key)) { map.removeLayer(m); markers.delete(key); }
+        }
+      }
+
+      syncMarkers(locations);
 
       if (pinnable.length > 1) {
         const bounds = L.latLngBounds(pinnable.map(l => [l.latitude, l.longitude]));
@@ -640,18 +668,9 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
           if (!data.locations || data.locations.length === 0) return;
           const noloc = document.getElementById('noloc');
           if (noloc) noloc.remove();
-          map.eachLayer(layer => {
-            if (layer instanceof L.Marker) map.removeLayer(layer);
-          });
-          data.locations.forEach(loc => {
-            if (loc.latitude == null || loc.longitude == null) return;
-            const spText = loc.speed_display ? ' &middot; &#128663; ' + loc.speed_display : '';
-            const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + escapeHtml(loc.profile_emoji) + '</span>' : '';
-            L.marker([loc.latitude, loc.longitude], { icon: profileIcon(loc.display_name || '', loc.profile_emoji || null) })
-              .bindPopup(emojiPrefix + '<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + (loc.updated_at ? new Date(loc.updated_at).toLocaleTimeString(LANG) : '') + '</small>')
-              .addTo(map);
-          });
-          if (locations.length === 0 && data.locations.length > 0) {
+          syncMarkers(data.locations);
+          // Recenter when the page initially had no pinnable locations.
+          if (pinnable.length === 0) {
             const fresh = data.locations.filter(l => l.latitude != null && l.longitude != null);
             if (fresh.length === 1) {
               map.setView([fresh[0].latitude, fresh[0].longitude], 15);
