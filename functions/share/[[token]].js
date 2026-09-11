@@ -519,7 +519,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
   const updatedLabel = t.updated;
   const markersJs = pinnable.map((loc, i) => {
     const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
-    const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
+    const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + escapeHtml(loc.profile_emoji) + '</span>' : '';
     return `
     L.marker([${loc.latitude}, ${loc.longitude}], { icon: profileIcon(${JSON.stringify(loc.display_name || "")}, ${JSON.stringify(loc.profile_emoji || null)}) })
       .bindPopup('${emojiPrefix}<b>${escapeHtml(loc.display_name)}</b>${spText}<br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
@@ -590,12 +590,23 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
 
       // Profile icon marker: emoji (when set) or first initial on a
       // deterministic color, matching the in-app crew markers.
+      // profile_emoji is user-writable via the API, so HTML-escape it —
+      // real emoji contain no HTML metacharacters and render unchanged.
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
       function profileIcon(name, emoji) {
         let hue = 0;
         for (let i = 0; i < name.length; i++) hue = (hue * 31 + name.charCodeAt(i)) % 360;
         const bg = 'hsl(' + hue + ', 65%, 48%)';
+        const safeEmoji = escapeHtml(emoji || '');
         const inner = emoji
-          ? '<span style="font-size:19px;line-height:1">' + emoji + '</span>'
+          ? '<span style="font-size:19px;line-height:1">' + safeEmoji + '</span>'
           : '<span style="color:#fff;font-weight:700;font-size:15px;font-family:system-ui,-apple-system,sans-serif">' + (name.trim().charAt(0).toUpperCase() || '?') + '</span>';
         return L.divIcon({
           className: '',
@@ -635,7 +646,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
           data.locations.forEach(loc => {
             if (loc.latitude == null || loc.longitude == null) return;
             const spText = loc.speed_display ? ' &middot; &#128663; ' + loc.speed_display : '';
-            const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
+            const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + escapeHtml(loc.profile_emoji) + '</span>' : '';
             L.marker([loc.latitude, loc.longitude], { icon: profileIcon(loc.display_name || '', loc.profile_emoji || null) })
               .bindPopup(emojiPrefix + '<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + (loc.updated_at ? new Date(loc.updated_at).toLocaleTimeString(LANG) : '') + '</small>')
               .addTo(map);
