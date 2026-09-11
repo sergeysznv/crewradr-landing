@@ -627,7 +627,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
     </style>
     </head><body>
     <div id="map"></div>
-    <button id="theme-btn" aria-haspopup="true" aria-expanded="false">🎨 <span id="theme-label"></span></button>
+    <button id="theme-btn" title="${escapeHtml(t.mapThemeTitle)}" aria-haspopup="true" aria-expanded="false">🎨 <span id="theme-label"></span></button>
     <div id="theme-menu" role="menu"></div>
     ${noLocationsMessage}
     <div id="cta">
@@ -638,7 +638,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
     <script>
       const UPDATED_LABEL = ${JSON.stringify(updatedLabel)};
       const LANG = ${JSON.stringify(lang)};
-      const THEME = { title: ${JSON.stringify(t.mapThemeTitle)}, system: ${JSON.stringify(t.mapThemeSystem)}, light: ${JSON.stringify(t.mapThemeLight)}, dark: ${JSON.stringify(t.mapThemeDark)} };
+      const THEME = { system: ${JSON.stringify(t.mapThemeSystem)}, light: ${JSON.stringify(t.mapThemeLight)}, dark: ${JSON.stringify(t.mapThemeDark)} };
       const locations = ${locJson};
       const pinnable = locations.filter(l => l.latitude != null && l.longitude != null);
       const map = L.map('map').setView(${center}, ${zoom});
@@ -730,8 +730,10 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         btn.type = 'button';
         btn.textContent = themeLabel(option);
         btn.dataset.theme = option;
+        btn.setAttribute('role', 'menuitem');
         btn.addEventListener('click', function () {
           try { localStorage.setItem('crewradr-map-theme', option); } catch (e) {}
+          mapTheme = option;
           applyTheme(option);
           menu.classList.remove('open');
           document.getElementById('theme-btn').setAttribute('aria-expanded', 'false');
@@ -742,10 +744,11 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         const open = menu.classList.toggle('open');
         document.getElementById('theme-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-      const mapTheme = storedMapTheme();
+      document.addEventListener('click', function (e) { if (!document.getElementById('theme-btn').contains(e.target) && !document.getElementById('theme-menu').contains(e.target)) { menu.classList.remove('open'); document.getElementById('theme-btn').setAttribute('aria-expanded', 'false'); } });
+      let mapTheme = storedMapTheme();
       applyTheme(mapTheme);
-      if (darkMq.addEventListener) darkMq.addEventListener('change', function () { applyTheme(mapTheme); });
-      else if (darkMq.addListener) darkMq.addListener(function () { applyTheme(mapTheme); });
+      if (darkMq.addEventListener) darkMq.addEventListener('change', function () { if (mapTheme === 'system') applyTheme(mapTheme); });
+      else if (darkMq.addListener) darkMq.addListener(function () { if (mapTheme === 'system') applyTheme(mapTheme); });
 
       function popupHtml(loc) {
         const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
