@@ -28,7 +28,7 @@ const STRINGS = {
     viewingCrew: "Viewing crew location via CrewRadr",
     viewingLive: "Viewing live location via CrewRadr",
     seeCrew: "See your whole crew on the map",
-    trackLovedOnes: "Track your loved ones",
+    seeLive: "See live location on the map",
     getTheApp: "Get the App",
     speedMph: "{s} mph",
     speedKmh: "{s} km/h",
@@ -52,7 +52,7 @@ const STRINGS = {
     viewingCrew: "Viendo la ubicación del grupo vía CrewRadr",
     viewingLive: "Viendo la ubicación en vivo vía CrewRadr",
     seeCrew: "Ve a todo tu grupo en el mapa",
-    trackLovedOnes: "Sigue a tus seres queridos",
+    seeLive: "Mira la ubicación en vivo en el mapa",
     getTheApp: "Descarga la app",
     speedMph: "{s} mph",
     speedKmh: "{s} km/h",
@@ -76,7 +76,7 @@ const STRINGS = {
     viewingCrew: "Position de l'équipe via CrewRadr",
     viewingLive: "Position en direct via CrewRadr",
     seeCrew: "Voyez toute votre équipe sur la carte",
-    trackLovedOnes: "Suivez vos proches",
+    seeLive: "Voyez la position en direct sur la carte",
     getTheApp: "Télécharger l'app",
     speedMph: "{s} mph",
     speedKmh: "{s} km/h",
@@ -100,7 +100,7 @@ const STRINGS = {
     viewingCrew: "عرض موقع الطاقم عبر CrewRadr",
     viewingLive: "عرض الموقع المباشر عبر CrewRadr",
     seeCrew: "شاهد طاقمك بالكامل على الخريطة",
-    trackLovedOnes: "تتبع أحباءك",
+    seeLive: "شاهد الموقع المباشر على الخريطة",
     getTheApp: "حمّل التطبيق",
     speedMph: "{s} ميل/س",
     speedKmh: "{s} كم/س",
@@ -124,7 +124,7 @@ const STRINGS = {
     viewingCrew: "通过 CrewRadr 查看团队位置",
     viewingLive: "通过 CrewRadr 查看实时位置",
     seeCrew: "在地图上查看您的整个团队",
-    trackLovedOnes: "追踪您的家人",
+    seeLive: "在地图上查看实时位置",
     getTheApp: "下载应用",
     speedMph: "{s} 英里/小时",
     speedKmh: "{s} 公里/小时",
@@ -148,7 +148,7 @@ const STRINGS = {
     viewingCrew: "Просмотр местоположения команды через CrewRadr",
     viewingLive: "Просмотр живого местоположения через CrewRadr",
     seeCrew: "Смотрите всю команду на карте",
-    trackLovedOnes: "Следите за близкими",
+    seeLive: "Смотрите местоположение на карте в реальном времени",
     getTheApp: "Скачать приложение",
     speedMph: "{s} миль/ч",
     speedKmh: "{s} км/ч",
@@ -574,7 +574,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
     ${noLocationsMessage}
     <div id="cta">
       <div class="badge">📍 ${mode === 'crew' ? t.viewingCrew : t.viewingLive}</div>
-      <div class="title">${mode === 'crew' ? t.seeCrew : t.trackLovedOnes}</div>
+      <div class="title">${mode === 'crew' ? t.seeCrew : t.seeLive}</div>
       <a href="https://crewradr.app" class="btn">${t.getTheApp}</a>
     </div>
     <script>
