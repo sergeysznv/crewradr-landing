@@ -253,6 +253,7 @@ export async function onRequest(context) {
               speedDisplay = tpl.replace("{s}", Math.round(sNum));
             }
             return {
+              user_id: loc.user_id || null,
               latitude: loc.latitude,
               longitude: loc.longitude,
               display_name: loc.display_name || t.crewMember,
@@ -345,6 +346,11 @@ export async function onRequest(context) {
             const profileRes = await fetch(profileUrl, { headers: authHeaders });
             const profiles = profileRes.ok ? await profileRes.json() : [];
             const prof = (profiles && profiles.length > 0) ? profiles[0] : null;
+            // Profile photo lives on crew_members, not profiles.
+            const memberAvUrl = `${supabaseUrl}/rest/v1/crew_members?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(share.creator_id)}&select=avatar_url`;
+            const memberAvRes = await fetch(memberAvUrl, { headers: authHeaders });
+            const memberAvas = memberAvRes.ok ? await memberAvRes.json() : [];
+            const avatarUrl = (memberAvas && memberAvas.length > 0) ? memberAvas[0].avatar_url : null;
             const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
             const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
             let speedDisplay = null;
@@ -356,11 +362,12 @@ export async function onRequest(context) {
             }
 
             locations.push({
+              user_id: share.creator_id,
               latitude: loc.latitude,
               longitude: loc.longitude,
               display_name: (prof && prof.display_name) || t.crewMember,
               updated_at: loc.created_at,
-              avatar_url: prof ? prof.avatar_url : null,
+              avatar_url: avatarUrl,
               profile_emoji: prof ? prof.profile_emoji : null,
               speed_ms: speedMs,
               speed_display: speedDisplay,
@@ -421,6 +428,12 @@ export async function onRequest(context) {
             const profilesRes = await fetch(profilesUrl, { headers: authHeaders });
             const profiles = profilesRes.ok ? await profilesRes.json() : [];
 
+            // Profile photos live on crew_members, not profiles.
+            const membersAvUrl = `${supabaseUrl}/rest/v1/crew_members?crew_id=eq.${encodeURIComponent(share.crew_id)}&select=user_id,avatar_url`;
+            const membersAvRes = await fetch(membersAvUrl, { headers: authHeaders });
+            const membersAvas = membersAvRes.ok ? await membersAvRes.json() : [];
+            const avMap = new Map((membersAvas || []).map(m => [m.user_id, m.avatar_url]));
+
             const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
 
             locations = latestPerUser.map(loc => {
@@ -436,11 +449,12 @@ export async function onRequest(context) {
               }
 
               return {
+                user_id: loc.user_id,
                 latitude: loc.latitude,
                 longitude: loc.longitude,
                 display_name: (prof && prof.display_name) || t.crewMember,
                 updated_at: loc.created_at,
-                avatar_url: prof ? prof.avatar_url : null,
+                avatar_url: avMap.get(loc.user_id) || null,
                 profile_emoji: prof ? prof.profile_emoji : null,
                 speed_ms: speedMs,
                 speed_display: speedDisplay,
@@ -496,10 +510,6 @@ function renderExpiredPage(t) {
     <div style="margin-top:24px">
       <a href="https://crewradr.app" style="display:inline-block;padding:12px 24px;background:#4f8cff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">${t.getCrewRadr}</a>
     </div>
-    <p style="margin-top:16px;font-size:0.85rem;color:#888">
-      ${t.availableOn} <a href="https://apps.apple.com/app/crewradr/id6743987530" style="color:#4f8cff">App Store</a> ·
-      <a href="https://play.google.com/store/apps/details?id=com.CrewRadr.app" style="color:#4f8cff">Google Play</a>
-    </p>
   `;
 }
 
@@ -557,8 +567,6 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         background: #4f8cff; color: #fff; text-decoration: none;
         border-radius: 8px; font-weight: 600; font-size: 0.95rem;
       }
-      #cta .stores { font-size: 0.8rem; color: #888; margin-top: 4px; }
-      #cta .stores a { color: #4f8cff; text-decoration: none; }
       .leaflet-popup-content { font-family: system-ui, -apple-system, sans-serif; font-size: 0.9rem; }
     </style>
     </head><body>
@@ -568,10 +576,6 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
       <div class="badge">📍 ${mode === 'crew' ? t.viewingCrew : t.viewingLive}</div>
       <div class="title">${mode === 'crew' ? t.seeCrew : t.trackLovedOnes}</div>
       <a href="https://crewradr.app" class="btn">${t.getTheApp}</a>
-      <div class="stores">
-        <a href="https://apps.apple.com/app/crewradr/id6743987530">App Store</a> ·
-        <a href="https://play.google.com/store/apps/details?id=com.CrewRadr.app">Google Play</a>
-      </div>
     </div>
     <script>
       const UPDATED_LABEL = ${JSON.stringify(updatedLabel)};
@@ -592,7 +596,19 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
       }
-      function profileIcon(name, emoji) {
+      function profileIcon(name, emoji, avatarUrl) {
+        // Profile photo (crew_members.avatar_url) wins when present and a
+        // sane https URL — otherwise emoji / initial on deterministic color.
+        // avatar_url is user-writable, so validate shape AND escape it.
+        if (avatarUrl && /^https:\/\/[^\s"'<>]+$/.test(avatarUrl)) {
+          return L.divIcon({
+            className: '',
+            html: '<div style="width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);background-image:url(&quot;' + escapeHtml(avatarUrl) + '&quot;);background-size:cover;background-position:center"></div>',
+            iconSize: [34, 34],
+            iconAnchor: [17, 17],
+            popupAnchor: [0, -19],
+          });
+        }
         let hue = 0;
         for (let i = 0; i < name.length; i++) hue = (hue * 31 + name.charCodeAt(i)) % 360;
         const bg = 'hsl(' + hue + ', 65%, 48%)';
@@ -619,7 +635,10 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
       function popupHtml(loc) {
         const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
         const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + escapeHtml(loc.profile_emoji) + '</span>' : '';
-        return emojiPrefix + '<b>' + escapeHtml(loc.display_name) + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + (loc.updated_at ? new Date(loc.updated_at).toLocaleTimeString(LANG) : '') + '</small>';
+        const ts = loc.updated_at
+          ? new Date(loc.updated_at).toLocaleString(LANG, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : '';
+        return emojiPrefix + '<b>' + escapeHtml(loc.display_name) + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + ts + '</small>';
       }
 
       // Marker sync: update in place so open popups survive the 15-second
@@ -642,7 +661,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
             existing.setPopupContent(html);
             if (wasOpen) { existing.closePopup(); existing.openPopup(); }
           } else {
-            markers.set(key, L.marker(latlng, { icon: profileIcon(loc.display_name || '', loc.profile_emoji || null) })
+            markers.set(key, L.marker(latlng, { icon: profileIcon(loc.display_name || '', loc.profile_emoji || null, loc.avatar_url || null) })
               .bindPopup(html)
               .addTo(map));
           }
