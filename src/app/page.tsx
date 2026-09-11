@@ -80,7 +80,7 @@ export default function LandingPage() {
         >
           {LOCALES.map((l) => (
             <option key={l.code} value={l.code} className="text-[#1A2327]">
-              {l.label}
+              {l.flag} {l.label}
             </option>
           ))}
         </select>

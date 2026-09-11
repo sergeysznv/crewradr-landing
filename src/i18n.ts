@@ -6,12 +6,12 @@
 // because it runs outside Next.js.
 
 export const LOCALES = [
-  { code: "en", label: "English", dir: "ltr" },
-  { code: "es", label: "Español", dir: "ltr" },
-  { code: "fr", label: "Français", dir: "ltr" },
-  { code: "ar", label: "العربية", dir: "rtl" },
-  { code: "zh", label: "中文", dir: "ltr" },
-  { code: "ru", label: "Русский", dir: "ltr" },
+  { code: "en", label: "English", flag: "🇺🇸", dir: "ltr" },
+  { code: "es", label: "Español", flag: "🇪🇸", dir: "ltr" },
+  { code: "fr", label: "Français", flag: "🇫🇷", dir: "ltr" },
+  { code: "ar", label: "العربية", flag: "🇸🇦", dir: "rtl" },
+  { code: "zh", label: "中文", flag: "🇨🇳", dir: "ltr" },
+  { code: "ru", label: "Русский", flag: "🇷🇺", dir: "ltr" },
 ] as const;
 
 export type LocaleCode = (typeof LOCALES)[number]["code"];
