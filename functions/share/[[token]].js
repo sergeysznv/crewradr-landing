@@ -32,6 +32,10 @@ const STRINGS = {
     getTheApp: "Get the App",
     speedMph: "{s} mph",
     speedKmh: "{s} km/h",
+    mapThemeTitle: "Map theme",
+    mapThemeSystem: "System",
+    mapThemeLight: "Light",
+    mapThemeDark: "Dark",
   },
   es: {
     invalidTitle: "Enlace de compartir no válido",
@@ -56,6 +60,10 @@ const STRINGS = {
     getTheApp: "Descarga la app",
     speedMph: "{s} mph",
     speedKmh: "{s} km/h",
+    mapThemeTitle: "Tema del mapa",
+    mapThemeSystem: "Sistema",
+    mapThemeLight: "Claro",
+    mapThemeDark: "Oscuro",
   },
   fr: {
     invalidTitle: "Lien de partage invalide",
@@ -80,6 +88,10 @@ const STRINGS = {
     getTheApp: "Télécharger l'app",
     speedMph: "{s} mph",
     speedKmh: "{s} km/h",
+    mapThemeTitle: "Thème de la carte",
+    mapThemeSystem: "Système",
+    mapThemeLight: "Clair",
+    mapThemeDark: "Sombre",
   },
   ar: {
     invalidTitle: "رابط مشاركة غير صالح",
@@ -104,6 +116,10 @@ const STRINGS = {
     getTheApp: "حمّل التطبيق",
     speedMph: "{s} ميل/س",
     speedKmh: "{s} كم/س",
+    mapThemeTitle: "سمة الخريطة",
+    mapThemeSystem: "النظام",
+    mapThemeLight: "فاتح",
+    mapThemeDark: "داكن",
   },
   zh: {
     invalidTitle: "分享链接无效",
@@ -128,6 +144,10 @@ const STRINGS = {
     getTheApp: "下载应用",
     speedMph: "{s} 英里/小时",
     speedKmh: "{s} 公里/小时",
+    mapThemeTitle: "地图主题",
+    mapThemeSystem: "系统",
+    mapThemeLight: "浅色",
+    mapThemeDark: "深色",
   },
   ru: {
     invalidTitle: "Недействительная ссылка",
@@ -152,6 +172,10 @@ const STRINGS = {
     getTheApp: "Скачать приложение",
     speedMph: "{s} миль/ч",
     speedKmh: "{s} км/ч",
+    mapThemeTitle: "Тема карты",
+    mapThemeSystem: "Система",
+    mapThemeLight: "Светлая",
+    mapThemeDark: "Тёмная",
   },
 };
 
@@ -576,9 +600,35 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
       #map.dark .leaflet-bar a { background: #1e242b; color: #e6e6e6; border-color: #333a42; }
       #map.dark .leaflet-control-attribution { background: rgba(18,22,26,0.85); color: #999; }
       #map.dark .leaflet-control-attribution a { color: #b0c4ff; }
+      #theme-btn {
+        position: fixed; top: 12px; right: 12px; z-index: 1100;
+        display: flex; align-items: center; gap: 6px;
+        padding: 8px 10px; border: none; border-radius: 8px;
+        background: rgba(26,26,46,0.92); color: #fff;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      }
+      #theme-menu {
+        position: fixed; top: 48px; right: 12px; z-index: 1100;
+        display: none; flex-direction: column; min-width: 130px;
+        background: rgba(26,26,46,0.96); border-radius: 10px;
+        padding: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      }
+      #theme-menu.open { display: flex; }
+      #theme-menu button {
+        border: none; background: transparent; color: #ddd;
+        text-align: left; padding: 8px 10px; border-radius: 6px;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 0.85rem; cursor: pointer;
+      }
+      #theme-menu button:hover { background: rgba(255,255,255,0.08); }
+      #theme-menu button.selected { color: #fff; font-weight: 700; }
     </style>
     </head><body>
     <div id="map"></div>
+    <button id="theme-btn" aria-haspopup="true" aria-expanded="false">🎨 <span id="theme-label"></span></button>
+    <div id="theme-menu" role="menu"></div>
     ${noLocationsMessage}
     <div id="cta">
       <div class="badge">📍 ${mode === 'crew' ? t.viewingCrew : t.viewingLive}</div>
@@ -588,6 +638,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
     <script>
       const UPDATED_LABEL = ${JSON.stringify(updatedLabel)};
       const LANG = ${JSON.stringify(lang)};
+      const THEME = { title: ${JSON.stringify(t.mapThemeTitle)}, system: ${JSON.stringify(t.mapThemeSystem)}, light: ${JSON.stringify(t.mapThemeLight)}, dark: ${JSON.stringify(t.mapThemeDark)} };
       const locations = ${locJson};
       const pinnable = locations.filter(l => l.latitude != null && l.longitude != null);
       const map = L.map('map').setView(${center}, ${zoom});
@@ -652,17 +703,49 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         maxZoom: 20,
       }).addTo(map);
 
-      // Follow the viewer's OS preference — Google raster tiles have no
-      // style API here, so dark mode inverts the tile pane via CSS.
+      // Map theme: System follows the OS; Light/Dark are explicit. Stored
+      // per-viewer in localStorage (default system).
       const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
-      function applyTheme(dark) {
-        document.getElementById('map').classList.toggle('dark', !!dark);
+      function storedMapTheme() {
+        try {
+          const v = localStorage.getItem('crewradr-map-theme');
+          return (v === 'light' || v === 'dark') ? v : 'system';
+        } catch (e) { return 'system'; }
       }
-      if (darkMq) {
-        applyTheme(darkMq.matches);
-        if (darkMq.addEventListener) darkMq.addEventListener('change', function (e) { applyTheme(e.matches); });
-        else if (darkMq.addListener) darkMq.addListener(function (e) { applyTheme(e.matches); });
+      function themeLabel(option) {
+        return option === 'light' ? THEME.light : option === 'dark' ? THEME.dark : THEME.system;
       }
+      function applyTheme(option) {
+        const dark = option === 'dark' || (option === 'system' && darkMq.matches);
+        document.getElementById('map').classList.toggle('dark', dark);
+        document.getElementById('theme-label').textContent = themeLabel(option);
+        const menu = document.getElementById('theme-menu');
+        Array.prototype.forEach.call(menu.children, function (btn) {
+          btn.classList.toggle('selected', btn.dataset.theme === option);
+        });
+      }
+      const menu = document.getElementById('theme-menu');
+      ['system', 'light', 'dark'].forEach(function (option) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = themeLabel(option);
+        btn.dataset.theme = option;
+        btn.addEventListener('click', function () {
+          try { localStorage.setItem('crewradr-map-theme', option); } catch (e) {}
+          applyTheme(option);
+          menu.classList.remove('open');
+          document.getElementById('theme-btn').setAttribute('aria-expanded', 'false');
+        });
+        menu.appendChild(btn);
+      });
+      document.getElementById('theme-btn').addEventListener('click', function () {
+        const open = menu.classList.toggle('open');
+        document.getElementById('theme-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      let mapTheme = storedMapTheme();
+      applyTheme(mapTheme);
+      if (darkMq.addEventListener) darkMq.addEventListener('change', function () { applyTheme(mapTheme); });
+      else if (darkMq.addListener) darkMq.addListener(function () { applyTheme(mapTheme); });
 
       function popupHtml(loc) {
         const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
