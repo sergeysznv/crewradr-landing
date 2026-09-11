@@ -568,6 +568,14 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         border-radius: 8px; font-weight: 600; font-size: 0.95rem;
       }
       .leaflet-popup-content { font-family: system-ui, -apple-system, sans-serif; font-size: 0.9rem; }
+      /* Dark mode: invert Google raster tiles (tile pane only — markers are
+         in a sibling pane and stay untouched) and theme Leaflet chrome. */
+      #map.dark { background: #12161a; }
+      #map.dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9) grayscale(0.12); }
+      #map.dark .leaflet-popup-content-wrapper, #map.dark .leaflet-popup-tip { background: #1e242b; color: #e6e6e6; }
+      #map.dark .leaflet-bar a { background: #1e242b; color: #e6e6e6; border-color: #333a42; }
+      #map.dark .leaflet-control-attribution { background: rgba(18,22,26,0.85); color: #999; }
+      #map.dark .leaflet-control-attribution a { color: #b0c4ff; }
     </style>
     </head><body>
     <div id="map"></div>
@@ -643,6 +651,18 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         attribution: '&copy; Google Maps',
         maxZoom: 20,
       }).addTo(map);
+
+      // Follow the viewer's OS preference — Google raster tiles have no
+      // style API here, so dark mode inverts the tile pane via CSS.
+      const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+      function applyTheme(dark) {
+        document.getElementById('map').classList.toggle('dark', !!dark);
+      }
+      if (darkMq) {
+        applyTheme(darkMq.matches);
+        if (darkMq.addEventListener) darkMq.addEventListener('change', function (e) { applyTheme(e.matches); });
+        else if (darkMq.addListener) darkMq.addListener(function (e) { applyTheme(e.matches); });
+      }
 
       function popupHtml(loc) {
         const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
