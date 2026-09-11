@@ -705,7 +705,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
 
       // Map theme: System follows the OS; Light/Dark are explicit. Stored
       // per-viewer in localStorage (default system).
-      const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+      const darkMq = window.matchMedia('(prefers-color-scheme: dark)') || { matches: false, addEventListener: null, addListener: null };
       function storedMapTheme() {
         try {
           const v = localStorage.getItem('crewradr-map-theme');
@@ -742,7 +742,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         const open = menu.classList.toggle('open');
         document.getElementById('theme-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-      let mapTheme = storedMapTheme();
+      const mapTheme = storedMapTheme();
       applyTheme(mapTheme);
       if (darkMq.addEventListener) darkMq.addEventListener('change', function () { applyTheme(mapTheme); });
       else if (darkMq.addListener) darkMq.addListener(function () { applyTheme(mapTheme); });
