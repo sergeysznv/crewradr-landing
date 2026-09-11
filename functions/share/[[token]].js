@@ -600,7 +600,19 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
         // Profile photo (crew_members.avatar_url) wins when present and a
         // sane https URL — otherwise emoji / initial on deterministic color.
         // avatar_url is user-writable, so validate shape AND escape it.
-        if (avatarUrl && /^https:\/\/[^\s"'<>]+$/.test(avatarUrl)) {
+        // NOTE: no regex — backslash escapes get mangled by the server-side
+        // template literal, and the broken regex kills the whole script.
+        function isSafeAvatarUrl(u) {
+          if (typeof u !== 'string' || u.length === 0 || u.length > 500) return false;
+          if (u.indexOf('https://') !== 0) return false;
+          for (let i = 0; i < u.length; i++) {
+            const c = u.charCodeAt(i);
+            // space/control chars (<=32) and " ' < > are forbidden
+            if (c <= 32 || c === 34 || c === 39 || c === 60 || c === 62) return false;
+          }
+          return true;
+        }
+        if (isSafeAvatarUrl(avatarUrl)) {
           return L.divIcon({
             className: '',
             html: '<div style="width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);background-image:url(&quot;' + escapeHtml(avatarUrl) + '&quot;);background-size:cover;background-position:center"></div>',
