@@ -341,7 +341,7 @@ export async function onRequest(context) {
             } catch (_) { /* encrypted ciphertext — skip */ }
           }
           if (loc.latitude != null && loc.longitude != null) {
-            const profileUrl = `${supabaseUrl}/rest/v1/profiles?user_id=eq.${encodeURIComponent(share.creator_id)}&select=display_name,avatar_url,profile_emoji,measurement_system`;
+            const profileUrl = `${supabaseUrl}/rest/v1/profiles?user_id=eq.${encodeURIComponent(share.creator_id)}&select=display_name,profile_emoji,measurement_system`;
             const profileRes = await fetch(profileUrl, { headers: authHeaders });
             const profiles = profileRes.ok ? await profileRes.json() : [];
             const prof = (profiles && profiles.length > 0) ? profiles[0] : null;
@@ -417,7 +417,7 @@ export async function onRequest(context) {
           if (latestPerUser.length > 0) {
             // Fetch profiles using PostgREST in operator
             const profileIn = userIds.map(id => encodeURIComponent(id)).join(",");
-            const profilesUrl = `${supabaseUrl}/rest/v1/profiles?user_id=in.(${profileIn})&select=user_id,display_name,avatar_url,profile_emoji,measurement_system`;
+            const profilesUrl = `${supabaseUrl}/rest/v1/profiles?user_id=in.(${profileIn})&select=user_id,display_name,profile_emoji,measurement_system`;
             const profilesRes = await fetch(profilesUrl, { headers: authHeaders });
             const profiles = profilesRes.ok ? await profilesRes.json() : [];
 
@@ -504,17 +504,20 @@ function renderExpiredPage(t) {
 }
 
 function renderPage(token, locations, mode, t, lang, viewerUnits) {
+  // Only members with real coordinates can be pinned; stale/no-fix members
+  // still appear in the JSON feed so the UI can surface them separately.
+  const pinnable = locations.filter(loc => loc.latitude != null && loc.longitude != null);
   const locJson = JSON.stringify(locations).replace(/</g, '\\u003c');
-  const center = locations.length > 0
-    ? `[${locations[0].latitude}, ${locations[0].longitude}]`
+  const center = pinnable.length > 0
+    ? `[${pinnable[0].latitude}, ${pinnable[0].longitude}]`
     : "[40.7128, -74.0060]";
-  const zoom = locations.length > 0 ? "15" : "4";
-  const noLocationsMessage = locations.length === 0
+  const zoom = pinnable.length > 0 ? "15" : "4";
+  const noLocationsMessage = pinnable.length === 0
     ? `<div id="noloc" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:12px 20px;border-radius:8px;z-index:1000;font-size:0.9rem">${mode === 'crew' ? t.noCrewLocations : t.waitingForLocation}</div>`
     : "";
 
   const updatedLabel = t.updated;
-  const markersJs = locations.map((loc, i) => {
+  const markersJs = pinnable.map((loc, i) => {
     const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
     const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
     return `
@@ -582,6 +585,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
       const UPDATED_LABEL = ${JSON.stringify(updatedLabel)};
       const LANG = ${JSON.stringify(lang)};
       const locations = ${locJson};
+      const pinnable = locations.filter(l => l.latitude != null && l.longitude != null);
       const map = L.map('map').setView(${center}, ${zoom});
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -590,8 +594,8 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
 
       ${markersJs}
 
-      if (locations.length > 1) {
-        const bounds = L.latLngBounds(locations.map(l => [l.latitude, l.longitude]));
+      if (pinnable.length > 1) {
+        const bounds = L.latLngBounds(pinnable.map(l => [l.latitude, l.longitude]));
         map.fitBounds(bounds.pad(0.1));
       }
 
@@ -608,17 +612,19 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
             if (layer instanceof L.Marker) map.removeLayer(layer);
           });
           data.locations.forEach(loc => {
+            if (loc.latitude == null || loc.longitude == null) return;
             const spText = loc.speed_display ? ' &middot; &#128663; ' + loc.speed_display : '';
             const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
             L.marker([loc.latitude, loc.longitude])
-              .bindPopup(emojiPrefix + '<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + new Date(loc.updated_at).toLocaleTimeString(LANG) + '</small>')
+              .bindPopup(emojiPrefix + '<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + (loc.updated_at ? new Date(loc.updated_at).toLocaleTimeString(LANG) : '') + '</small>')
               .addTo(map);
           });
           if (locations.length === 0 && data.locations.length > 0) {
-            if (data.locations.length === 1) {
-              map.setView([data.locations[0].latitude, data.locations[0].longitude], 15);
-            } else {
-              const bounds = L.latLngBounds(data.locations.map(l => [l.latitude, l.longitude]));
+            const fresh = data.locations.filter(l => l.latitude != null && l.longitude != null);
+            if (fresh.length === 1) {
+              map.setView([fresh[0].latitude, fresh[0].longitude], 15);
+            } else if (fresh.length > 1) {
+              const bounds = L.latLngBounds(fresh.map(l => [l.latitude, l.longitude]));
               map.fitBounds(bounds.pad(0.1));
             }
           }
