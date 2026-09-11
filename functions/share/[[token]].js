@@ -521,7 +521,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
     const spText = loc.speed_display ? ' &middot; &#128663; ' + escapeHtml(loc.speed_display) : '';
     const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
     return `
-    L.marker([${loc.latitude}, ${loc.longitude}])
+    L.marker([${loc.latitude}, ${loc.longitude}], { icon: profileIcon(${JSON.stringify(loc.display_name || "")}, ${JSON.stringify(loc.profile_emoji || null)}) })
       .bindPopup('${emojiPrefix}<b>${escapeHtml(loc.display_name)}</b>${spText}<br><small>${updatedLabel} ${new Date(loc.updated_at).toLocaleTimeString(lang)}</small>')
       .addTo(map);
   `;}).join("\n");
@@ -587,9 +587,30 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
       const locations = ${locJson};
       const pinnable = locations.filter(l => l.latitude != null && l.longitude != null);
       const map = L.map('map').setView(${center}, ${zoom});
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19,
+
+      // Profile icon marker: emoji (when set) or first initial on a
+      // deterministic color, matching the in-app crew markers.
+      function profileIcon(name, emoji) {
+        let hue = 0;
+        for (let i = 0; i < name.length; i++) hue = (hue * 31 + name.charCodeAt(i)) % 360;
+        const bg = 'hsl(' + hue + ', 65%, 48%)';
+        const inner = emoji
+          ? '<span style="font-size:19px;line-height:1">' + emoji + '</span>'
+          : '<span style="color:#fff;font-weight:700;font-size:15px;font-family:system-ui,-apple-system,sans-serif">' + (name.trim().charAt(0).toUpperCase() || '?') + '</span>';
+        return L.divIcon({
+          className: '',
+          html: '<div style="width:34px;height:34px;border-radius:50%;background:' + bg + ';border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;overflow:hidden">' + inner + '</div>',
+          iconSize: [34, 34],
+          iconAnchor: [17, 17],
+          popupAnchor: [0, -19],
+        });
+      }
+
+      // Google Maps raster tiles — same provider as the in-app map.
+      L.tileLayer('https://{s}.google.com/vt/lyrs=m&hl=${lang}&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps',
+        maxZoom: 20,
       }).addTo(map);
 
       ${markersJs}
@@ -615,7 +636,7 @@ function renderPage(token, locations, mode, t, lang, viewerUnits) {
             if (loc.latitude == null || loc.longitude == null) return;
             const spText = loc.speed_display ? ' &middot; &#128663; ' + loc.speed_display : '';
             const emojiPrefix = loc.profile_emoji ? '<span style="font-size:1.15rem;vertical-align:middle;margin-right:4px">' + loc.profile_emoji + '</span>' : '';
-            L.marker([loc.latitude, loc.longitude])
+            L.marker([loc.latitude, loc.longitude], { icon: profileIcon(loc.display_name || '', loc.profile_emoji || null) })
               .bindPopup(emojiPrefix + '<b>' + loc.escaped_display_name + '</b>' + spText + '<br><small>' + UPDATED_LABEL + ' ' + (loc.updated_at ? new Date(loc.updated_at).toLocaleTimeString(LANG) : '') + '</small>')
               .addTo(map);
           });
