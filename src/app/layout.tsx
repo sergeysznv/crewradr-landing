@@ -17,15 +17,27 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "CrewRadr — Coming Soon",
-    description: "Real-time location sharing for trusted crews. Coming soon.",
+    title: "CrewRadr — Real-Time Situational Awareness & Fleet Safety",
+    description: "Real-time location sharing, Severe Weather Doppler Radar, and emergency telemetry for land, sea, air, and road.",
     locale: "en_US",
-    // The static export is prerendered in English and switches locale on the
-    // client, so crawlers always read the English tags — declare the other
-    // supported locales here so unfurls can at least pick the right variant.
     alternateLocale: ["es_ES", "fr_FR", "ar_AR", "zh_CN", "ru_RU"],
     siteName: "CrewRadr",
     type: "website",
+    url: "https://crewradr.com",
+    images: [
+      {
+        url: "https://crewradr.com/logo-512.png",
+        width: 512,
+        height: 512,
+        alt: "CrewRadr Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "CrewRadr — Real-Time Situational Awareness & Fleet Safety",
+    description: "Real-time location sharing, Severe Weather Doppler Radar, and emergency telemetry for land, sea, air, and road.",
+    images: ["https://crewradr.com/logo-512.png"],
   },
 };
 

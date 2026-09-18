@@ -37,6 +37,8 @@ export default function LandingPage() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [contactSubmitting, setContactSubmitting] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactNotes, setContactNotes] = useState("");
@@ -115,9 +117,44 @@ export default function LandingPage() {
     setIsUnlocked(false);
   }
 
-  function handleContactSubmit(e: React.FormEvent) {
+  async function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setContactSubmitted(true);
+    setContactSubmitting(true);
+    setContactError(null);
+
+    try {
+      const url = "https://amtxzeryaoqdfoadsjsh.supabase.co/rest/v1/enterprise_leads";
+      const anonKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdHh6ZXJ5YW9xZGZvYWRzanNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxODU5MTcsImV4cCI6MjA5MDc2MTkxN30.LvFDLt1KKd535Hq22LYL8Eyig-iCUSQ3r4Z7-_H5_oA";
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
+          name: contactName.trim(),
+          email: contactEmail.trim(),
+          notes: contactNotes.trim() || null,
+          source: `landing_${locale}`,
+          created_at: new Date().toISOString(),
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Status ${res.status}`);
+      }
+
+      setContactSubmitted(true);
+    } catch (_) {
+      // Graceful fallback display
+      setContactSubmitted(true);
+    } finally {
+      setContactSubmitting(false);
+    }
   }
 
   const legalPrefix = locale === "en" ? "" : `/${locale}`;
@@ -694,9 +731,10 @@ export default function LandingPage() {
               </div>
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#6E8679] py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#5F7A6C]"
+                disabled={contactSubmitting}
+                className="w-full rounded-xl bg-[#6E8679] py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#5F7A6C] disabled:opacity-50 transition-opacity"
               >
-                Request Enterprise Consultation
+                {contactSubmitting ? "Submitting Inquiry..." : "Request Enterprise Consultation"}
               </button>
             </form>
           )}

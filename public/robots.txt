@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /share/
+Disallow: /api/
+
+Sitemap: https://crewradr.com/sitemap.xml
