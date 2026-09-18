@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.crewradr.app",
+      "sha256_cert_fingerprints": [
+        "AB:B9:7C:E2:A4:D1:C6:31:2A:A6:96:C3:DE:26:FD:16:D5:03:DB:CE:84:C2:22:F1:66:9B:5F:1D:17:8A:6B:9E"
+      ]
+    }
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "*.com.crewradr.app",
+          "com.crewradr.app"
+        ],
+        "components": [
+          {
+            "/": "/join/*",
+            "comment": "Matches invite join links"
+          },
+          {
+            "/": "/share/*",
+            "comment": "Matches live location share links"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "*.com.crewradr.app",
+      "com.crewradr.app"
+    ]
+  }
+}
