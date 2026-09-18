@@ -54,7 +54,7 @@ export default function LandingPage() {
   return (
     <div
       dir={LOCALE_DIRS[locale]}
-      className="relative flex min-h-screen flex-col items-center justify-center px-6 text-center bg-[#F5F4F0] dark:bg-[#1A2327] text-[#1A2327] dark:text-[#EDE8E0] transition-colors duration-300"
+      className="relative flex min-h-screen flex-col items-center justify-center px-6 text-center bg-[#F6F4EE] dark:bg-[#1E2121] text-[#262017] dark:text-[#F0F3F1] transition-colors duration-300"
     >
       {/* Glow */}
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(ellipse,rgba(142,165,149,0.25)_0%,transparent_60%)] dark:bg-[radial-gradient(ellipse,rgba(142,165,149,0.12)_0%,transparent_60%)]" />
@@ -75,11 +75,11 @@ export default function LandingPage() {
           aria-label={t(locale, "language")}
           value={locale}
           onChange={(e) => changeLocale(e.target.value as LocaleCode)}
-          className="h-10 rounded-xl border bg-transparent px-3 text-sm text-[#1A2327] dark:text-[#EDE8E0]"
+          className="h-10 rounded-xl border bg-transparent px-3 text-sm text-[#262017] dark:text-[#F0F3F1]"
           style={{ borderColor: "rgba(142,165,149,0.2)" }}
         >
           {LOCALES.map((l) => (
-            <option key={l.code} value={l.code} className="text-[#1A2327]">
+            <option key={l.code} value={l.code} className="text-[#262017]">
               {l.flag} {l.label}
             </option>
           ))}
@@ -100,12 +100,12 @@ export default function LandingPage() {
       </h1>
 
       {/* Subtitle */}
-      <p className="relative z-10 mt-3 max-w-[400px] text-[clamp(1rem,2vw,1.15rem)] text-[#5A6568] dark:text-[#9AA5A8]">
+      <p className="relative z-10 mt-3 max-w-[400px] text-[clamp(1rem,2vw,1.15rem)] text-[#5C635F] dark:text-[#B4BCB8]">
         {t(locale, "subtitle")}
       </p>
 
       {/* Footer */}
-      <div className="fixed bottom-6 flex items-center gap-4 text-sm text-[#5A6568] dark:text-[#9AA5A8]">
+      <div className="fixed bottom-6 flex items-center gap-4 text-sm text-[#5C635F] dark:text-[#B4BCB8]">
         <span>&copy; {new Date().getFullYear()} CrewRadr</span>
         <a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "privacy")}</a>
         <span aria-hidden>·</span>
