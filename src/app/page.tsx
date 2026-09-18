@@ -17,6 +17,19 @@ function getTheme(): "light" | "dark" {
   return document.documentElement.classList.contains("dark") ? "dark" : "light";
 }
 
+// SHA-256 hash of the authorized launch preview password.
+// The plaintext password is never bundled in client code.
+const LAUNCH_AUTH_HASH =
+  "c016a9544e252ff4ac436f21cbaceef79eae512ed945d4441fc5b1a47126f69a";
+
+async function sha256Hex(str: string): Promise<string> {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest("SHA-256", enc.encode(str));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 export default function LandingPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
@@ -38,19 +51,33 @@ export default function LandingPage() {
     setLocale(resolved);
     if (resolved !== "en") applyLocale(resolved);
 
+    // Invalidate any legacy insecure unlock keys
+    localStorage.removeItem("crewradr_launch_unlocked");
+
     // Check preview unlock state
     const params = new URLSearchParams(search);
     if (params.get("lock") === "true") {
-      localStorage.removeItem("crewradr_launch_unlocked");
+      localStorage.removeItem("crewradr_launch_auth");
       setIsUnlocked(false);
-    } else if (
-      params.get("preview") === "launch" ||
-      params.get("preview") === "true" ||
-      params.get("unlock") === "launch" ||
-      localStorage.getItem("crewradr_launch_unlocked") === "true"
-    ) {
-      localStorage.setItem("crewradr_launch_unlocked", "true");
-      setIsUnlocked(true);
+    } else {
+      const storedAuth = localStorage.getItem("crewradr_launch_auth");
+      if (storedAuth === LAUNCH_AUTH_HASH) {
+        setIsUnlocked(true);
+      }
+
+      const keyParam =
+        params.get("key") || params.get("password") || params.get("pwd");
+      if (keyParam) {
+        sha256Hex(keyParam.trim()).then((hash) => {
+          if (hash === LAUNCH_AUTH_HASH) {
+            localStorage.setItem("crewradr_launch_auth", LAUNCH_AUTH_HASH);
+            setIsUnlocked(true);
+            try {
+              window.history.replaceState({}, "", window.location.pathname);
+            } catch (_) {}
+          }
+        });
+      }
     }
   }, []);
 
@@ -66,17 +93,24 @@ export default function LandingPage() {
     applyLocale(code);
   }
 
-  function handleUnlockPrompt() {
-    const key = prompt("Enter launch preview passphrase:");
-    if (key && (key.toLowerCase() === "crewradr" || key.toLowerCase() === "launch" || key.toLowerCase() === "preview")) {
-      localStorage.setItem("crewradr_launch_unlocked", "true");
-      setIsUnlocked(true);
-    } else if (key) {
-      alert("Invalid passphrase.");
+  async function handleUnlockPrompt() {
+    const key = prompt("Enter launch authorization key:");
+    if (!key) return;
+    try {
+      const hash = await sha256Hex(key.trim());
+      if (hash === LAUNCH_AUTH_HASH) {
+        localStorage.setItem("crewradr_launch_auth", LAUNCH_AUTH_HASH);
+        setIsUnlocked(true);
+      } else {
+        alert("Access Denied: Invalid authorization key.");
+      }
+    } catch (_) {
+      alert("Access Denied.");
     }
   }
 
   function handleLock() {
+    localStorage.removeItem("crewradr_launch_auth");
     localStorage.removeItem("crewradr_launch_unlocked");
     setIsUnlocked(false);
   }
