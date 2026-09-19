@@ -34,7 +34,7 @@ export default function LandingPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
   const [locale, setLocale] = useState<LocaleCode>("en");
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(true);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [contactSubmitting, setContactSubmitting] = useState(false);
@@ -62,24 +62,7 @@ export default function LandingPage() {
       localStorage.removeItem("crewradr_launch_auth");
       setIsUnlocked(false);
     } else {
-      const storedAuth = localStorage.getItem("crewradr_launch_auth");
-      if (storedAuth === LAUNCH_AUTH_HASH) {
-        setIsUnlocked(true);
-      }
-
-      const keyParam =
-        params.get("key") || params.get("password") || params.get("pwd");
-      if (keyParam) {
-        sha256Hex(keyParam.trim()).then((hash) => {
-          if (hash === LAUNCH_AUTH_HASH) {
-            localStorage.setItem("crewradr_launch_auth", LAUNCH_AUTH_HASH);
-            setIsUnlocked(true);
-            try {
-              window.history.replaceState({}, "", window.location.pathname);
-            } catch (_) {}
-          }
-        });
-      }
+      setIsUnlocked(true);
     }
   }, []);
 
@@ -123,8 +106,12 @@ export default function LandingPage() {
     setContactError(null);
 
     try {
-      const url = "https://amtxzeryaoqdfoadsjsh.supabase.co/rest/v1/enterprise_leads";
+      const url =
+        process.env.NEXT_PUBLIC_SUPABASE_URL
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/enterprise_leads`
+          : "https://amtxzeryaoqdfoadsjsh.supabase.co/rest/v1/enterprise_leads";
       const anonKey =
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdHh6ZXJ5YW9xZGZvYWRzanNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxODU5MTcsImV4cCI6MjA5MDc2MTkxN30.LvFDLt1KKd535Hq22LYL8Eyig-iCUSQ3r4Z7-_H5_oA";
 
       const res = await fetch(url, {
@@ -150,8 +137,7 @@ export default function LandingPage() {
 
       setContactSubmitted(true);
     } catch (_) {
-      // Graceful fallback display
-      setContactSubmitted(true);
+      setContactError("Unable to submit lead right now. Please reach out to contact@crewradr.app directly.");
     } finally {
       setContactSubmitting(false);
     }
@@ -248,24 +234,26 @@ export default function LandingPage() {
       dir={LOCALE_DIRS[locale]}
       className="min-h-screen bg-[#F6F4EE] dark:bg-[#1E2121] text-[#262017] dark:text-[#F0F3F1] transition-colors duration-300 selection:bg-[#8EA595]/30"
     >
-      {/* Internal preview banner */}
-      <aside className="sticky top-0 z-50 flex items-center justify-between border-b border-[#8EA595]/30 bg-[#8EA595]/15 px-4 py-1.5 text-xs backdrop-blur-md">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-[#6E8679] animate-pulse" />
-          <span className="font-semibold text-[#4D6558] dark:text-[#C5D3CB]">
-            {t(locale, "previewModeActive")}
-          </span>
-        </div>
-        <button
-          onClick={handleLock}
-          className="font-bold underline text-[#4D6558] dark:text-[#C5D3CB] hover:opacity-75"
-        >
-          {t(locale, "lockPage")}
-        </button>
-      </aside>
+      {/* Internal preview banner (only when ?preview=true) */}
+      {mounted && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("preview") === "true" && (
+        <aside className="sticky top-0 z-50 flex items-center justify-between border-b border-[#8EA595]/30 bg-[#8EA595]/15 px-4 py-1.5 text-xs backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#6E8679] animate-pulse" />
+            <span className="font-semibold text-[#4D6558] dark:text-[#C5D3CB]">
+              {t(locale, "previewModeActive")}
+            </span>
+          </div>
+          <button
+            onClick={handleLock}
+            className="font-bold underline text-[#4D6558] dark:text-[#C5D3CB] hover:opacity-75"
+          >
+            {t(locale, "lockPage")}
+          </button>
+        </aside>
+      )}
 
       {/* Navigation */}
-      <nav className="sticky top-[33px] z-40 flex items-center justify-between border-b border-[#8EA595]/20 bg-[#F6F4EE]/85 dark:bg-[#1E2121]/85 px-6 py-4 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 flex items-center justify-between border-b border-[#8EA595]/20 bg-[#F6F4EE]/85 dark:bg-[#1E2121]/85 px-6 py-4 backdrop-blur-md">
         <a href="/" className="flex items-center gap-3 font-bold text-xl tracking-tight">
           <Image src="/logo-96.png" alt="CrewRadr" width={34} height={34} className="rounded-lg shadow-sm" />
           <span>CrewRadr</span>

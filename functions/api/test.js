@@ -1,9 +1,19 @@
 export async function onRequest(context) {
+  const auth = context.request.headers.get("Authorization");
+  const expectedSecret = context.env.API_TEST_SECRET;
+
+  // Protect diagnostic endpoint behind secret in production
+  if (!expectedSecret || auth !== `Bearer ${expectedSecret}`) {
+    return new Response(JSON.stringify({ error: "Not Found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const { env } = context;
   const supabaseUrl = env.SUPABASE_URL;
   const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
 
-  // Test Supabase connection
   let testResult = "not tested";
   if (supabaseUrl && serviceKey) {
     try {
@@ -17,10 +27,7 @@ export async function onRequest(context) {
   }
 
   return new Response(JSON.stringify({
-    hasUrl: !!supabaseUrl,
-    urlPrefix: (supabaseUrl || '').substring(0, 30),
-    hasKey: !!serviceKey,
-    keyLength: (serviceKey || '').length,
+    ok: true,
     testResult,
   }), { headers: { "Content-Type": "application/json" } });
 }
