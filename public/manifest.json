@@ -1,0 +1,22 @@
+{
+  "name": "CrewRadr — Safety & Location Intelligence",
+  "short_name": "CrewRadr",
+  "description": "Real-time crew safety, location telemetry, and tactical awareness.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F4F0",
+  "theme_color": "#8EA595",
+  "icons": [
+    {
+      "src": "/logo-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

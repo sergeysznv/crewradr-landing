@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "CrewRadr — Coming Soon",
   description: "Real-time location sharing for trusted crews. Coming soon.",
   icons: "/logo-32.png",
+  manifest: "/manifest.json",
   alternates: {
     canonical: "/",
     languages: {
