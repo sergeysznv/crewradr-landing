@@ -109,15 +109,24 @@
 
   .theme-toggle:hover { border-color: var(--sage); color: var(--sage-dark); }
 
-  /* ── LANGUAGE SWITCH ──────────────────── */
-  .lang-switch { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-  .lang-switch a {
-    color: var(--text-secondary); text-decoration: none;
-    font-size: 0.85rem; padding: 4px 8px; border-radius: 8px;
+    /* ── LANGUAGE SELECT ──────────────────── */
+  .lang-select {
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0 10px;
+    cursor: pointer;
+    font-family: inherit;
     transition: all 0.2s ease;
+    outline: none;
   }
-  .lang-switch a:hover { color: var(--sage-dark); }
-  .lang-switch a.active { color: var(--text-primary); background: var(--sage-glow); font-weight: 700; }
+  .lang-select:hover, .lang-select:focus { border-color: var(--sage); }
+  [data-theme="dark"] .lang-select { background: var(--card-bg); color: var(--text-primary); border-color: var(--card-border); }
+  .lang-select option { background: var(--card-bg); color: var(--text-primary); }
 
   /* ── GOVERNING CLAUSE ─────────────────── */
   .governing-clause {
@@ -233,14 +242,14 @@
     CrewRadr
   </a>
   <div class="nav-actions">
-    <div class="lang-switch" aria-label="Language">
-      <a href="/privacy/" class="active">EN</a>
-      <a href="/privacy/es/">ES</a>
-      <a href="/privacy/fr/">FR</a>
-      <a href="/privacy/ar/">ع</a>
-      <a href="/privacy/zh/">中文</a>
-      <a href="/privacy/ru/">РУ</a>
-    </div>
+        <select class="lang-select" onchange="if(this.value) window.location.href=this.value" aria-label="Language">
+      <option value="/privacy/" selected>🇺🇸 English</option>
+      <option value="/privacy/es/">🇪🇸 Español</option>
+      <option value="/privacy/fr/">🇫🇷 Français</option>
+      <option value="/privacy/ar/">🇸🇦 العربية</option>
+      <option value="/privacy/zh/">🇨🇳 中文</option>
+      <option value="/privacy/ru/">🇷🇺 Русский</option>
+    </select>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">☀️</button>
   </div>
 </nav>

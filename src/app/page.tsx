@@ -296,7 +296,7 @@ export default function LandingPage() {
           >
             {LOCALES.map((l) => (
               <option key={l.code} value={l.code} className="text-[#262017]">
-                {l.flag} {l.code.toUpperCase()}
+                {l.flag} {l.label}
               </option>
             ))}
           </select>
