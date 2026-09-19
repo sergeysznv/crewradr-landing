@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { CountryFlag } from "@/components/CountryFlag";
 import { useVersionCheck } from "@/hooks/use-version-check";
 import {
   LOCALES,
@@ -36,12 +37,6 @@ export default function LandingPage() {
   const [locale, setLocale] = useState<LocaleCode>("en");
   const [isUnlocked, setIsUnlocked] = useState(true);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [contactSubmitted, setContactSubmitted] = useState(false);
-  const [contactSubmitting, setContactSubmitting] = useState(false);
-  const [contactError, setContactError] = useState<string | null>(null);
-  const [contactName, setContactName] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactNotes, setContactNotes] = useState("");
 
   useVersionCheck();
 
@@ -100,49 +95,6 @@ export default function LandingPage() {
     setIsUnlocked(false);
   }
 
-  async function handleContactSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setContactSubmitting(true);
-    setContactError(null);
-
-    try {
-      const url =
-        process.env.NEXT_PUBLIC_SUPABASE_URL
-          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/enterprise_leads`
-          : "https://amtxzeryaoqdfoadsjsh.supabase.co/rest/v1/enterprise_leads";
-      const anonKey =
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtdHh6ZXJ5YW9xZGZvYWRzanNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxODU5MTcsImV4cCI6MjA5MDc2MTkxN30.LvFDLt1KKd535Hq22LYL8Eyig-iCUSQ3r4Z7-_H5_oA";
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: anonKey,
-          Authorization: `Bearer ${anonKey}`,
-          Prefer: "return=minimal",
-        },
-        body: JSON.stringify({
-          name: contactName.trim(),
-          email: contactEmail.trim(),
-          notes: contactNotes.trim() || null,
-          source: `landing_${locale}`,
-          created_at: new Date().toISOString(),
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`Status ${res.status}`);
-      }
-
-      setContactSubmitted(true);
-    } catch (_) {
-      setContactError("Unable to submit lead right now. Please reach out to contact@crewradr.app directly.");
-    } finally {
-      setContactSubmitting(false);
-    }
-  }
-
   const legalPrefix = locale === "en" ? "" : `/${locale}`;
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -168,12 +120,13 @@ export default function LandingPage() {
         </button>
 
         {/* Language switcher */}
-        <div className="fixed left-5 top-5">
+        <div className="fixed left-5 top-5 flex items-center gap-2">
+          <CountryFlag code={locale} className="w-5 h-3.5 rounded-xs border border-[#8EA595]/30 shadow-xs" />
           <select
             aria-label={t(locale, "language")}
             value={locale}
             onChange={(e) => changeLocale(e.target.value as LocaleCode)}
-            className="h-10 rounded-xl border bg-transparent px-3 text-sm text-[#262017] dark:text-[#F0F3F1]"
+            className="h-10 rounded-xl border bg-transparent px-3 text-sm text-[#262017] dark:text-[#F0F3F1] cursor-pointer"
             style={{ borderColor: "rgba(142,165,149,0.2)" }}
           >
             {LOCALES.map((l) => (
@@ -276,18 +229,21 @@ export default function LandingPage() {
 
         <div className="flex items-center gap-3">
           {/* Language picker */}
-          <select
-            aria-label={t(locale, "language")}
-            value={locale}
-            onChange={(e) => changeLocale(e.target.value as LocaleCode)}
-            className="h-9 rounded-lg border border-[#8EA595]/30 bg-transparent px-2 text-xs font-semibold text-[#262017] dark:text-[#F0F3F1]"
-          >
-            {LOCALES.map((l) => (
-              <option key={l.code} value={l.code} className="text-[#262017]">
-                {l.flag} {l.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <CountryFlag code={locale} className="w-5 h-3.5 rounded-xs border border-[#8EA595]/30 shadow-xs" />
+            <select
+              aria-label={t(locale, "language")}
+              value={locale}
+              onChange={(e) => changeLocale(e.target.value as LocaleCode)}
+              className="h-9 rounded-lg border border-[#8EA595]/30 bg-transparent px-2 text-xs font-semibold text-[#262017] dark:text-[#F0F3F1] cursor-pointer"
+            >
+              {LOCALES.map((l) => (
+                <option key={l.code} value={l.code} className="text-[#262017]">
+                  {l.flag} {l.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Theme toggle */}
           <button
@@ -668,69 +624,6 @@ export default function LandingPage() {
               )}
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Enterprise Contact / Lead Capture */}
-      <section className="mx-auto max-w-2xl px-6 py-16 text-center">
-        <div className="rounded-2xl border border-[#8EA595]/30 bg-[#FDFCFA] dark:bg-[#262929] p-8 shadow-sm">
-          <h2 className="text-xl font-bold">Custom Fleet & Enterprise Deployments</h2>
-          <p className="mt-2 text-xs text-[#5C635F] dark:text-[#B4BCB8]">
-            Need dedicated SLA, on-premises KMS key isolation, or integration with your proprietary dispatch ERP?
-          </p>
-
-          {contactSubmitted ? (
-            <div className="mt-6 rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-              ✓ Thank you! Our enterprise solutions team will reach out to {contactEmail || "you"} within 24 hours.
-            </div>
-          ) : (
-            <form onSubmit={handleContactSubmit} className="mt-6 space-y-3 text-left">
-              <div>
-                <label htmlFor="contact-name" className="block text-xs font-semibold mb-1">Your Name</label>
-                <input
-                  id="contact-name"
-                  type="text"
-                  required
-                  aria-required="true"
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  placeholder="Alex Mercer"
-                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
-                />
-              </div>
-              <div>
-                <label htmlFor="contact-email" className="block text-xs font-semibold mb-1">Work Email</label>
-                <input
-                  id="contact-email"
-                  type="email"
-                  required
-                  aria-required="true"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="alex@fleetcompany.com"
-                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
-                />
-              </div>
-              <div>
-                <label htmlFor="contact-notes" className="block text-xs font-semibold mb-1">Fleet or Team Notes</label>
-                <textarea
-                  id="contact-notes"
-                  rows={3}
-                  value={contactNotes}
-                  onChange={(e) => setContactNotes(e.target.value)}
-                  placeholder="Estimated number of vehicles/members, special requirements..."
-                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={contactSubmitting}
-                className="w-full rounded-xl bg-[#6E8679] py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#5F7A6C] disabled:opacity-50 transition-opacity"
-              >
-                {contactSubmitting ? "Submitting Inquiry..." : "Request Enterprise Consultation"}
-              </button>
-            </form>
-          )}
         </div>
       </section>
 
