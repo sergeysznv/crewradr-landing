@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — SMS & Text Messaging Policy. Toll-Free verification compliance, opt-in disclosures, and carrier non-sharing terms.">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — SMS &amp; Text Messaging Policy</title>
+<link rel="canonical" href="/sms-terms/">
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.3);
+    --cream: #F5F4F0;
+    --cream-warm: #EDE8E0;
+    --sand: #D9CDBC;
+    --slate: #1A2327;
+    --slate-container: #242F35;
+    --slate-surface: #2A363D;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --text-muted: #8A9598;
+    --bg: #F5F4F0;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(142, 165, 149, 0.15);
+    --card-shadow: 0 1px 3px rgba(26, 35, 39, 0.06), 0 8px 32px rgba(26, 35, 39, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --cream-warm: #242F35;
+    --sand: #6E8679;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --text-muted: #6A7578;
+    --bg: #1A2327;
+    --card-bg: #242F35;
+    --card-border: rgba(142, 165, 149, 0.1);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+    --sage-glow: rgba(142, 165, 149, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(245, 244, 240, 0.85);
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  [data-theme="dark"] nav {
+    background: rgba(26, 35, 39, 0.85);
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-primary);
+    font-weight: 700; font-size: 1.25rem;
+  }
+
+  .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+  .theme-toggle {
+    width: 40px; height: 40px; border: 1px solid var(--card-border);
+    border-radius: 10px; background: var(--card-bg);
+    cursor: pointer; font-size: 1.1rem; transition: all 0.2s ease;
+    color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
+  }
+
+  .container {
+    max-width: 860px; margin: 0 auto;
+    padding: 110px 24px 60px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700; margin-bottom: 12px;
+    letter-spacing: -0.02em; color: var(--text-primary);
+  }
+
+  .last-updated {
+    font-size: 0.95rem; color: var(--text-secondary);
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 28px;
+  }
+
+  h2 {
+    font-size: 1.35rem; font-weight: 700;
+    margin-top: 24px; margin-bottom: 12px;
+    color: var(--text-primary);
+  }
+
+  h3 {
+    font-size: 1.1rem; font-weight: 700;
+    margin-top: 16px; margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  p { margin-bottom: 14px; color: var(--text-secondary); }
+
+  ul {
+    margin-left: 20px; margin-bottom: 16px;
+    color: var(--text-secondary);
+  }
+
+  li { margin-bottom: 8px; }
+
+  strong { color: var(--text-primary); }
+
+  .highlight-box {
+    background: rgba(142, 165, 149, 0.12);
+    border-left: 4px solid var(--sage-dark);
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+
+  .highlight-box p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+
+  .mockup-box {
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 20px;
+    background: var(--cream);
+    margin: 16px 0;
+  }
+
+  [data-theme="dark"] .mockup-box {
+    background: #1E2121;
+  }
+
+  footer {
+    text-align: center; padding: 40px 24px;
+    font-size: 0.85rem; color: var(--text-muted);
+    border-top: 1px solid var(--card-border);
+    background: var(--bg);
+  }
+
+  footer a { color: var(--sage-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-brand">
+    <img src="/logo-96.png" alt="CrewRadr">
+    <span>CrewRadr</span>
+  </a>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <a href="/" style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary); text-decoration: none;">&larr; Back to Home</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>SMS &amp; Text Messaging Policy</h1>
+  <p class="last-updated">Last Updated: September 18, 2026 &middot; Toll-Free Service: <strong>+1 (855) 710-7793</strong></p>
+
+  <div class="card">
+    <h2>1. Program Overview &amp; Description</h2>
+    <p>CrewRadr operates an automated, transactional SMS messaging service via toll-free number <strong>+1 (855) 710-7793</strong> designed strictly for situational awareness, vehicular safety alerts, and account security notifications.</p>
+    <p>SMS notifications are triggered only upon explicit user opt-in or critical safety events:</p>
+    <ul>
+      <li><strong>Automated Vehicular Crash Detection Alerts:</strong> Instant telemetry alerts dispatched to user-designated trusted emergency contacts when high-G deceleration or severe collisions are detected.</li>
+      <li><strong>Emergency SOS &amp; Safe Landing Check-Ins:</strong> Notifications sent when a family member or crew member activates an emergency SOS distress beacon.</li>
+      <li><strong>Account Security &amp; Authentication:</strong> Transactional one-time verification passcodes (OTP / 2FA) to secure logins and account recovery.</li>
+      <li><strong>Enterprise &amp; Customer Inquiries:</strong> Follow-up text messages responding to inbound consultations voluntarily requested via web forms.</li>
+    </ul>
+
+    <h2>2. Carrier Non-Sharing Clause</h2>
+    <div class="highlight-box">
+      <p><strong>Strict Privacy Guarantee:</strong> No mobile information will be shared with third parties/affiliates for marketing/promotional purposes. All the above categories exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties.</p>
+    </div>
+
+    <h2>3. Explicit &amp; Voluntary Opt-In Mechanism</h2>
+    <p>In accordance with CTIA, TCPA, and carrier guidelines:</p>
+    <ul>
+      <li><strong>Consent Is Not a Requirement for Service:</strong> Opting in to receive text messages is completely voluntary. Agreeing to receive SMS is <strong>never mandatory</strong> to create an account, purchase subscriptions, download the application, or use any core features of CrewRadr.</li>
+      <li><strong>Standalone, Unchecked Checkbox:</strong> When opting in via web or app forms, consent is collected through an explicit checkbox that is <strong>unchecked by default</strong> and separate from the Terms of Service.</li>
+    </ul>
+
+    <h3>Example Opt-In Workflow (Web Form)</h3>
+    <div class="mockup-box">
+      <p style="font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; color: var(--text-primary);">Web Consultation / Inquiry Form Example:</p>
+      <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+        <div style="margin-bottom: 8px;">[Phone Number Input: e.g. +1 (555) 019-2834 (Optional)]</div>
+        <div style="display: flex; gap: 8px; align-items: flex-start; border: 1px solid var(--card-border); padding: 10px; border-radius: 8px; background: var(--card-bg);">
+          <input type="checkbox" disabled style="margin-top: 3px;">
+          <span>
+            [ ] I agree to receive transactional and consultation text messages (SMS) from CrewRadr at the phone number provided above. 
+            <strong>Consent is voluntary and not a condition of purchase or receiving services.</strong> Message frequency varies. 
+            Message and data rates may apply. Reply STOP to cancel at any time, HELP for help. View our 
+            <a href="/terms/" style="color: var(--sage-dark);">Terms</a> and <a href="/privacy/" style="color: var(--sage-dark);">Privacy Policy</a>.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Example Opt-In Workflow (In-App Emergency Contact)</h3>
+    <div class="mockup-box">
+      <p style="font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; color: var(--text-primary);">Designated Emergency Contact Welcome Alert:</p>
+      <p style="font-size: 0.85rem; font-style: italic; background: var(--card-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+        "CrewRadr Safety Network: Alex Mercer designated you as a trusted emergency contact. Automated SMS notifications will only be dispatched if a severe vehicular collision or SOS distress event is triggered. Reply HELP for support or STOP to opt out."
+      </p>
+    </div>
+
+    <h2>4. How to Opt-Out (STOP)</h2>
+    <p>You may cancel the SMS service at any time. Simply reply with the keyword <strong>STOP</strong> to <strong>+1 (855) 710-7793</strong>.</p>
+    <p>After texting <strong>STOP</strong>, we will send you a single confirmation text message confirming that you have been unsubscribed. No further messages will be sent to your mobile phone number unless you explicitly re-enroll.</p>
+
+    <h2>5. How to Get Help (HELP)</h2>
+    <p>If you experience any issues with the messaging program or need assistance, reply with the keyword <strong>HELP</strong> to <strong>+1 (855) 710-7793</strong>.</p>
+    <p>You can also reach our customer support team directly at:</p>
+    <ul>
+      <li><strong>Support Email:</strong> <a href="mailto:support@crewradr.app" style="color: var(--sage-dark);">support@crewradr.app</a></li>
+      <li><strong>Toll-Free Phone:</strong> <a href="tel:+18557107793" style="color: var(--sage-dark);">+1 (855) 710-7793</a></li>
+      <li><strong>Business Hours:</strong> Monday through Friday, 9:00 AM – 6:00 PM EST</li>
+    </ul>
+
+    <h2>6. Message Rates and Frequency</h2>
+    <ul>
+      <li><strong>Rates:</strong> As always, message and data rates may apply for any messages sent to you from us and to us from you. If you have any questions about your text or data plan, please contact your wireless provider.</li>
+      <li><strong>Frequency:</strong> Message frequency varies based on active user safety alerts, vehicular crash detections, or individual account authentication requests.</li>
+      <li><strong>Carriers:</strong> Carriers are not liable for delayed or undelivered messages. Supported carriers include major US and Canadian networks (AT&amp;T, T-Mobile, Verizon, Sprint, Rogers, Bell, Telus, and others).</li>
+    </ul>
+
+    <h2>7. Compliance &amp; Additional Information</h2>
+    <p>For more details on how CrewRadr protects your privacy and governs service operations, please consult our:</p>
+    <ul>
+      <li><a href="/privacy/" style="color: var(--sage-dark);">Privacy Policy</a></li>
+      <li><a href="/terms/" style="color: var(--sage-dark);">Terms of Service</a></li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="/?lang=en">CrewRadr</a>. Built for crews, not corporations. &middot; <a href="/privacy/">Privacy Policy</a> &middot; <a href="/terms/">Terms of Service</a> &middot; <a href="/sms-terms/">SMS Policy</a> &middot; <a href="mailto:support@crewradr.app">Contact</a></p>
+</footer>
+
+<script>
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { setTheme(saved); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+
+  toggle.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+</script>
+</body>
+</html>

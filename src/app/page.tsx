@@ -18,24 +18,10 @@ function getTheme(): "light" | "dark" {
   return document.documentElement.classList.contains("dark") ? "dark" : "light";
 }
 
-// SHA-256 hash of the authorized launch preview password.
-// The plaintext password is never bundled in client code.
-const LAUNCH_AUTH_HASH =
-  "c016a9544e252ff4ac436f21cbaceef79eae512ed945d4441fc5b1a47126f69a";
-
-async function sha256Hex(str: string): Promise<string> {
-  const enc = new TextEncoder();
-  const buf = await crypto.subtle.digest("SHA-256", enc.encode(str));
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
 export default function LandingPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
   const [locale, setLocale] = useState<LocaleCode>("en");
-  const [isUnlocked, setIsUnlocked] = useState(true);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   useVersionCheck();
@@ -47,18 +33,6 @@ export default function LandingPage() {
     const resolved = resolveLocale(search);
     setLocale(resolved);
     if (resolved !== "en") applyLocale(resolved);
-
-    // Invalidate any legacy insecure unlock keys
-    localStorage.removeItem("crewradr_launch_unlocked");
-
-    // Check preview unlock state
-    const params = new URLSearchParams(search);
-    if (params.get("lock") === "true") {
-      localStorage.removeItem("crewradr_launch_auth");
-      setIsUnlocked(false);
-    } else {
-      setIsUnlocked(true);
-    }
   }, []);
 
   function toggleTheme() {
@@ -73,138 +47,13 @@ export default function LandingPage() {
     applyLocale(code);
   }
 
-  async function handleUnlockPrompt() {
-    const key = prompt("Enter launch authorization key:");
-    if (!key) return;
-    try {
-      const hash = await sha256Hex(key.trim());
-      if (hash === LAUNCH_AUTH_HASH) {
-        localStorage.setItem("crewradr_launch_auth", LAUNCH_AUTH_HASH);
-        setIsUnlocked(true);
-      } else {
-        alert("Access Denied: Invalid authorization key.");
-      }
-    } catch (_) {
-      alert("Access Denied.");
-    }
-  }
-
-  function handleLock() {
-    localStorage.removeItem("crewradr_launch_auth");
-    localStorage.removeItem("crewradr_launch_unlocked");
-    setIsUnlocked(false);
-  }
-
   const legalPrefix = locale === "en" ? "" : `/${locale}`;
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // 1. LOCKED / PUBLIC TEASER VIEW (Default when unreleased)
-  // ─────────────────────────────────────────────────────────────────────────────
-  if (!isUnlocked) {
-    return (
-      <div
-        dir={LOCALE_DIRS[locale]}
-        className="relative flex min-h-screen flex-col items-center justify-center px-6 text-center bg-[#F6F4EE] dark:bg-[#1E2121] text-[#262017] dark:text-[#F0F3F1] transition-colors duration-300"
-      >
-        {/* Glow */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(ellipse,rgba(142,165,149,0.25)_0%,transparent_60%)] dark:bg-[radial-gradient(ellipse,rgba(142,165,149,0.12)_0%,transparent_60%)]" />
-
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          aria-label={t(locale, "toggleTheme")}
-          className="fixed right-5 top-5 flex h-10 w-10 items-center justify-center rounded-xl border text-lg transition-colors hover:border-[#8EA595]"
-          style={{ borderColor: "rgba(142,165,149,0.2)" }}
-        >
-          {mounted ? (theme === "dark" ? "\u{1F319}" : "\u{2600}\u{FE0F}") : "\u{2600}\u{FE0F}"}
-        </button>
-
-        {/* Language switcher */}
-        <div className="fixed left-5 top-5 flex items-center gap-2">
-          <CountryFlag code={locale} className="w-5 h-3.5 rounded-xs border border-[#8EA595]/30 shadow-xs" />
-          <select
-            aria-label={t(locale, "language")}
-            value={locale}
-            onChange={(e) => changeLocale(e.target.value as LocaleCode)}
-            className="h-10 rounded-xl border bg-transparent px-3 text-sm text-[#262017] dark:text-[#F0F3F1] cursor-pointer"
-            style={{ borderColor: "rgba(142,165,149,0.2)" }}
-          >
-            {LOCALES.map((l) => (
-              <option key={l.code} value={l.code} className="text-[#262017]">
-                {l.flag} {l.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Logo */}
-        <Image
-          src="/logo-96.png"
-          alt="CrewRadr"
-          width={96}
-          height={96}
-          className="relative z-10 mb-8 rounded-[22px]"
-          style={{ boxShadow: "0 8px 40px rgba(142,165,149,0.25)" }}
-        />
-
-        {/* Heading */}
-        <h1 className="relative z-10 text-[clamp(2rem,5vw,3.2rem)] font-bold tracking-[-0.02em]">
-          {t(locale, "headingPart1")}<br />
-          <span className="text-[#6E8679]">{t(locale, "headingPart2")}</span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="relative z-10 mt-3 max-w-[420px] text-[clamp(1rem,2vw,1.15rem)] text-[#5C635F] dark:text-[#B4BCB8] leading-relaxed">
-          {t(locale, "subtitle")}
-        </p>
-
-        {/* Footer */}
-        <div className="fixed bottom-6 flex items-center gap-3 text-sm text-[#5C635F] dark:text-[#B4BCB8]">
-          <span>&copy; {new Date().getFullYear()} CrewRadr</span>
-          <span aria-hidden>·</span>
-          <a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "privacy")}</a>
-          <span aria-hidden>·</span>
-          <a href={`/terms${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "terms")}</a>
-          <span aria-hidden>·</span>
-          {/* Discreet Preview unlock button */}
-          <button
-            onClick={handleUnlockPrompt}
-            title="Preview locked page (Internal)"
-            className="opacity-40 hover:opacity-100 transition-opacity text-xs"
-          >
-            🔒
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // 2. UNLOCKED FULL PRODUCT LANDING PAGE
-  // ─────────────────────────────────────────────────────────────────────────────
   return (
     <div
       dir={LOCALE_DIRS[locale]}
       className="min-h-screen bg-[#F6F4EE] dark:bg-[#1E2121] text-[#262017] dark:text-[#F0F3F1] transition-colors duration-300 selection:bg-[#8EA595]/30"
     >
-      {/* Internal preview banner (only when ?preview=true) */}
-      {mounted && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("preview") === "true" && (
-        <aside className="sticky top-0 z-50 flex items-center justify-between border-b border-[#8EA595]/30 bg-[#8EA595]/15 px-4 py-1.5 text-xs backdrop-blur-md">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-[#6E8679] animate-pulse" />
-            <span className="font-semibold text-[#4D6558] dark:text-[#C5D3CB]">
-              {t(locale, "previewModeActive")}
-            </span>
-          </div>
-          <button
-            onClick={handleLock}
-            className="font-bold underline text-[#4D6558] dark:text-[#C5D3CB] hover:opacity-75"
-          >
-            {t(locale, "lockPage")}
-          </button>
-        </aside>
-      )}
-
       {/* Navigation */}
       <nav className="sticky top-0 z-40 flex items-center justify-between border-b border-[#8EA595]/20 bg-[#F6F4EE]/85 dark:bg-[#1E2121]/85 px-6 py-4 backdrop-blur-md">
         <a href="/" className="flex items-center gap-3 font-bold text-xl tracking-tight">
@@ -627,20 +476,150 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Statutory Disclaimer & Footer */}
-      <footer className="border-t border-[#8EA595]/25 px-6 py-10 text-center text-xs text-[#5C635F] dark:text-[#B4BCB8]">
-        <div className="mx-auto max-w-3xl space-y-4">
-          <p className="leading-relaxed opacity-75">{t(locale, "emergencyNotice")}</p>
-          <div className="flex items-center justify-center gap-4 text-xs font-semibold">
-            <span>&copy; {new Date().getFullYear()} CrewRadr</span>
-            <span>·</span>
-            <a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "privacy")}</a>
-            <span>·</span>
-            <a href={`/terms${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "terms")}</a>
-            <span>·</span>
-            <button onClick={handleLock} className="underline hover:opacity-75">
-              {t(locale, "lockPage")}
+      {/* Contact & Consultation Section with TCPA/CTIA Compliant Opt-In */}
+      <section id="contact" className="border-t border-[#8EA595]/20 bg-[#F6F4EE]/50 dark:bg-[#1E2121]/50 px-6 py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="rounded-full bg-[#8EA595]/20 px-3.5 py-1 text-xs font-bold text-[#6E8679] dark:text-[#8EA595]">
+            Contact &amp; Support
+          </span>
+          <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">Get in Touch with CrewRadr</h2>
+          <p className="mt-2 text-xs text-[#5C635F] dark:text-[#B4BCB8]">
+            Have questions regarding fleet deployment, custom situational integrations, or customer support? Reach out directly.
+          </p>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              alert("Thank you! Your message has been received. Our team will contact you shortly.");
+            }}
+            className="mt-8 space-y-4 text-left rounded-2xl border border-[#8EA595]/30 bg-[#FDFCFA] dark:bg-[#262929] p-6 shadow-sm"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="contact-name" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                  Your Name *
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  required
+                  placeholder="Alex Mercer"
+                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-email" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                  Email Address *
+                </label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  required
+                  placeholder="alex@example.com"
+                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="contact-phone" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                Mobile Phone Number <span className="text-[#5C635F] dark:text-[#B4BCB8] font-normal">(Optional)</span>
+              </label>
+              <input
+                id="contact-phone"
+                type="tel"
+                placeholder="+1 (555) 000-0000"
+                className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+              />
+            </div>
+
+            {/* Standalone, Unchecked Voluntary SMS Consent Checkbox */}
+            <div className="rounded-xl border border-[#8EA595]/20 bg-[#8EA595]/5 p-3.5">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="sms-consent"
+                  className="mt-0.5 h-4 w-4 rounded border-[#8EA595] text-[#6E8679] focus:ring-[#6E8679]"
+                />
+                <span className="text-[11px] text-[#5C635F] dark:text-[#B4BCB8] leading-relaxed">
+                  I agree to receive transactional and consultation text messages (SMS) from CrewRadr at the phone number provided above. 
+                  <strong> Consent is voluntary and not a condition of purchase or receiving services.</strong> Message frequency varies. 
+                  Message and data rates may apply. Reply STOP to cancel at any time, HELP for help. View our{" "}
+                  <a href={`/terms${legalPrefix}/`} className="underline hover:text-[#6E8679]">Terms of Service</a> and{" "}
+                  <a href={`/privacy${legalPrefix}/`} className="underline hover:text-[#6E8679]">Privacy Policy</a>.
+                </span>
+              </label>
+            </div>
+
+            <div>
+              <label htmlFor="contact-message" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                Message / Inquiries
+              </label>
+              <textarea
+                id="contact-message"
+                rows={3}
+                placeholder="How can our crew help you?"
+                className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-[#6E8679] py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#5F7A6C] transition-colors"
+            >
+              Send Message
             </button>
+          </form>
+        </div>
+      </section>
+
+      {/* Statutory Disclaimer & Business Footer */}
+      <footer className="border-t border-[#8EA595]/25 px-6 py-12 text-xs text-[#5C635F] dark:text-[#B4BCB8]">
+        <div className="mx-auto max-w-4xl space-y-6">
+          <p className="text-center leading-relaxed opacity-75">{t(locale, "emergencyNotice")}</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left border-y border-[#8EA595]/15 py-6">
+            <div>
+              <div className="flex items-center gap-2 font-bold text-sm text-[#262017] dark:text-[#F0F3F1] mb-2">
+                <Image src="/logo-96.png" alt="CrewRadr" width={22} height={22} className="rounded-md" />
+                CrewRadr
+              </div>
+              <p className="text-xs leading-relaxed">
+                Situational awareness, severe weather radar overlays, and peer safety telematics for families, trusted circles, and fleets.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-xs uppercase tracking-wider text-[#262017] dark:text-[#F0F3F1] mb-2">
+                Business &amp; Support Contact
+              </h4>
+              <p className="text-xs leading-relaxed space-y-1">
+                <span><strong>Brand:</strong> CrewRadr</span><br />
+                <span><strong>Support Email:</strong> <a href="mailto:support@crewradr.app" className="underline hover:text-[#6E8679]">support@crewradr.app</a></span><br />
+                <span><strong>Toll-Free Helpline:</strong> <a href="tel:+18557107793" className="underline hover:text-[#6E8679]">+1 (855) 710-7793</a></span><br />
+                <span><strong>Hours:</strong> Mon–Fri, 9:00 AM – 6:00 PM EST</span>
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-xs uppercase tracking-wider text-[#262017] dark:text-[#F0F3F1] mb-2">
+                Legal &amp; Compliance
+              </h4>
+              <ul className="space-y-1.5 text-xs">
+                <li><a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679] underline">{t(locale, "privacy")}</a></li>
+                <li><a href={`/terms${legalPrefix}/`} className="hover:text-[#6E8679] underline">{t(locale, "terms")}</a></li>
+                <li><a href="/sms-terms/" className="hover:text-[#6E8679] underline font-medium text-[#6E8679] dark:text-[#8EA595]">SMS &amp; Text Messaging Policy</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold pt-2 text-center sm:text-left">
+            <span>&copy; {new Date().getFullYear()} CrewRadr. All rights reserved.</span>
+            <div className="flex items-center gap-4">
+              <a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "privacy")}</a>
+              <span>·</span>
+              <a href={`/terms${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "terms")}</a>
+              <span>·</span>
+              <a href="/sms-terms/" className="hover:text-[#6E8679]">SMS Policy</a>
+            </div>
           </div>
         </div>
       </footer>

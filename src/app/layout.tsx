@@ -11,8 +11,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "CrewRadr — Coming Soon",
-  description: "Real-time location sharing for trusted crews. Coming soon.",
+  title: "CrewRadr — Real-Time Situational Awareness & Fleet Safety",
+  description: "Real-time location radar, predictive driving telematics, severe weather Doppler overlays, and emergency check-ins for trusted crews and fleets.",
   icons: "/logo-32.png",
   manifest: "/manifest.json",
   alternates: {
@@ -28,15 +28,15 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "CrewRadr — Real-Time Situational Awareness & Fleet Safety",
-    description: "Real-time location sharing, Severe Weather Doppler Radar, and emergency telemetry for land, sea, air, and road.",
+    description: "Real-time location radar, predictive driving telematics, severe weather Doppler overlays, and emergency telemetry for land, sea, air, and road.",
     locale: "en_US",
     alternateLocale: ["es_ES", "fr_FR", "ar_AR", "zh_CN", "ru_RU"],
     siteName: "CrewRadr",
     type: "website",
-    url: "https://crewradr.com",
+    url: "https://crewradr.app",
     images: [
       {
-        url: "https://crewradr.com/logo-512.png",
+        url: "https://crewradr.app/logo-512.png",
         width: 512,
         height: 512,
         alt: "CrewRadr Logo",
@@ -46,8 +46,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary",
     title: "CrewRadr — Real-Time Situational Awareness & Fleet Safety",
-    description: "Real-time location sharing, Severe Weather Doppler Radar, and emergency telemetry for land, sea, air, and road.",
-    images: ["https://crewradr.com/logo-512.png"],
+    description: "Real-time location radar, predictive driving telematics, severe weather Doppler overlays, and emergency telemetry for land, sea, air, and road.",
+    images: ["https://crewradr.app/logo-512.png"],
   },
 };
 
