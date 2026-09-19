@@ -698,10 +698,12 @@ export default function LandingPage() {
           ) : (
             <form onSubmit={handleContactSubmit} className="mt-6 space-y-3 text-left">
               <div>
-                <label className="block text-xs font-semibold mb-1">Your Name</label>
+                <label htmlFor="contact-name" className="block text-xs font-semibold mb-1">Your Name</label>
                 <input
+                  id="contact-name"
                   type="text"
                   required
+                  aria-required="true"
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                   placeholder="Alex Mercer"
@@ -709,10 +711,12 @@ export default function LandingPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1">Work Email</label>
+                <label htmlFor="contact-email" className="block text-xs font-semibold mb-1">Work Email</label>
                 <input
+                  id="contact-email"
                   type="email"
                   required
+                  aria-required="true"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="alex@fleetcompany.com"
@@ -720,8 +724,9 @@ export default function LandingPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1">Fleet or Team Notes</label>
+                <label htmlFor="contact-notes" className="block text-xs font-semibold mb-1">Fleet or Team Notes</label>
                 <textarea
+                  id="contact-notes"
                   rows={3}
                   value={contactNotes}
                   onChange={(e) => setContactNotes(e.target.value)}
