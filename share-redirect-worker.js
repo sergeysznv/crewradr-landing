@@ -540,11 +540,15 @@ async function fetchLocations(base, auth, share, viewerUnits, t) {
     if (members && members.length > 0) {
       var ids = members.map(function(m) { return m.user_id; });
       var inClause = ids.map(function(id) { return encodeURIComponent(id); }).join(",");
-      var lr = await fetch(
-        base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=in.(" + inClause + ")&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=" + Math.max(ids.length * 5, 25) + "&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload",
-        { headers: auth }
-      );
-      var raw = lr.ok ? await lr.json() : [];
+      // Query per-user in parallel to prevent active drivers from starving out other members
+      var perUserPromises = ids.map(function(uid) {
+        var uUrl = base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=eq." + encodeURIComponent(uid) + "&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=3&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload";
+        return fetch(uUrl, { headers: auth })
+          .then(function(r) { return r.ok ? r.json() : []; })
+          .catch(function() { return []; });
+      });
+      var perUserResults = await Promise.all(perUserPromises);
+      var raw = [].concat.apply([], perUserResults);
       var seen = new Set();
       var deduped = [];
       for (var i = 0; i < (raw || []).length; i++) {

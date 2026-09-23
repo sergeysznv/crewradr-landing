@@ -408,16 +408,26 @@ export async function onRequest(context) {
         if (members && members.length > 0) {
           const userIds = members.map(m => m.user_id);
 
-          // Get latest location for each crew member (fetch enough rows to cover all users)
-          const userIn = userIds.map(id => encodeURIComponent(id)).join(",");
-          const locsUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=in.(${userIn})&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=${Math.max(members.length * 5, 25)}&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload`;
-          const locsRes = await fetch(locsUrl, { headers: authHeaders });
-          const locs = locsRes.ok ? await locsRes.json() : [];
+          // Fetch latest location for each crew member in parallel so one active driver does not crowd out others
+          const locResults = await Promise.all(
+            userIds.map(async (uid) => {
+              try {
+                const uLocUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(uid)}&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=1&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload`;
+                const r = await fetch(uLocUrl, { headers: authHeaders });
+                if (r.ok) {
+                  const arr = await r.json();
+                  if (arr && arr.length > 0) return arr[0];
+                }
+              } catch (_) {}
+              return null;
+            })
+          );
+          const locs = locResults.filter(Boolean);
 
           // Deduplicate — keep only latest per user, skip null coordinates
           const seen = new Set();
           const latestPerUser = [];
-          for (const loc of (locs || [])) {
+          for (const loc of locs) {
             // Fallback: if lat/lng are NULL, try encrypted_payload
             if ((loc.latitude == null || loc.longitude == null) && loc.encrypted_payload) {
               try {
