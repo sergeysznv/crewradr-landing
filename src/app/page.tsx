@@ -606,6 +606,7 @@ export default function LandingPage() {
               <ul className="space-y-1.5 text-xs">
                 <li><a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679] underline">{t(locale, "privacy")}</a></li>
                 <li><a href={`/terms${legalPrefix}/`} className="hover:text-[#6E8679] underline">{t(locale, "terms")}</a></li>
+                <li><a href="/contact/" className="hover:text-[#6E8679] underline">Contact &amp; Consultation</a></li>
                 <li><a href="/sms-terms/" className="hover:text-[#6E8679] underline font-medium text-[#6E8679] dark:text-[#8EA595]">SMS &amp; Text Messaging Policy</a></li>
               </ul>
             </div>
@@ -614,6 +615,8 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold pt-2 text-center sm:text-left">
             <span>&copy; {new Date().getFullYear()} CrewRadr. All rights reserved.</span>
             <div className="flex items-center gap-4">
+              <a href="/contact/" className="hover:text-[#6E8679]">Contact</a>
+              <span>·</span>
               <a href={`/privacy${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "privacy")}</a>
               <span>·</span>
               <a href={`/terms${legalPrefix}/`} className="hover:text-[#6E8679]">{t(locale, "terms")}</a>

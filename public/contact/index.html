@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CrewRadr — Contact & Fleet Consultation. Inquiries, customer support, and voluntary SMS notification options.">
+<meta name="theme-color" content="#8EA595">
+<title>CrewRadr — Contact &amp; Consultation</title>
+<link rel="canonical" href="/contact/">
+<link rel="icon" type="image/png" href="/logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap');
+
+  :root {
+    --sage: #8EA595;
+    --sage-dark: #6E8679;
+    --sage-glow: rgba(142, 165, 149, 0.3);
+    --cream: #F5F4F0;
+    --cream-warm: #EDE8E0;
+    --sand: #D9CDBC;
+    --slate: #1A2327;
+    --slate-container: #242F35;
+    --slate-surface: #2A363D;
+    --text-primary: #1A2327;
+    --text-secondary: #5A6568;
+    --text-muted: #8A9598;
+    --bg: #F5F4F0;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(142, 165, 149, 0.2);
+    --card-shadow: 0 1px 3px rgba(26, 35, 39, 0.06), 0 8px 32px rgba(26, 35, 39, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font: 'PT Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --cream: #1A2327;
+    --cream-warm: #242F35;
+    --sand: #6E8679;
+    --text-primary: #EDE8E0;
+    --text-secondary: #9AA5A8;
+    --text-muted: #6A7578;
+    --bg: #1A2327;
+    --card-bg: #242F35;
+    --card-border: rgba(142, 165, 149, 0.15);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(245, 244, 240, 0.85);
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  [data-theme="dark"] nav {
+    background: rgba(26, 35, 39, 0.85);
+  }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-primary);
+    font-weight: 700; font-size: 1.25rem;
+  }
+
+  .nav-brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+  .theme-toggle {
+    width: 40px; height: 40px; border: 1px solid var(--card-border);
+    border-radius: 10px; background: var(--card-bg);
+    cursor: pointer; font-size: 1.1rem; transition: all 0.2s ease;
+    color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
+  }
+
+  .container {
+    max-width: 680px; margin: 0 auto;
+    padding: 110px 24px 60px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700; margin-bottom: 8px;
+    letter-spacing: -0.02em; color: var(--text-primary);
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 1rem; color: var(--text-secondary);
+    margin-bottom: 32px; text-align: center;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 580px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+  }
+
+  .label-opt {
+    font-weight: normal;
+    color: var(--text-muted);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    background: var(--cream);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="email"],
+  [data-theme="dark"] input[type="tel"],
+  [data-theme="dark"] textarea {
+    background: #1E2121;
+  }
+
+  input:focus, textarea:focus {
+    border-color: var(--sage-dark);
+  }
+
+  .checkbox-panel {
+    background: rgba(142, 165, 149, 0.08);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin: 20px 0;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--sage-dark);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .checkbox-label strong {
+    color: var(--text-primary);
+  }
+
+  .checkbox-label a {
+    color: var(--sage-dark);
+    text-decoration: underline;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: var(--sage-dark);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    box-shadow: 0 2px 8px rgba(110, 134, 121, 0.3);
+  }
+
+  .btn-submit:hover {
+    background: #5E7468;
+  }
+
+  .notice-box {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    background: rgba(142, 165, 149, 0.1);
+    border-left: 4px solid var(--sage-dark);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .notice-box strong {
+    color: var(--text-primary);
+  }
+
+  .direct-contact {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .direct-contact a {
+    color: var(--sage-dark);
+    text-decoration: underline;
+    font-weight: 700;
+  }
+
+  footer {
+    text-align: center; padding: 40px 24px;
+    font-size: 0.85rem; color: var(--text-muted);
+    border-top: 1px solid var(--card-border);
+    background: var(--bg);
+  }
+
+  footer a { color: var(--sage-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="/" class="nav-brand">
+    <img src="/logo-96.png" alt="CrewRadr">
+    <span>CrewRadr</span>
+  </a>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <a href="/" style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary); text-decoration: none;">&larr; Home</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1>Contact &amp; Fleet Consultation</h1>
+  <p class="subtitle">Request an enterprise demo, fleet safety consultation, or platform support.</p>
+
+  <div class="card">
+    <form id="contactForm" onsubmit="event.preventDefault(); alert('Thank you! Your message has been received. Our team will contact you shortly.');">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contact-name">Your Full Name *</label>
+          <input type="text" id="contact-name" name="name" required placeholder="Alex Mercer">
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Email Address *</label>
+          <input type="email" id="contact-email" name="email" required placeholder="alex@example.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="contact-phone">
+          Mobile Phone Number <span class="label-opt">(Optional — For SMS Consultation Updates)</span>
+        </label>
+        <input type="tel" id="contact-phone" name="phone" placeholder="+1 (555) 019-2834">
+      </div>
+
+      <!-- Standalone Unchecked Voluntary SMS Consent Checkbox -->
+      <div class="checkbox-panel">
+        <label class="checkbox-label" for="sms-consent">
+          <input type="checkbox" id="sms-consent" name="sms_consent">
+          <span>
+            I agree to receive transactional and account notification text messages (SMS) from CrewRadr at the mobile phone number provided above. 
+            <strong>Consent is voluntary and is NOT a condition of purchase or receiving services.</strong> Message frequency varies. 
+            Message and data rates may apply. Reply STOP to cancel at any time, HELP for assistance. View our 
+            <a href="/terms/" target="_blank">Terms of Service</a> and <a href="/privacy/" target="_blank">Privacy Policy</a>.
+          </span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="contact-message">Message / Fleet Inquiries</label>
+        <textarea id="contact-message" name="message" rows="4" placeholder="How can our crew help you?"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit Inquiry</button>
+    </form>
+
+    <div class="notice-box">
+      <strong>Voluntary Consent Guarantee:</strong> Providing a mobile phone number and consenting to SMS is 100% voluntary and never required to contact us, create an account, or use CrewRadr services. No mobile information will be shared with third parties for marketing purposes.
+    </div>
+
+    <div class="direct-contact">
+      Prefer to reach us directly? Email <a href="mailto:support@crewradr.app">support@crewradr.app</a> or call toll-free <a href="tel:+18557107793">+1 (855) 710-7793</a> (Mon–Fri 9am–6pm EST).
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="/?lang=en">CrewRadr</a>. Built for crews, not corporations. &middot; <a href="/privacy/">Privacy Policy</a> &middot; <a href="/terms/">Terms of Service</a> &middot; <a href="/sms-terms/">SMS Policy</a> &middot; <a href="/contact/">Contact</a></p>
+</footer>
+
+<script>
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    toggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { setTheme(saved); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { setTheme('dark'); }
+
+  toggle.addEventListener('click', () => {
+    setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+</script>
+</body>
+</html>
