@@ -103,14 +103,12 @@ export default function LandingPage() {
             {mounted ? (theme === "dark" ? "\u{1F319}" : "\u{2600}\u{FE0F}") : "\u{2600}\u{FE0F}"}
           </button>
 
-          {/* Admin Web Portal CTA */}
+          {/* Private Beta Access CTA */}
           <a
-            href="https://admin.crewradr.app"
-            target="_blank"
-            rel="noreferrer"
+            href="#contact"
             className="hidden sm:inline-flex items-center rounded-xl bg-[#6E8679] px-3.5 py-2 text-xs font-bold text-white shadow-sm transition-transform hover:scale-102 hover:bg-[#5F7A6C]"
           >
-            {t(locale, "navAdminPortal")} &rarr;
+            Early Access &rarr;
           </a>
         </div>
       </nav>
@@ -134,12 +132,10 @@ export default function LandingPage() {
 
         <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
           <a
-            href="https://admin.crewradr.app"
-            target="_blank"
-            rel="noreferrer"
+            href="#contact"
             className="rounded-xl bg-[#6E8679] px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-[#5F7A6C] hover:shadow-lg"
           >
-            {t(locale, "heroGetStarted")}
+            Request Private Beta Access
           </a>
           <a
             href="#pricing"
@@ -328,12 +324,10 @@ export default function LandingPage() {
               </ul>
             </div>
             <a
-              href="https://admin.crewradr.app"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 block rounded-xl border border-[#8EA595]/40 py-2.5 text-center text-xs font-bold hover:border-[#8EA595]"
+              href="#contact"
+              className="mt-8 block rounded-xl border border-[#8EA595]/40 py-2.5 text-center text-xs font-bold hover:border-[#8EA595] transition-colors"
             >
-              Get Started
+              Request Private Beta Access
             </a>
           </div>
 
@@ -362,12 +356,10 @@ export default function LandingPage() {
               </ul>
             </div>
             <a
-              href="https://admin.crewradr.app"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 block rounded-xl bg-[#6E8679] py-2.5 text-center text-xs font-bold text-white hover:bg-[#5F7A6C]"
+              href="#contact"
+              className="mt-8 block rounded-xl bg-[#6E8679] py-2.5 text-center text-xs font-bold text-white hover:bg-[#5F7A6C] transition-colors"
             >
-              Choose First Mate
+              Join Early Access
             </a>
           </div>
 
@@ -393,12 +385,10 @@ export default function LandingPage() {
               </ul>
             </div>
             <a
-              href="https://admin.crewradr.app"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 block rounded-xl border border-[#8EA595]/40 py-2.5 text-center text-xs font-bold hover:border-[#8EA595]"
+              href="#contact"
+              className="mt-8 block rounded-xl border border-[#8EA595]/40 py-2.5 text-center text-xs font-bold hover:border-[#8EA595] transition-colors"
             >
-              Choose Captain
+              Request Private Beta Access
             </a>
           </div>
 
@@ -424,12 +414,10 @@ export default function LandingPage() {
               </ul>
             </div>
             <a
-              href="https://admin.crewradr.app"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 block rounded-xl border border-[#8EA595]/40 py-2.5 text-center text-xs font-bold hover:border-[#8EA595]"
+              href="#contact"
+              className="mt-8 block rounded-xl border border-[#8EA595]/40 py-2.5 text-center text-xs font-bold hover:border-[#8EA595] transition-colors"
             >
-              Choose Admiral
+              Request Enterprise Beta
             </a>
           </div>
         </div>
@@ -595,7 +583,6 @@ export default function LandingPage() {
               <p className="text-xs leading-relaxed space-y-1">
                 <span><strong>Brand:</strong> CrewRadr</span><br />
                 <span><strong>Support Email:</strong> <a href="mailto:support@crewradr.app" className="underline hover:text-[#6E8679]">support@crewradr.app</a></span><br />
-                <span><strong>Toll-Free Helpline:</strong> <a href="tel:+18557107793" className="underline hover:text-[#6E8679]">+1 (855) 710-7793</a></span><br />
                 <span><strong>Hours:</strong> Mon–Fri, 9:00 AM – 6:00 PM EST</span>
               </p>
             </div>
