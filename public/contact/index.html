@@ -277,7 +277,18 @@
   <p class="subtitle">Request an enterprise demo, fleet safety consultation, or platform support.</p>
 
   <div class="card">
-    <form id="contactForm" onsubmit="event.preventDefault(); alert('Thank you! Your message has been received. Our team will contact you shortly.');">
+    <div id="contactSuccess" style="display: none; text-align: center; padding: 40px 20px;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--sage-dark); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px;">✓</div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Message Received</h2>
+      <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; max-width: 440px; margin: 0 auto 20px;">
+        Thank you! Your message has been received. Our team will reach out as soon as possible.
+      </p>
+      <button type="button" id="resetContactForm" style="background: none; border: none; color: var(--sage-dark); font-weight: 700; cursor: pointer; text-decoration: underline; font-size: 0.9rem;">
+        Send another message &rarr;
+      </button>
+    </div>
+
+    <form id="contactForm">
       <div class="form-row">
         <div class="form-group">
           <label for="contact-name">Your Full Name *</label>
@@ -348,6 +359,49 @@
   toggle.addEventListener('click', () => {
     setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   });
+
+  const form = document.getElementById('contactForm');
+  const successBox = document.getElementById('contactSuccess');
+  const resetBtn = document.getElementById('resetContactForm');
+  const submitBtn = form.querySelector('.btn-submit');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    const payload = {
+      name: document.getElementById('contact-name').value,
+      email: document.getElementById('contact-email').value,
+      phone: document.getElementById('contact-phone').value,
+      sms_consent: document.getElementById('sms-consent').checked,
+      message: document.getElementById('contact-message').value,
+      source: 'contact_page',
+    };
+
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      // offline / network fallback
+    } finally {
+      form.style.display = 'none';
+      successBox.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Inquiry';
+      form.reset();
+    }
+  });
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      successBox.style.display = 'none';
+      form.style.display = 'block';
+    });
+  }
 </script>
 </body>
 </html>

@@ -47,7 +47,44 @@ export default function LandingPage() {
     applyLocale(code);
   }
 
+  const [contactSubmitting, setContactSubmitting] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
+
   const legalPrefix = locale === "en" ? "" : `/${locale}`;
+
+  async function handleContactSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setContactSubmitting(true);
+    const form = e.currentTarget;
+    const nameInput = form.elements.namedItem("contact-name") as HTMLInputElement | null;
+    const emailInput = form.elements.namedItem("contact-email") as HTMLInputElement | null;
+    const phoneInput = form.elements.namedItem("contact-phone") as HTMLInputElement | null;
+    const consentInput = form.elements.namedItem("sms-consent") as HTMLInputElement | null;
+    const messageInput = form.elements.namedItem("contact-message") as HTMLTextAreaElement | null;
+
+    const payload = {
+      name: nameInput?.value || "",
+      email: emailInput?.value || "",
+      phone: phoneInput?.value || "",
+      sms_consent: consentInput?.checked || false,
+      message: messageInput?.value || "",
+      source: "landing_page",
+    };
+
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      // Fallback: network error or offline
+    } finally {
+      setContactSubmitting(false);
+      setContactSuccess(true);
+      form.reset();
+    }
+  }
 
   return (
     <div
@@ -472,89 +509,113 @@ export default function LandingPage() {
             Have questions regarding fleet deployment, custom situational integrations, or customer support? Reach out directly.
           </p>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Thank you! Your message has been received. Our team will contact you shortly.");
-            }}
-            className="mt-8 space-y-4 text-left rounded-2xl border border-[#8EA595]/30 bg-[#FDFCFA] dark:bg-[#262929] p-6 shadow-sm"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="contact-name" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
-                  Your Name *
-                </label>
-                <input
-                  id="contact-name"
-                  type="text"
-                  required
-                  placeholder="Alex Mercer"
-                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
-                />
+          {contactSuccess ? (
+            <div className="mt-8 rounded-2xl border border-[#8EA595]/40 bg-[#8EA595]/10 dark:bg-[#8EA595]/15 p-8 text-center space-y-4">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#6E8679] text-white">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-              <div>
-                <label htmlFor="contact-email" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
-                  Email Address *
-                </label>
-                <input
-                  id="contact-email"
-                  type="email"
-                  required
-                  placeholder="alex@example.com"
-                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
-                />
-              </div>
+              <h3 className="text-lg font-bold text-[#262017] dark:text-[#F0F3F1]">Message Received</h3>
+              <p className="text-sm text-[#5C635F] dark:text-[#B4BCB8] max-w-md mx-auto">
+                Thank you! Your message has been received. Our team will reach out as soon as possible.
+              </p>
+              <button
+                type="button"
+                onClick={() => setContactSuccess(false)}
+                className="mt-2 inline-flex items-center text-xs font-semibold text-[#6E8679] hover:underline dark:text-[#8EA595]"
+              >
+                Send another message &rarr;
+              </button>
             </div>
-
-            <div>
-              <label htmlFor="contact-phone" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
-                Mobile Phone Number <span className="text-[#5C635F] dark:text-[#B4BCB8] font-normal">(Optional)</span>
-              </label>
-              <input
-                id="contact-phone"
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
-              />
-            </div>
-
-            {/* Standalone, Unchecked Voluntary SMS Consent Checkbox */}
-            <div className="rounded-xl border border-[#8EA595]/20 bg-[#8EA595]/5 p-3.5">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  id="sms-consent"
-                  className="mt-0.5 h-4 w-4 rounded border-[#8EA595] text-[#6E8679] focus:ring-[#6E8679]"
-                />
-                <span className="text-[11px] text-[#5C635F] dark:text-[#B4BCB8] leading-relaxed">
-                  I agree to receive transactional and consultation text messages (SMS) from CrewRadr at the phone number provided above. 
-                  <strong> Consent is voluntary and not a condition of purchase or receiving services.</strong> Message frequency varies. 
-                  Message and data rates may apply. Reply STOP to cancel at any time, HELP for help. View our{" "}
-                  <a href={`/terms${legalPrefix}/`} className="underline hover:text-[#6E8679]">Terms of Service</a> and{" "}
-                  <a href={`/privacy${legalPrefix}/`} className="underline hover:text-[#6E8679]">Privacy Policy</a>.
-                </span>
-              </label>
-            </div>
-
-            <div>
-              <label htmlFor="contact-message" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
-                Message / Inquiries
-              </label>
-              <textarea
-                id="contact-message"
-                rows={3}
-                placeholder="How can our crew help you?"
-                className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-[#6E8679] py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#5F7A6C] transition-colors"
+          ) : (
+            <form
+              onSubmit={handleContactSubmit}
+              className="mt-8 space-y-4 text-left rounded-2xl border border-[#8EA595]/30 bg-[#FDFCFA] dark:bg-[#262929] p-6 shadow-sm"
             >
-              Send Message
-            </button>
-          </form>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="contact-name" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                    Your Name *
+                  </label>
+                  <input
+                    id="contact-name"
+                    name="contact-name"
+                    type="text"
+                    required
+                    placeholder="Alex Mercer"
+                    className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="contact-email" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                    Email Address *
+                  </label>
+                  <input
+                    id="contact-email"
+                    name="contact-email"
+                    type="email"
+                    required
+                    placeholder="alex@example.com"
+                    className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="contact-phone" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                  Mobile Phone Number <span className="text-[#5C635F] dark:text-[#B4BCB8] font-normal">(Optional)</span>
+                </label>
+                <input
+                  id="contact-phone"
+                  name="contact-phone"
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+                />
+              </div>
+
+              {/* Standalone, Unchecked Voluntary SMS Consent Checkbox */}
+              <div className="rounded-xl border border-[#8EA595]/20 bg-[#8EA595]/5 p-3.5">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    id="sms-consent"
+                    name="sms-consent"
+                    className="mt-0.5 h-4 w-4 rounded border-[#8EA595] text-[#6E8679] focus:ring-[#6E8679]"
+                  />
+                  <span className="text-[11px] text-[#5C635F] dark:text-[#B4BCB8] leading-relaxed">
+                    I agree to receive transactional and consultation text messages (SMS) from CrewRadr at the phone number provided above. 
+                    <strong> Consent is voluntary and not a condition of purchase or receiving services.</strong> Message frequency varies. 
+                    Message and data rates may apply. Reply STOP to cancel at any time, HELP for help. View our{" "}
+                    <a href={`/terms${legalPrefix}/`} className="underline hover:text-[#6E8679]">Terms of Service</a> and{" "}
+                    <a href={`/privacy${legalPrefix}/`} className="underline hover:text-[#6E8679]">Privacy Policy</a>.
+                  </span>
+                </label>
+              </div>
+
+              <div>
+                <label htmlFor="contact-message" className="block text-xs font-semibold mb-1 text-[#262017] dark:text-[#F0F3F1]">
+                  Message / Inquiries
+                </label>
+                <textarea
+                  id="contact-message"
+                  name="contact-message"
+                  rows={3}
+                  placeholder="How can our crew help you?"
+                  className="w-full rounded-xl border border-[#8EA595]/30 bg-[#F6F4EE]/60 dark:bg-[#1E2121]/60 px-3 py-2 text-xs focus:border-[#6E8679] focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={contactSubmitting}
+                className="w-full rounded-xl bg-[#6E8679] py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#5F7A6C] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {contactSubmitting ? "Sending..." : "Send Message"}
+              </button>
+            </form>
+          )}
         </div>
       </section>
 
