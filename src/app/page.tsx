@@ -65,9 +65,6 @@ export default function LandingPage() {
           <a href="#features" className="hover:text-[#6E8679] dark:hover:text-[#8EA595] transition-colors">
             {t(locale, "navFeatures")}
           </a>
-          <a href="#safety" className="hover:text-[#6E8679] dark:hover:text-[#8EA595] transition-colors">
-            {t(locale, "navSafety")}
-          </a>
           <a href="#pricing" className="hover:text-[#6E8679] dark:hover:text-[#8EA595] transition-colors">
             {t(locale, "navPricing")}
           </a>
@@ -267,8 +264,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Safety & Telematics Strip */}
-      <section id="safety" className="border-y border-[#8EA595]/25 bg-[#EFECE5] dark:bg-[#262929] px-6 py-14">
+      {/* Telematics & Reliability Strip */}
+      <section className="border-y border-[#8EA595]/25 bg-[#EFECE5] dark:bg-[#262929] px-6 py-14">
         <div className="mx-auto max-w-5xl text-center">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             <div>
