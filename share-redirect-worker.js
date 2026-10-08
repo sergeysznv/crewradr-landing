@@ -307,12 +307,18 @@ async function handleShare(request, env, url) {
   }
 
   const base = env.SUPABASE_URL;
-  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  // Public share links only ever need the get_shared_location RPC, which is
+  // SECURITY DEFINER and granted to anon. Never hand this worker the
+  // service-role key: it would bypass RLS for the whole database.
+  const key = env.SUPABASE_ANON_KEY;
   const mapsKey = env.GOOGLE_MAPS_API_KEY || "";
+  if (!base || !key) {
+    return htmlRes(503, t.unavailableTitle, t.unavailableHeading, t.unavailableBody, t, lang);
+  }
   const auth = { "apikey": key, "Authorization": "Bearer " + key };
 
   try {
-    // 1. Primary: Try get_shared_location RPC (SECURITY DEFINER — works with publishable/anon or service key)
+    // 1. Primary: Try get_shared_location RPC (SECURITY DEFINER, granted to anon)
     try {
       const rpcUrl = base + "/rest/v1/rpc/get_shared_location";
       const rpcRes = await fetch(rpcUrl, {
@@ -387,222 +393,15 @@ async function handleShare(request, env, url) {
         }
       }
     } catch (rpcErr) {
-      // Fall through to PostgREST query
+      // fall through to the fail-closed 502 below
     }
 
-    // 2. Fallback: Direct PostgREST queries
-    const now = new Date().toISOString();
-    const shareRes = await fetch(
-      base + "/rest/v1/location_shares?token=eq." + encodeURIComponent(token) + "&expires_at=gt." + encodeURIComponent(now) + "&select=*",
-      { headers: auth }
-    );
-    if (!shareRes.ok) {
-      return htmlRes(502, t.unavailableTitle, t.unavailableHeading, t.unavailableBody, t, lang);
-    }
-
-    const shares = await shareRes.json();
-    if (!shares || shares.length === 0) {
-      const allRes = await fetch(
-        base + "/rest/v1/location_shares?token=eq." + encodeURIComponent(token) + "&select=id",
-        { headers: auth }
-      );
-      const all = allRes.ok ? await allRes.json() : [];
-      rateLimit(clientIP);
-      return (all && all.length > 0)
-        ? htmlRes(410, t.expiredTitle, t.expiredHeading, t.expiredBody, t, lang)
-        : htmlRes(404, t.invalidTitle, t.invalidHeading, t.invalidBody, t, lang);
-    }
-
-    const share = shares[0];
-    const viewerUnits = resolveUnits(url, request, null);
-    const locations = (await fetchLocations(base, auth, share, viewerUnits, t)).map(function(l) {
-      return {
-        latitude: l.latitude,
-        longitude: l.longitude,
-        display_name: l.display_name,
-        updated_at: l.updated_at,
-        avatar_url: l.avatar_url,
-        profile_emoji: l.profile_emoji || null,
-        escaped_display_name: esc(l.display_name),
-        speed: l.speed != null ? l.speed : null,
-        speed_ms: l.speed_ms != null ? l.speed_ms : null,
-        speed_display: l.speed_display || null,
-        units: l.units || viewerUnits,
-      };
-    });
-
-    if (isJson) {
-      return new Response(JSON.stringify({
-        locations: locations,
-        mode: share.mode,
-        units: viewerUnits,
-        lang: lang,
-      }), { headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-store",
-        "X-Robots-Tag": "noindex, nofollow",
-      }});
-    }
-
-    var html = renderPage(locations, share.mode, mapsKey, t, lang, viewerUnits);
-    return new Response(html, {
-      status: 200,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Referrer-Policy": "no-referrer",
-        "X-Content-Type-Options": "nosniff",
-      },
-    });
+    // The RPC is the only data path. If it did not return a usable answer,
+    // fail closed rather than querying tables directly.
+    return htmlRes(502, t.unavailableTitle, t.unavailableHeading, t.unavailableBody, t, lang);
   } catch (e) {
     return htmlRes(502, t.unavailableTitle, t.unavailableHeading, t.unavailableBody, t, lang);
   }
-}
-
-async function fetchLocations(base, auth, share, viewerUnits, t) {
-  var locs = [];
-
-  if (share.mode === "single") {
-    var locUrl = base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=eq." + encodeURIComponent(share.creator_id) + "&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload";
-    var r = await fetch(locUrl, { headers: auth });
-    var data = r.ok ? await r.json() : [];
-
-    if (!data || data.length === 0) {
-      // Fallback: check location_logs by user_id alone
-      var fallbackUrl = base + "/rest/v1/location_logs?user_id=eq." + encodeURIComponent(share.creator_id) + "&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload";
-      var fallbackR = await fetch(fallbackUrl, { headers: auth });
-      if (fallbackR.ok) data = await fallbackR.json();
-    }
-
-    // Fallback: direct coordinates stored on the share itself
-    if ((!data || data.length === 0) && share.latitude != null && share.longitude != null) {
-      data = [{
-        latitude: share.latitude,
-        longitude: share.longitude,
-        created_at: share.updated_at || share.created_at,
-        speed_ms: share.speed_ms,
-      }];
-    }
-
-    if (!data || data.length === 0) {
-      var anyUrl = base + "/rest/v1/location_logs?user_id=eq." + encodeURIComponent(share.creator_id) + "&order=created_at.desc&limit=3&select=latitude,longitude,created_at,speed_ms,encrypted_payload";
-      var anyR = await fetch(anyUrl, { headers: auth });
-      if (anyR.ok) data = await anyR.json();
-    }
-
-    if (data && data[0]) {
-      var d = data[0];
-      // Fallback: try encrypted_payload if lat/lng are NULL (pre-backfill rows)
-      if ((d.latitude == null || d.longitude == null) && d.encrypted_payload) {
-        try {
-          var p = JSON.parse(d.encrypted_payload);
-          d.latitude = p.lat != null ? p.lat : (p.latitude != null ? p.latitude : null);
-          d.longitude = p.lng != null ? p.lng : (p.longitude != null ? p.longitude : null);
-          if (d.speed_ms == null && p.speed != null) d.speed_ms = p.speed;
-        } catch (_) { /* encrypted — skip */ }
-      }
-      if (d.latitude != null && d.longitude != null) {
-        var pr = await fetch(
-          base + "/rest/v1/profiles?user_id=eq." + encodeURIComponent(share.creator_id) + "&select=display_name,avatar_url,measurement_system",
-          { headers: auth }
-        );
-        var p = pr.ok ? await pr.json() : [];
-        var prof = (p && p[0]) || null;
-        var memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
-        var speedMs = d.speed_ms != null ? d.speed_ms : null;
-        var speedDisplay = null;
-        var speedNum = null;
-        if (speedMs != null && speedMs >= 0) {
-          var isImp = memberUnits === "imperial";
-          speedNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
-          var tpl = isImp ? t.speedMph : t.speedKmh;
-          speedDisplay = tpl.replace("{s}", Math.round(speedNum));
-        }
-        locs.push({
-          latitude: d.latitude,
-          longitude: d.longitude,
-          display_name: (prof && prof.display_name) || t.crewMember,
-          updated_at: d.created_at,
-          avatar_url: prof ? prof.avatar_url : null,
-          speed: speedNum,
-          speed_ms: speedMs,
-          speed_display: speedDisplay,
-          units: memberUnits,
-        });
-      }
-    }
-  } else if (share.mode === "crew" && share.crew_id) {
-    var mr = await fetch(
-      base + "/rest/v1/crew_members?crew_id=eq." + encodeURIComponent(share.crew_id) + "&select=user_id",
-      { headers: auth }
-    );
-    var members = mr.ok ? await mr.json() : [];
-    if (members && members.length > 0) {
-      var ids = members.map(function(m) { return m.user_id; });
-      var inClause = ids.map(function(id) { return encodeURIComponent(id); }).join(",");
-      // Query per-user in parallel to prevent active drivers from starving out other members
-      var perUserPromises = ids.map(function(uid) {
-        var uUrl = base + "/rest/v1/location_logs?crew_id=eq." + encodeURIComponent(share.crew_id) + "&user_id=eq." + encodeURIComponent(uid) + "&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=3&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload";
-        return fetch(uUrl, { headers: auth })
-          .then(function(r) { return r.ok ? r.json() : []; })
-          .catch(function() { return []; });
-      });
-      var perUserResults = await Promise.all(perUserPromises);
-      var raw = [].concat.apply([], perUserResults);
-      var seen = new Set();
-      var deduped = [];
-      for (var i = 0; i < (raw || []).length; i++) {
-        var loc = raw[i];
-        // Fallback: try encrypted_payload if lat/lng are NULL
-        if ((loc.latitude == null || loc.longitude == null) && loc.encrypted_payload) {
-          try {
-            var pl = JSON.parse(loc.encrypted_payload);
-            loc.latitude = pl.lat != null ? pl.lat : (pl.latitude != null ? pl.latitude : null);
-            loc.longitude = pl.lng != null ? pl.lng : (pl.longitude != null ? pl.longitude : null);
-            if (loc.speed_ms == null && pl.speed != null) loc.speed_ms = pl.speed;
-          } catch (_) { /* encrypted — skip */ }
-        }
-        if (!seen.has(loc.user_id) && loc.latitude != null && loc.longitude != null) {
-          seen.add(loc.user_id);
-          deduped.push(loc);
-        }
-      }
-      if (deduped.length > 0) {
-        var pr2 = await fetch(
-          base + "/rest/v1/profiles?user_id=in.(" + inClause + ")&select=user_id,display_name,avatar_url,measurement_system",
-          { headers: auth }
-        );
-        var profiles = pr2.ok ? await pr2.json() : [];
-        var profileMap = new Map((profiles || []).map(function(p) { return [p.user_id, p]; }));
-        for (var j = 0; j < deduped.length; j++) {
-          var dloc = deduped[j];
-          var profM = profileMap.get(dloc.user_id);
-          var mUnits = (profM && profM.measurement_system) ? profM.measurement_system : viewerUnits;
-          var sMs = dloc.speed_ms != null ? dloc.speed_ms : null;
-          var sDisplay = null;
-          var sNum = null;
-          if (sMs != null && sMs >= 0) {
-            var isImpM = mUnits === "imperial";
-            sNum = isImpM ? (sMs * 2.23694) : (sMs * 3.6);
-            var tplM = isImpM ? t.speedMph : t.speedKmh;
-            sDisplay = tplM.replace("{s}", Math.round(sNum));
-          }
-          locs.push({
-            latitude: dloc.latitude,
-            longitude: dloc.longitude,
-            display_name: (profM && profM.display_name) || t.crewMember,
-            updated_at: dloc.created_at,
-            avatar_url: profM ? profM.avatar_url : null,
-            speed: sNum,
-            speed_ms: sMs,
-            speed_display: sDisplay,
-            units: mUnits,
-          });
-        }
-      }
-    }
-  }
-  return locs;
 }
 
 function htmlRes(status, title, heading, body, t, lang) {

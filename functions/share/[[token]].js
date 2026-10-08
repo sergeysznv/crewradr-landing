@@ -231,15 +231,21 @@ export async function onRequest(context) {
   const isJson = url.searchParams.get("json") === "1";
 
   const supabaseUrl = env.SUPABASE_URL;
-  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
+  // Public share links only ever need the get_shared_location RPC, which is
+  // SECURITY DEFINER and granted to anon. Never bind the service-role key to
+  // this function: it would bypass RLS for the whole database.
+  const anonKey = env.SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !anonKey) {
+    return htmlResponse(503, t.unavailableTitle, t.unavailableBody, lang);
+  }
   const authHeaders = {
-    "apikey": serviceKey,
-    "Authorization": `Bearer ${serviceKey}`,
+    "apikey": anonKey,
+    "Authorization": `Bearer ${anonKey}`,
     "Accept": "application/json",
   };
 
   try {
-    // 2a. Primary: Try get_shared_location RPC (SECURITY DEFINER — works with publishable/anon or service key)
+    // 2a. Primary: Try get_shared_location RPC (SECURITY DEFINER, granted to anon)
     let rpcSucceeded = false;
     let shareMode = "single";
     let locations = [];
@@ -292,212 +298,12 @@ export async function onRequest(context) {
         }
       }
     } catch (rpcErr) {
-      console.warn("get_shared_location RPC attempt failed, falling back to PostgREST:", rpcErr);
+      console.warn("get_shared_location RPC attempt failed:", rpcErr);
     }
 
     if (!rpcSucceeded) {
-      // 2b. Fallback: Look up share via PostgREST — filter expiry at database level
-      const now = new Date().toISOString();
-      const shareUrl = `${supabaseUrl}/rest/v1/location_shares?token=eq.${encodeURIComponent(token)}&expires_at=gt.${encodeURIComponent(now)}&select=*`;
-
-      const shareRes = await fetch(shareUrl, { headers: authHeaders });
-      if (!shareRes.ok) {
-        console.error(`location_shares query failed: ${shareRes.status}`);
-        return htmlResponse(502, t.unavailableTitle, t.unavailableBody, lang);
-      }
-
-      const shares = await shareRes.json();
-
-      if (!shares || shares.length === 0) {
-        // Distinguish 404 vs 410: check if token exists at all (ignoring expiry)
-        const allTimeUrl = `${supabaseUrl}/rest/v1/location_shares?token=eq.${encodeURIComponent(token)}&select=id,expires_at`;
-        const allTimeRes = await fetch(allTimeUrl, { headers: authHeaders });
-        const allTimeShares = allTimeRes.ok ? await allTimeRes.json() : [];
-
-        if (allTimeShares && allTimeShares.length > 0) {
-          return htmlResponse(410, t.expiredH1, renderExpiredPage(t), lang);
-        }
-        return htmlResponse(404, t.notFoundTitle, t.notFoundBody, lang);
-      }
-
-      const share = shares[0];
-      shareMode = share.mode || "single";
-
-      // 3. Fetch location data
-      if (share.mode === "single") {
-        // Latest location for the creator with non-null coordinates
-        let locUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(share.creator_id)}&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
-        let locRes = await fetch(locUrl, { headers: authHeaders });
-        let locs = locRes.ok ? await locRes.json() : [];
-
-        if (!locs || locs.length === 0) {
-          // Fallback: check location_logs by user_id alone
-          const fallbackUrl = `${supabaseUrl}/rest/v1/location_logs?user_id=eq.${encodeURIComponent(share.creator_id)}&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=5&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
-          const fallbackRes = await fetch(fallbackUrl, { headers: authHeaders });
-          if (fallbackRes.ok) locs = await fallbackRes.json();
-        }
-
-        // Fallback: direct coordinates stored on the share itself
-        if ((!locs || locs.length === 0) && share.latitude != null && share.longitude != null) {
-          locs = [{
-            latitude: share.latitude,
-            longitude: share.longitude,
-            created_at: share.updated_at || share.created_at,
-            speed_ms: share.speed_ms,
-          }];
-        }
-
-        // If still no locs, try without null filter in case pre-backfill rows need encrypted_payload parsing
-        if (!locs || locs.length === 0) {
-          const anyUrl = `${supabaseUrl}/rest/v1/location_logs?user_id=eq.${encodeURIComponent(share.creator_id)}&order=created_at.desc&limit=3&select=latitude,longitude,created_at,speed_ms,encrypted_payload`;
-          const anyRes = await fetch(anyUrl, { headers: authHeaders });
-          if (anyRes.ok) locs = await anyRes.json();
-        }
-
-        if (locs && locs.length > 0) {
-          // Fallback: if lat/lng are NULL (pre-backfill rows), try encrypted_payload
-          let loc = locs[0];
-          if ((loc.latitude == null || loc.longitude == null) && loc.encrypted_payload) {
-            try {
-              const payload = JSON.parse(loc.encrypted_payload);
-              loc.latitude = payload.lat ?? payload.latitude ?? null;
-              loc.longitude = payload.lng ?? payload.longitude ?? null;
-              if (loc.speed_ms == null && payload.speed != null) loc.speed_ms = payload.speed;
-            } catch (_) { /* encrypted ciphertext — skip */ }
-          }
-          if (loc.latitude != null && loc.longitude != null) {
-            const profileUrl = `${supabaseUrl}/rest/v1/profiles?user_id=eq.${encodeURIComponent(share.creator_id)}&select=display_name,profile_emoji,measurement_system`;
-            const profileRes = await fetch(profileUrl, { headers: authHeaders });
-            const profiles = profileRes.ok ? await profileRes.json() : [];
-            const prof = (profiles && profiles.length > 0) ? profiles[0] : null;
-            // Profile photo lives on crew_members, not profiles.
-            const memberAvUrl = `${supabaseUrl}/rest/v1/crew_members?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(share.creator_id)}&select=avatar_url`;
-            const memberAvRes = await fetch(memberAvUrl, { headers: authHeaders });
-            const memberAvas = memberAvRes.ok ? await memberAvRes.json() : [];
-            const avatarUrl = (memberAvas && memberAvas.length > 0) ? memberAvas[0].avatar_url : null;
-            const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
-            const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
-            let speedDisplay = null;
-            if (speedMs != null && speedMs >= 0) {
-              const isImp = memberUnits === "imperial";
-              const sNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
-              const tpl = isImp ? t.speedMph : t.speedKmh;
-              speedDisplay = tpl.replace("{s}", Math.round(sNum));
-            }
-
-            locations.push({
-              user_id: share.creator_id,
-              latitude: loc.latitude,
-              longitude: loc.longitude,
-              display_name: (prof && prof.display_name) || t.crewMember,
-              updated_at: loc.created_at,
-              avatar_url: avatarUrl,
-              profile_emoji: prof ? prof.profile_emoji : null,
-              speed_ms: speedMs,
-              speed_display: speedDisplay,
-              units: memberUnits,
-            });
-          }
-        }
-      } else if (share.mode === "crew" && share.crew_id) {
-        // Get crew members
-        const membersUrl = `${supabaseUrl}/rest/v1/crew_members?crew_id=eq.${encodeURIComponent(share.crew_id)}&select=user_id`;
-        const membersRes = await fetch(membersUrl, { headers: authHeaders });
-        const members = membersRes.ok ? await membersRes.json() : [];
-
-        if (members && members.length > 0) {
-          const userIds = members.map(m => m.user_id);
-
-          // Fetch latest location for each crew member in parallel so one active driver does not crowd out others
-          const locResults = await Promise.all(
-            userIds.map(async (uid) => {
-              try {
-                const uLocUrl = `${supabaseUrl}/rest/v1/location_logs?crew_id=eq.${encodeURIComponent(share.crew_id)}&user_id=eq.${encodeURIComponent(uid)}&latitude=not.is.null&longitude=not.is.null&order=created_at.desc&limit=1&select=latitude,longitude,created_at,speed_ms,user_id,encrypted_payload`;
-                const r = await fetch(uLocUrl, { headers: authHeaders });
-                if (r.ok) {
-                  const arr = await r.json();
-                  if (arr && arr.length > 0) return arr[0];
-                }
-              } catch (_) {}
-              return null;
-            })
-          );
-          const locs = locResults.filter(Boolean);
-
-          // Deduplicate — keep only latest per user, skip null coordinates
-          const seen = new Set();
-          const latestPerUser = [];
-          for (const loc of locs) {
-            // Fallback: if lat/lng are NULL, try encrypted_payload
-            if ((loc.latitude == null || loc.longitude == null) && loc.encrypted_payload) {
-              try {
-                const payload = JSON.parse(loc.encrypted_payload);
-                loc.latitude = payload.lat ?? payload.latitude ?? null;
-                loc.longitude = payload.lng ?? payload.longitude ?? null;
-                if (loc.speed_ms == null && payload.speed != null) loc.speed_ms = payload.speed;
-              } catch (_) { /* encrypted — skip */ }
-            }
-            if (!seen.has(loc.user_id) && loc.latitude != null && loc.longitude != null) {
-              seen.add(loc.user_id);
-              latestPerUser.push(loc);
-            }
-          }
-
-          // Also check if creator had direct coordinates on share and isn't yet in latestPerUser
-          if (!seen.has(share.creator_id) && share.latitude != null && share.longitude != null) {
-            seen.add(share.creator_id);
-            latestPerUser.push({
-              user_id: share.creator_id,
-              latitude: share.latitude,
-              longitude: share.longitude,
-              created_at: share.updated_at || share.created_at,
-              speed_ms: share.speed_ms,
-            });
-          }
-
-          if (latestPerUser.length > 0) {
-            // Fetch profiles using PostgREST in operator
-            const profileIn = userIds.map(id => encodeURIComponent(id)).join(",");
-            const profilesUrl = `${supabaseUrl}/rest/v1/profiles?user_id=in.(${profileIn})&select=user_id,display_name,profile_emoji,measurement_system`;
-            const profilesRes = await fetch(profilesUrl, { headers: authHeaders });
-            const profiles = profilesRes.ok ? await profilesRes.json() : [];
-
-            // Profile photos live on crew_members, not profiles.
-            const membersAvUrl = `${supabaseUrl}/rest/v1/crew_members?crew_id=eq.${encodeURIComponent(share.crew_id)}&select=user_id,avatar_url`;
-            const membersAvRes = await fetch(membersAvUrl, { headers: authHeaders });
-            const membersAvas = membersAvRes.ok ? await membersAvRes.json() : [];
-            const avMap = new Map((membersAvas || []).map(m => [m.user_id, m.avatar_url]));
-
-            const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-
-            locations = latestPerUser.map(loc => {
-              const prof = profileMap.get(loc.user_id);
-              const memberUnits = (prof && prof.measurement_system) ? prof.measurement_system : viewerUnits;
-              const speedMs = loc.speed_ms != null ? loc.speed_ms : null;
-              let speedDisplay = null;
-              if (speedMs != null && speedMs >= 0) {
-                const isImp = memberUnits === "imperial";
-                const sNum = isImp ? (speedMs * 2.23694) : (speedMs * 3.6);
-                const tpl = isImp ? t.speedMph : t.speedKmh;
-                speedDisplay = tpl.replace("{s}", Math.round(sNum));
-              }
-
-              return {
-                user_id: loc.user_id,
-                latitude: loc.latitude,
-                longitude: loc.longitude,
-                display_name: (prof && prof.display_name) || t.crewMember,
-                updated_at: loc.created_at,
-                avatar_url: avMap.get(loc.user_id) || null,
-                profile_emoji: prof ? prof.profile_emoji : null,
-                speed_ms: speedMs,
-                speed_display: speedDisplay,
-                units: memberUnits,
-              };
-            });
-          }
-        }
-      }
+      // The RPC is the only data path; fail closed instead of querying tables.
+      return htmlResponse(502, t.unavailableTitle, t.unavailableBody, lang);
     }
 
     // JSON mode for client-side polling
