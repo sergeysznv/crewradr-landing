@@ -111,38 +111,81 @@ export async function onRequestPost(context) {
     // 2. Email dispatch via Resend API (if RESEND_API_KEY is configured)
     const resendApiKey = env.RESEND_API_KEY;
     const recipientEmail = env.CONTACT_NOTIFICATION_EMAIL || "support@crewradr.app";
+    const fromAddress = env.RESEND_FROM_EMAIL || "CrewRadr Inquiries <notifications@crewradr.app>";
+
+    const emailStatus = {
+      attempted: false,
+      hasKey: Boolean(resendApiKey),
+      recipient: recipientEmail,
+      error: null,
+    };
 
     if (resendApiKey) {
+      emailStatus.attempted = true;
       try {
-        const emailRes = await fetch("https://api.resend.com/emails", {
+        const emailPayload = {
+          from: fromAddress,
+          to: [recipientEmail],
+          reply_to: email,
+          subject: `New Inquiry from ${name} (${email})`,
+          html: `
+            <h2>New Contact / Consultation Inquiry</h2>
+            <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+            <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+            <p><strong>Phone:</strong> ${escapeHtml(phone || "Not provided")}</p>
+            <p><strong>SMS Opt-In Consent:</strong> ${smsConsent ? "✓ Consented (Voluntary)" : "No"}</p>
+            <p><strong>Source Page:</strong> ${escapeHtml(source)}</p>
+            <p><strong>Message:</strong></p>
+            <blockquote style="background:#f4f4f4;padding:12px;border-left:4px solid #6E8679;white-space:pre-wrap;">${escapeHtml(message || "(No message provided)")}</blockquote>
+            <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
+            <p style="font-size:11px;color:#888;">Submitted at ${timestamp} &middot; IP: ${clientIp}</p>
+          `,
+        };
+
+        let emailRes = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${resendApiKey}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            from: "CrewRadr Inquiries <notifications@crewradr.app>",
-            to: [recipientEmail],
-            reply_to: email,
-            subject: `New Inquiry from ${name} (${email})`,
-            html: `
-              <h2>New Contact / Consultation Inquiry</h2>
-              <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-              <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
-              <p><strong>Phone:</strong> ${escapeHtml(phone || "Not provided")}</p>
-              <p><strong>SMS Opt-In Consent:</strong> ${smsConsent ? "✓ Consented (Voluntary)" : "No"}</p>
-              <p><strong>Source Page:</strong> ${escapeHtml(source)}</p>
-              <p><strong>Message:</strong></p>
-              <blockquote style="background:#f4f4f4;padding:12px;border-left:4px solid #6E8679;white-space:pre-wrap;">${escapeHtml(message || "(No message provided)")}</blockquote>
-              <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
-              <p style="font-size:11px;color:#888;">Submitted at ${timestamp} &middot; IP: ${clientIp}</p>
-            `,
-          }),
+          body: JSON.stringify(emailPayload),
         });
-        if (emailRes.ok) emailSent = true;
+
+        if (emailRes.ok) {
+          emailSent = true;
+        } else {
+          const errData = await emailRes.json().catch(() => ({}));
+          emailStatus.error = errData;
+
+          // If custom domain is not yet verified in Resend, retry with onboarding@resend.dev
+          if (fromAddress.includes("crewradr.app")) {
+            const fallbackRes = await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${resendApiKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                ...emailPayload,
+                from: "CrewRadr <onboarding@resend.dev>",
+              }),
+            });
+
+            if (fallbackRes.ok) {
+              emailSent = true;
+              emailStatus.fallbackUsed = true;
+              emailStatus.error = null;
+            } else {
+              const fbErrData = await fallbackRes.json().catch(() => ({}));
+              emailStatus.fallbackError = fbErrData;
+            }
+          }
+        }
       } catch (emailErr) {
-        console.error("Resend dispatch error:", emailErr);
+        emailStatus.error = String(emailErr?.message || emailErr);
       }
+    } else {
+      emailStatus.error = "RESEND_API_KEY not detected in runtime environment.";
     }
 
     return new Response(
@@ -151,6 +194,7 @@ export async function onRequestPost(context) {
         message: "Thank you! Your message has been received. Our team will reach out as soon as possible.",
         savedToDb,
         emailSent,
+        emailStatus,
       }),
       {
         status: 200,
