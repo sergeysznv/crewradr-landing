@@ -1,0 +1,39 @@
+name: Landing CI
+
+# Required check on pull requests into main. Deployment is done by Cloudflare
+# Pages (project crewradr-landing) on every push to main; do not deploy from here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Check version files were generated
+        run: |
+          test -s out/version.txt
+          node -e "const v=require('./out/version.json'); if(!v.version||!v.sha) process.exit(1); console.log(v)"
