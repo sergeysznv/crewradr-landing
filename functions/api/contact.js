@@ -34,19 +34,30 @@ export async function onRequestPost(context) {
       body = await request.json().catch(() => ({}));
     }
 
-    const name = (body.name || "").trim();
-    const email = (body.email || "").trim();
-    const phone = (body.phone || "").trim();
-    const smsConsent = Boolean(body.smsConsent || body.sms_consent);
-    const message = (body.message || "").trim();
-    const source = (body.source || "landing_page").trim();
+    const str = (v) => (typeof v === "string" ? v.trim() : "");
+    const name = str(body.name);
+    const email = str(body.email);
+    const phone = str(body.phone);
+    const smsConsent = body.smsConsent === true || body.smsConsent === "true" || body.smsConsent === "on" ||
+      body.sms_consent === true || body.sms_consent === "true" || body.sms_consent === "on";
+    const message = str(body.message);
+    const source = str(body.source) || "landing_page";
 
-    if (!name || !email) {
-      return new Response(
-        JSON.stringify({ ok: false, error: "Name and email are required." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    const jsonHeaders = { ...corsHeaders, "Content-Type": "application/json" };
+    const reject = (error) =>
+      new Response(JSON.stringify({ ok: false, error }), { status: 400, headers: jsonHeaders });
+
+    // Honeypot: real visitors never fill this hidden field; pretend success to bots.
+    if (str(body.website)) {
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers: jsonHeaders });
     }
+
+    if (!name || !email) return reject("Name and email are required.");
+    if (name.length > 120) return reject("Name is too long.");
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return reject("Please enter a valid email address.");
+    if (phone.length > 40) return reject("Phone number is too long.");
+    if (message.length > 4000) return reject("Message is too long (4000 characters max).");
+    if (source.length > 50) return reject("Invalid source.");
 
     const timestamp = new Date().toISOString();
     const clientIp = request.headers.get("cf-connecting-ip") || "unknown";
@@ -57,7 +68,9 @@ export async function onRequestPost(context) {
 
     // 1. Supabase insert (Audit log & persistence)
     const supabaseUrl = env.SUPABASE_URL;
-    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY;
+    // Anon key only: the table's INSERT-only policy is all this endpoint needs. Never bind the
+    // service-role key to a public function.
+    const supabaseKey = env.SUPABASE_ANON_KEY;
 
     if (supabaseUrl && supabaseKey) {
       try {
@@ -188,13 +201,14 @@ export async function onRequestPost(context) {
       emailStatus.error = "RESEND_API_KEY not detected in runtime environment.";
     }
 
+    if (!savedToDb || !emailSent) {
+      console.error("contact: delivery incomplete", { savedToDb, emailSent, emailStatus });
+    }
+
     return new Response(
       JSON.stringify({
         ok: true,
         message: "Thank you! Your message has been received. Our team will reach out as soon as possible.",
-        savedToDb,
-        emailSent,
-        emailStatus,
       }),
       {
         status: 200,
