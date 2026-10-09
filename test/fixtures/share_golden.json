@@ -1,0 +1,16 @@
+{
+  "key": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA",
+  "token": "abcdefgh23456789",
+  "ciphertext": "FiNFMVSp-roXcT8rvKWe1SknoOkBSOqWbs70lDho8yLhiddfB431BjU-P_5OhUlFRuI2M-91sW5dmUNZoiL-fYAgFqn45NHPiJP0OY0Hj2snKk4ZRB-ekgVYICfY1jk3ng9oLOKwNQ9Kr1_LLNacL2kKhusSeTT250xipd7p5SbzoHolnk_EX1VQSAtSoe_kyVSsJXvq--IUZEXCvs5Ayuj3pm4KoJwqnfq44oXFa8y1hM926NWCVt0eVfvy9Nwm1-RpZ6KMP0ayfP7Z",
+  "expected": {
+    "lat": 37.7749,
+    "lng": -122.4194,
+    "seq": 1760000000007,
+    "name": "Sam",
+    "fix_at": "2026-10-09T12:00:00.000Z",
+    "speed_ms": 13.4,
+    "heading": 90.0,
+    "status": "live",
+    "v": 1
+  }
+}

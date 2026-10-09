@@ -36,6 +36,21 @@ const STRINGS = {
     mapThemeSystem: "System",
     mapThemeLight: "Light",
     mapThemeDark: "Dark",
+    encIncompleteTitle: "This link is incomplete",
+    encIncompleteBody: "Part of the link is missing, so the location can't be unlocked. Ask the sender to share the full link again and open it exactly as received.",
+    encUndecryptableTitle: "This link can't be opened",
+    encUndecryptableBody: "The location couldn't be decrypted with this link. It may have been copied incorrectly. Ask the sender for a new link.",
+    encUnsupportedTitle: "Browser not supported",
+    encUnsupportedBody: "This browser can't open encrypted location links. Update it or open the link in another browser.",
+    encRevokedTitle: "This link is no longer available",
+    encRevokedBody: "The sender may have stopped sharing or revoked the link.",
+    encStale: "Location may be out of date",
+    encUpdatedJustNow: "Updated just now",
+    encUpdatedMinAgo: "Updated {n} min ago",
+    encEncrypted: "End-to-end encrypted",
+    encLoading: "Loading location...",
+    encRetrying: "Connection problem. Retrying...",
+    encMapUnavailable: "Map could not be loaded. Last position:",
   },
   es: {
     invalidTitle: "Enlace de compartir no válido",
@@ -64,6 +79,21 @@ const STRINGS = {
     mapThemeSystem: "Sistema",
     mapThemeLight: "Claro",
     mapThemeDark: "Oscuro",
+    encIncompleteTitle: "Este enlace está incompleto",
+    encIncompleteBody: "Falta parte del enlace, así que no se puede desbloquear la ubicación. Pide al remitente que vuelva a compartir el enlace completo y ábrelo tal como lo recibiste.",
+    encUndecryptableTitle: "No se puede abrir este enlace",
+    encUndecryptableBody: "No se pudo descifrar la ubicación con este enlace. Puede que se haya copiado mal. Pide al remitente un enlace nuevo.",
+    encUnsupportedTitle: "Navegador no compatible",
+    encUnsupportedBody: "Este navegador no puede abrir enlaces de ubicación cifrados. Actualízalo o abre el enlace en otro navegador.",
+    encRevokedTitle: "Este enlace ya no está disponible",
+    encRevokedBody: "Es posible que el remitente haya dejado de compartir o haya revocado el enlace.",
+    encStale: "Es posible que la ubicación no esté actualizada",
+    encUpdatedJustNow: "Actualizado justo ahora",
+    encUpdatedMinAgo: "Actualizado hace {n} min",
+    encEncrypted: "Cifrado de extremo a extremo",
+    encLoading: "Cargando ubicación...",
+    encRetrying: "Problema de conexión. Reintentando...",
+    encMapUnavailable: "No se pudo cargar el mapa. Última posición:",
   },
   fr: {
     invalidTitle: "Lien de partage invalide",
@@ -92,6 +122,21 @@ const STRINGS = {
     mapThemeSystem: "Système",
     mapThemeLight: "Clair",
     mapThemeDark: "Sombre",
+    encIncompleteTitle: "Ce lien est incomplet",
+    encIncompleteBody: "Une partie du lien est manquante, la position ne peut donc pas être déverrouillée. Demandez à l'expéditeur de partager à nouveau le lien complet et ouvrez-le tel que vous l'avez reçu.",
+    encUndecryptableTitle: "Impossible d'ouvrir ce lien",
+    encUndecryptableBody: "La position n'a pas pu être déchiffrée avec ce lien. Il a peut-être été mal copié. Demandez un nouveau lien à l'expéditeur.",
+    encUnsupportedTitle: "Navigateur non pris en charge",
+    encUnsupportedBody: "Ce navigateur ne peut pas ouvrir les liens de position chiffrés. Mettez-le à jour ou ouvrez le lien dans un autre navigateur.",
+    encRevokedTitle: "Ce lien n'est plus disponible",
+    encRevokedBody: "L'expéditeur a peut-être arrêté le partage ou révoqué le lien.",
+    encStale: "La position n'est peut-être plus à jour",
+    encUpdatedJustNow: "Mis à jour à l'instant",
+    encUpdatedMinAgo: "Mis à jour il y a {n} min",
+    encEncrypted: "Chiffré de bout en bout",
+    encLoading: "Chargement de la position...",
+    encRetrying: "Problème de connexion. Nouvelle tentative...",
+    encMapUnavailable: "Impossible de charger la carte. Dernière position :",
   },
   ar: {
     invalidTitle: "رابط مشاركة غير صالح",
@@ -120,6 +165,21 @@ const STRINGS = {
     mapThemeSystem: "النظام",
     mapThemeLight: "فاتح",
     mapThemeDark: "داكن",
+    encIncompleteTitle: "هذا الرابط غير مكتمل",
+    encIncompleteBody: "جزء من الرابط مفقود، لذا لا يمكن فتح الموقع. اطلب من المرسل مشاركة الرابط كاملاً مرة أخرى وافتحه كما وصلك تماماً.",
+    encUndecryptableTitle: "تعذّر فتح هذا الرابط",
+    encUndecryptableBody: "تعذّر فك تشفير الموقع باستخدام هذا الرابط. ربما نُسخ بشكل غير صحيح. اطلب من المرسل رابطاً جديداً.",
+    encUnsupportedTitle: "المتصفح غير مدعوم",
+    encUnsupportedBody: "لا يمكن لهذا المتصفح فتح روابط الموقع المشفّرة. قم بتحديثه أو افتح الرابط في متصفح آخر.",
+    encRevokedTitle: "هذا الرابط لم يعد متاحاً",
+    encRevokedBody: "ربما أوقف المرسل المشاركة أو ألغى الرابط.",
+    encStale: "قد لا يكون الموقع محدّثاً",
+    encUpdatedJustNow: "تم التحديث الآن",
+    encUpdatedMinAgo: "تم التحديث قبل {n} دقيقة",
+    encEncrypted: "مشفّر من طرف إلى طرف",
+    encLoading: "جارٍ تحميل الموقع...",
+    encRetrying: "مشكلة في الاتصال. جارٍ إعادة المحاولة...",
+    encMapUnavailable: "تعذّر تحميل الخريطة. آخر موقع:",
   },
   zh: {
     invalidTitle: "分享链接无效",
@@ -148,6 +208,21 @@ const STRINGS = {
     mapThemeSystem: "系统",
     mapThemeLight: "浅色",
     mapThemeDark: "深色",
+    encIncompleteTitle: "此链接不完整",
+    encIncompleteBody: "链接缺少一部分，因此无法解锁位置。请让发送者重新分享完整链接，并按收到时的原样打开。",
+    encUndecryptableTitle: "无法打开此链接",
+    encUndecryptableBody: "无法使用此链接解密位置。链接可能复制有误。请向发送者索取新链接。",
+    encUnsupportedTitle: "不支持此浏览器",
+    encUnsupportedBody: "此浏览器无法打开加密的位置链接。请更新浏览器或在其他浏览器中打开链接。",
+    encRevokedTitle: "此链接已不可用",
+    encRevokedBody: "发送者可能已停止共享或撤销了此链接。",
+    encStale: "位置可能已过时",
+    encUpdatedJustNow: "刚刚更新",
+    encUpdatedMinAgo: "{n} 分钟前更新",
+    encEncrypted: "端到端加密",
+    encLoading: "正在加载位置...",
+    encRetrying: "连接出现问题，正在重试...",
+    encMapUnavailable: "无法加载地图。最新位置：",
   },
   ru: {
     invalidTitle: "Недействительная ссылка",
@@ -176,6 +251,21 @@ const STRINGS = {
     mapThemeSystem: "Система",
     mapThemeLight: "Светлая",
     mapThemeDark: "Тёмная",
+    encIncompleteTitle: "Ссылка неполная",
+    encIncompleteBody: "Часть ссылки отсутствует, поэтому местоположение нельзя открыть. Попросите отправителя снова поделиться полной ссылкой и откройте её в точности в том виде, в каком получили.",
+    encUndecryptableTitle: "Не удаётся открыть ссылку",
+    encUndecryptableBody: "Не удалось расшифровать местоположение по этой ссылке. Возможно, она скопирована с ошибкой. Попросите у отправителя новую ссылку.",
+    encUnsupportedTitle: "Браузер не поддерживается",
+    encUnsupportedBody: "Этот браузер не может открывать зашифрованные ссылки на местоположение. Обновите его или откройте ссылку в другом браузере.",
+    encRevokedTitle: "Ссылка больше недоступна",
+    encRevokedBody: "Возможно, отправитель прекратил делиться местоположением или отозвал ссылку.",
+    encStale: "Местоположение может быть устаревшим",
+    encUpdatedJustNow: "Обновлено только что",
+    encUpdatedMinAgo: "Обновлено {n} мин назад",
+    encEncrypted: "Сквозное шифрование",
+    encLoading: "Загрузка местоположения...",
+    encRetrying: "Проблема с соединением. Повторная попытка...",
+    encMapUnavailable: "Не удалось загрузить карту. Последнее местоположение:",
   },
 };
 
@@ -268,6 +358,12 @@ export async function onRequest(context) {
         }
         if (rpcData && rpcData.status === "expired") {
           return htmlResponse(410, t.expiredH1, renderExpiredPage(t), lang);
+        }
+        if (rpcData && rpcData.status === "ok" && rpcData.encrypted === true) {
+          // End-to-end encrypted share: the server only ever relays ciphertext.
+          return isJson
+            ? encryptedJsonResponse(rpcData)
+            : encryptedPageResponse(token, t, lang, viewerUnits);
         }
         if (rpcData && rpcData.status === "ok") {
           rpcSucceeded = true;
@@ -647,3 +743,432 @@ function escapeHtml(text) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+// BEGIN encrypted viewer
+// End-to-end encrypted shares (`encrypted: true` from get_shared_location).
+// The key lives only in the URL fragment (#k=...), which browsers never send
+// to a server, so this function only ever sees and relays ciphertext. The
+// shell page carries no position, name, avatar or payload; the browser
+// decrypts with /assets/share-viewer-core.js. Decrypted, sender-controlled
+// text is rendered with textContent only (never as HTML).
+
+const ENC_STRING_KEYS = [
+  "encIncompleteTitle", "encIncompleteBody", "encUndecryptableTitle", "encUndecryptableBody",
+  "encUnsupportedTitle", "encUnsupportedBody", "encRevokedTitle", "encRevokedBody",
+  "encStale", "encUpdatedJustNow", "encUpdatedMinAgo", "encEncrypted", "encLoading",
+  "encRetrying", "expiredH1", "expiredP", "waitingForLocation", "crewMember",
+  "speedMph", "speedKmh", "encMapUnavailable",
+];
+
+const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+const LEAFLET_CSS_SRI = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+const LEAFLET_JS_SRI = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+
+function makeNonce() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+// Headers shared by the encrypted HTML shell and its JSON feed.
+function encryptedPrivacyHeaders(contentType) {
+  return {
+    "Content-Type": contentType,
+    "Cache-Control": "no-store",
+    "Referrer-Policy": "no-referrer",
+    "X-Robots-Tag": "noindex",
+    "X-Content-Type-Options": "nosniff",
+  };
+}
+
+// Nonce-based strict CSP following Google's Maps JavaScript API CSP guidance
+// (per-response nonce + 'strict-dynamic', `https:` fallback for browsers
+// without 'strict-dynamic', object-src and base-uri locked down). The viewer
+// draws Google raster tiles through Leaflet, exactly like the legacy page,
+// not the Maps JS API, so the guidance's 'unsafe-eval'/blob: allowances
+// (needed only by the Maps JS API) are left out.
+function encryptedCsp(nonce) {
+  return [
+    "default-src 'none'",
+    `script-src 'nonce-${nonce}' 'strict-dynamic' https:`,
+    "style-src 'self' 'unsafe-inline' https://unpkg.com",
+    "img-src 'self' data: https://*.google.com https://unpkg.com",
+    "connect-src 'self'",
+    "font-src 'self'",
+    "manifest-src 'self'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+  ].join("; ");
+}
+
+function encryptedJsonResponse(rpcData) {
+  const body = {
+    encrypted: true,
+    enc_payload: rpcData.enc_payload ?? null,
+    enc_updated_at: rpcData.enc_updated_at ?? null,
+    enc_seq: rpcData.enc_seq ?? null,
+    expires_at: rpcData.expires_at ?? null,
+    server_time: rpcData.server_time ?? null,
+    share_kind: rpcData.share_kind ?? null,
+  };
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: {
+      ...encryptedPrivacyHeaders("application/json; charset=utf-8"),
+      "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+    },
+  });
+}
+
+function encryptedPageResponse(token, t, lang, viewerUnits) {
+  const nonce = makeNonce();
+  return new Response(renderEncryptedPage(token, t, lang, viewerUnits, nonce), {
+    status: 200,
+    headers: {
+      ...encryptedPrivacyHeaders("text/html; charset=utf-8"),
+      "Content-Security-Policy": encryptedCsp(nonce),
+      "X-Frame-Options": "DENY",
+      "Permissions-Policy": "geolocation=(), camera=(), microphone=()",
+    },
+  });
+}
+
+function renderEncryptedPage(token, t, lang, viewerUnits, nonce) {
+  const s = {};
+  for (const k of ENC_STRING_KEYS) s[k] = t[k];
+  // `<` is escaped so no string can close the script element.
+  const cfg = JSON.stringify({ token, lang, units: viewerUnits, s }).replace(/</g, "\\u003c");
+  const dir = lang === "ar" ? ' dir="rtl"' : "";
+  const rtlFont = lang === "ar"
+    ? 'html[dir="rtl"] { font-family: "Noto Naskh Arabic", system-ui, -apple-system, sans-serif; }'
+    : "";
+  const e = escapeHtml;
+
+  return `<!DOCTYPE html><html lang="${lang}"${dir}><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>${e(t.liveTitle)}</title>
+    <meta name="description" content="${e(t.viewingLive)}">
+    <meta property="og:title" content="${e(t.liveTitle)}">
+    <meta property="og:description" content="${e(t.viewingLive)}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CrewRadr">
+    <meta property="og:locale" content="${OG_LOCALES[lang] || "en_US"}">
+    <meta property="og:image" content="https://crewradr.app/logo-512.png">
+    <meta name="twitter:card" content="summary">
+    <link rel="stylesheet" href="${LEAFLET_CSS}" integrity="${LEAFLET_CSS_SRI}" crossorigin="">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body { height: 100%; width: 100%; font-family: system-ui, -apple-system, sans-serif; background: #1a1a2e; }
+      ${rtlFont}
+      #map { height: 100%; width: 100%; }
+      #map.dark { background: #12161a; }
+      #map.dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9) grayscale(0.12); }
+      #map.dark .leaflet-bar a { background: #1e242b; color: #e6e6e6; border-color: #333a42; }
+      #map.dark .leaflet-control-attribution { background: rgba(18,22,26,0.85); color: #999; }
+      .pin {
+        width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center;
+        color: #fff; font-weight: 700; font-size: 15px; overflow: hidden;
+      }
+      #status {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.7); color: #fff; padding: 12px 20px; border-radius: 8px;
+        z-index: 1000; font-size: 0.9rem; text-align: center; white-space: pre-line;
+      }
+      #stale {
+        position: fixed; top: 12px; left: 12px; right: 12px; z-index: 1050;
+        background: #b45309; color: #fff; padding: 8px 12px; border-radius: 8px;
+        font-size: 0.85rem; font-weight: 600; text-align: center;
+      }
+      #card {
+        position: fixed; left: 12px; right: 12px; bottom: 150px; z-index: 1050;
+        background: rgba(26,26,46,0.94); color: #fff; padding: 10px 14px; border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+      #who { font-weight: 700; font-size: 1rem; overflow-wrap: anywhere; }
+      #meta, #retry { font-size: 0.8rem; color: #bbb; margin-top: 2px; }
+      .panel {
+        position: fixed; inset: 0; z-index: 2000; background: #1a1a2e; color: #eee;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 20px; gap: 12px;
+      }
+      .panel h1 { font-size: 1.5rem; }
+      .panel p { color: #aaa; max-width: 34rem; }
+      .panel a, #cta .btn {
+        display: inline-block; padding: 12px 28px; background: #4f8cff; color: #fff;
+        text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+      }
+      #cta {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(180deg, transparent, rgba(26,26,46,0.95) 30%);
+        padding: 24px 16px 20px; z-index: 1001;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+      }
+      #cta .badge { font-size: 0.8rem; color: #aaa; }
+    </style>
+    </head><body>
+    <div id="map"></div>
+    <div id="status">${e(t.encLoading)}</div>
+    <div id="stale" role="status" hidden>&#9888; ${e(t.encStale)}</div>
+    <div id="card" hidden>
+      <div id="who"></div>
+      <div id="meta"></div>
+      <div id="retry" hidden>${e(t.encRetrying)}</div>
+    </div>
+    <div id="panel" class="panel" hidden>
+      <h1 id="panel-title"></h1>
+      <p id="panel-body"></p>
+      <a href="https://crewradr.app">${e(t.getCrewRadr)}</a>
+    </div>
+    <noscript><div class="panel"><h1>${e(t.encUnsupportedTitle)}</h1><p>${e(t.encUnsupportedBody)}</p></div></noscript>
+    <div id="cta">
+      <div class="badge">&#128274; ${e(t.encEncrypted)} &middot; ${e(t.viewingLive)}</div>
+      <a href="https://crewradr.app" class="btn">${e(t.getTheApp)}</a>
+    </div>
+    <script nonce="${nonce}" src="/assets/share-viewer-core.js"></script>
+    <script nonce="${nonce}" src="${LEAFLET_JS}" integrity="${LEAFLET_JS_SRI}" crossorigin="anonymous"></script>
+    <script nonce="${nonce}">
+    (function () {
+      'use strict';
+      var CFG = ${cfg};
+      var S = CFG.s;
+      var C = window.CrewRadrShare;
+      var VISIBLE_MS = 5000;
+      var HIDDEN_MS = 15000;
+      var MAX_BACKOFF_MS = 120000;
+
+      function byId(id) { return document.getElementById(id); }
+      function show(id, on) { byId(id).hidden = !on; }
+
+      var store = null;
+      try { store = window.sessionStorage; } catch (err) { store = null; }
+
+      // Read the key (fragment first, then this tab's sessionStorage), then
+      // drop the fragment from the address bar.
+      var hash = location.hash;
+      var key = C ? C.resolveKey(location.hash, store, CFG.token) : null;
+      if (location.hash) {
+        try { history.replaceState(history.state, '', location.pathname + location.search); } catch (err) { /* ignore */ }
+      }
+
+      var stopped = false;
+      var timer = null;
+      var inFlight = false;
+      var failures = 0;
+      var lastSeq = null;
+      var last = null;
+      var lastName = null;
+      var map = null;
+      var marker = null;
+
+      function stop() {
+        stopped = true;
+        if (timer) { clearTimeout(timer); timer = null; }
+      }
+
+      function showPanel(title, body) {
+        stop();
+        show('map', false);
+        show('status', false);
+        show('stale', false);
+        show('card', false);
+        show('cta', false);
+        byId('panel-title').textContent = title;
+        byId('panel-body').textContent = body;
+        show('panel', true);
+      }
+
+      var hasSubtle = !!(window.isSecureContext !== false && window.crypto && window.crypto.subtle);
+      if (!C) { showPanel(S.encUnsupportedTitle, S.encUnsupportedBody); return; }
+      var state = C.viewerState(hash, hasSubtle, key);
+      if (state === 'unsupported') { showPanel(S.encUnsupportedTitle, S.encUnsupportedBody); return; }
+      if (state !== 'ready' || !key) { showPanel(S.encIncompleteTitle, S.encIncompleteBody); return; }
+
+      function isDark() {
+        var pref = 'system';
+        try { pref = localStorage.getItem('crewradr-map-theme') || 'system'; } catch (err) { /* ignore */ }
+        if (pref === 'dark') return true;
+        if (pref === 'light') return false;
+        return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      }
+
+      function ensureMap() {
+        if (map || !window.L) return;
+        byId('map').classList.toggle('dark', isDark());
+        map = L.map('map').setView([20, 0], 2);
+        L.tileLayer('https://{s}.google.com/vt/lyrs=m&hl=' + encodeURIComponent(CFG.lang) + '&x={x}&y={y}&z={z}', {
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '&copy; Google Maps',
+          maxZoom: 20,
+        }).addTo(map);
+      }
+
+      // Marker icon built from DOM nodes: the initial goes in via textContent.
+      function pinIcon(name) {
+        var el = document.createElement('div');
+        el.className = 'pin';
+        var hue = 0;
+        for (var i = 0; i < name.length; i++) hue = (hue * 31 + name.charCodeAt(i)) % 360;
+        el.style.background = 'hsl(' + hue + ', 65%, 48%)';
+        el.textContent = name.trim().charAt(0).toUpperCase() || '?';
+        return L.divIcon({ className: '', html: el, iconSize: [34, 34], iconAnchor: [17, 17] });
+      }
+
+      function speedText(speedMs) {
+        if (typeof speedMs !== 'number' || speedMs < 0) return '';
+        var imperial = CFG.units === 'imperial';
+        var n = Math.round(imperial ? speedMs * 2.23694 : speedMs * 3.6);
+        return (imperial ? S.speedMph : S.speedKmh).replace('{s}', String(n));
+      }
+
+      function render(p) {
+        var name = C.sanitizeName(p.name);
+        byId('who').textContent = name || S.crewMember;
+        show('card', true);
+        if (p.status === 'waiting' || p.lat === null || p.lng === null) {
+          byId('status').textContent = S.waitingForLocation;
+          show('status', true);
+          return;
+        }
+        ensureMap();
+        if (!map) {
+          // Leaflet did not load (blocked, offline or SRI mismatch): still show
+          // where the sharer is, as plain text, and keep polling.
+          // ('\\n' is escaped once for the enclosing server-side template.)
+          byId('status').textContent = S.encMapUnavailable + '\\n' +
+            Number(p.lat).toFixed(5) + ', ' + Number(p.lng).toFixed(5);
+          show('status', true);
+          return;
+        }
+        show('status', false);
+        var ll = [p.lat, p.lng];
+        if (!marker) {
+          marker = L.marker(ll, { icon: pinIcon(name), keyboard: false, interactive: false }).addTo(map);
+          map.setView(ll, 15);
+        } else {
+          marker.setLatLng(ll);
+          if (name !== lastName) marker.setIcon(pinIcon(name));
+        }
+        lastName = name;
+      }
+
+      // Age and staleness are judged on server_time, never the local clock.
+      function renderAge(serverTime) {
+        if (!last || last.status === 'waiting' || last.lat === null) {
+          show('stale', false);
+          byId('meta').textContent = '';
+          return;
+        }
+        var mins = C.minutesAgo(last.fixAt, serverTime);
+        var parts = [];
+        if (mins !== null) parts.push(mins < 1 ? S.encUpdatedJustNow : S.encUpdatedMinAgo.replace('{n}', String(mins)));
+        var sp = speedText(last.speedMs);
+        if (sp) parts.push(sp);
+        byId('meta').textContent = parts.join(' · ');
+        show('stale', C.isStale(last.fixAt, serverTime));
+      }
+
+      function schedule(ms) {
+        if (stopped) return;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(poll, ms);
+      }
+
+      function nextDelay() { return document.hidden ? HIDDEN_MS : VISIBLE_MS; }
+
+      function retryLater() {
+        failures++;
+        if (failures >= 2) show('retry', true);
+        schedule(Math.min(nextDelay() * Math.pow(2, failures), MAX_BACKOFF_MS));
+      }
+
+      async function poll() {
+        timer = null;
+        if (stopped || inFlight) return;
+        inFlight = true;
+        try {
+          await pollOnce();
+        } catch (err) {
+          retryLater();
+        } finally {
+          inFlight = false;
+        }
+      }
+
+      async function pollOnce() {
+        var res;
+        try {
+          res = await fetch('?json=1&lang=' + encodeURIComponent(CFG.lang), {
+            cache: 'no-store',
+            credentials: 'omit',
+            headers: { Accept: 'application/json' },
+          });
+        } catch (err) { retryLater(); return; }
+
+        if (res.status === 404) {
+          C.forgetKey(store, CFG.token);
+          showPanel(S.encRevokedTitle, S.encRevokedBody);
+          return;
+        }
+        if (res.status === 410) {
+          C.forgetKey(store, CFG.token);
+          showPanel(S.expiredH1, S.expiredP);
+          return;
+        }
+        if (!res.ok) { retryLater(); return; }
+
+        var data;
+        try { data = await res.json(); } catch (err) { retryLater(); return; }
+        if (!data || data.encrypted !== true) { retryLater(); return; }
+        failures = 0;
+        show('retry', false);
+
+        // enc_seq is only a hint to skip work; the decrypted seq decides.
+        var hint = Number(data.enc_seq);
+        var maybeNewer = lastSeq === null || data.enc_seq === null || !isFinite(hint) || C.isNewer(lastSeq, hint);
+        if (data.enc_payload && maybeNewer) {
+          try {
+            var p = await C.decryptSharePayload(data.enc_payload, key, CFG.token);
+            if (C.isNewer(lastSeq, p.seq)) {
+              lastSeq = p.seq;
+              last = p;
+              render(p);
+            }
+          } catch (err) {
+            if (!last) {
+              showPanel(S.encUndecryptableTitle, S.encUndecryptableBody);
+              return;
+            }
+            // Keep the last good position; a bad update never replaces it.
+          }
+        } else if (!data.enc_payload && !last) {
+          byId('status').textContent = S.waitingForLocation;
+        }
+        renderAge(data.server_time);
+        schedule(nextDelay());
+      }
+
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && !stopped && !inFlight) {
+          if (timer) clearTimeout(timer);
+          timer = null;
+          poll();
+        }
+      });
+
+      poll();
+    })();
+    </script>
+    </body></html>
+  `;
+}
+// END encrypted viewer
