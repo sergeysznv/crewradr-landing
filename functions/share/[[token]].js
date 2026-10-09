@@ -50,6 +50,7 @@ const STRINGS = {
     encEncrypted: "End-to-end encrypted",
     encLoading: "Loading location...",
     encRetrying: "Connection problem. Retrying...",
+    encMapUnavailable: "Map could not be loaded. Last position:",
   },
   es: {
     invalidTitle: "Enlace de compartir no válido",
@@ -92,6 +93,7 @@ const STRINGS = {
     encEncrypted: "Cifrado de extremo a extremo",
     encLoading: "Cargando ubicación...",
     encRetrying: "Problema de conexión. Reintentando...",
+    encMapUnavailable: "No se pudo cargar el mapa. Última posición:",
   },
   fr: {
     invalidTitle: "Lien de partage invalide",
@@ -134,6 +136,7 @@ const STRINGS = {
     encEncrypted: "Chiffré de bout en bout",
     encLoading: "Chargement de la position...",
     encRetrying: "Problème de connexion. Nouvelle tentative...",
+    encMapUnavailable: "Impossible de charger la carte. Dernière position :",
   },
   ar: {
     invalidTitle: "رابط مشاركة غير صالح",
@@ -176,6 +179,7 @@ const STRINGS = {
     encEncrypted: "مشفّر من طرف إلى طرف",
     encLoading: "جارٍ تحميل الموقع...",
     encRetrying: "مشكلة في الاتصال. جارٍ إعادة المحاولة...",
+    encMapUnavailable: "تعذّر تحميل الخريطة. آخر موقع:",
   },
   zh: {
     invalidTitle: "分享链接无效",
@@ -218,6 +222,7 @@ const STRINGS = {
     encEncrypted: "端到端加密",
     encLoading: "正在加载位置...",
     encRetrying: "连接出现问题，正在重试...",
+    encMapUnavailable: "无法加载地图。最新位置：",
   },
   ru: {
     invalidTitle: "Недействительная ссылка",
@@ -260,6 +265,7 @@ const STRINGS = {
     encEncrypted: "Сквозное шифрование",
     encLoading: "Загрузка местоположения...",
     encRetrying: "Проблема с соединением. Повторная попытка...",
+    encMapUnavailable: "Не удалось загрузить карту. Последнее местоположение:",
   },
 };
 
@@ -751,7 +757,7 @@ const ENC_STRING_KEYS = [
   "encUnsupportedTitle", "encUnsupportedBody", "encRevokedTitle", "encRevokedBody",
   "encStale", "encUpdatedJustNow", "encUpdatedMinAgo", "encEncrypted", "encLoading",
   "encRetrying", "expiredH1", "expiredP", "waitingForLocation", "crewMember",
-  "speedMph", "speedKmh",
+  "speedMph", "speedKmh", "encMapUnavailable",
 ];
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
@@ -876,7 +882,7 @@ function renderEncryptedPage(token, t, lang, viewerUnits, nonce) {
       #status {
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
         background: rgba(0,0,0,0.7); color: #fff; padding: 12px 20px; border-radius: 8px;
-        z-index: 1000; font-size: 0.9rem; text-align: center;
+        z-index: 1000; font-size: 0.9rem; text-align: center; white-space: pre-line;
       }
       #stale {
         position: fixed; top: 12px; left: 12px; right: 12px; z-index: 1050;
@@ -1033,9 +1039,17 @@ function renderEncryptedPage(token, t, lang, viewerUnits, nonce) {
           show('status', true);
           return;
         }
-        show('status', false);
         ensureMap();
-        if (!map) return;
+        if (!map) {
+          // Leaflet did not load (blocked, offline or SRI mismatch): still show
+          // where the sharer is, as plain text, and keep polling.
+          // ('\\n' is escaped once for the enclosing server-side template.)
+          byId('status').textContent = S.encMapUnavailable + '\\n' +
+            Number(p.lat).toFixed(5) + ', ' + Number(p.lng).toFixed(5);
+          show('status', true);
+          return;
+        }
+        show('status', false);
         var ll = [p.lat, p.lng];
         if (!marker) {
           marker = L.marker(ll, { icon: pinIcon(name), keyboard: false, interactive: false }).addTo(map);

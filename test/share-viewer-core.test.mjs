@@ -524,7 +524,7 @@ describe('inline init script (simulated browser)', () => {
   }
 
   // feed: array of {status, body} returned by successive fetches.
-  function boot({ hash, storage = fakeStorage(), feed = [], subtle = true, withCore = true }) {
+  function boot({ hash, storage = fakeStorage(), feed = [], subtle = true, withCore = true, withLeaflet = true }) {
     const els = new Map();
     const timers = [];
     const fetches = [];
@@ -565,6 +565,7 @@ describe('inline init script (simulated browser)', () => {
         },
       },
     };
+    if (!withLeaflet) delete sandbox.L; // unpkg blocked/down or SRI mismatch
     sandbox.window = sandbox;
     vm.runInNewContext(inlineScript, sandbox);
     return { els: (id) => doc.getElementById(id), timers, fetches, markers, loc, storage, listeners };
@@ -651,6 +652,38 @@ describe('inline init script (simulated browser)', () => {
     assert.equal(b.els('who').textContent, evil);
   });
 
+  test('Leaflet missing: coordinates shown as text, polling keeps updating them', async () => {
+    const first = await seal(JSON.stringify(payload({ seq: 50, lat: 10.123456, lng: -20.5, fix_at: '2026-10-09T12:00:00Z' })));
+    const second = await seal(JSON.stringify(payload({ seq: 60, lat: 11, lng: 21.000004, fix_at: '2026-10-09T12:00:05Z' })));
+    const b = boot({
+      hash: '#k=' + golden.key,
+      withLeaflet: false,
+      feed: [
+        { status: 200, body: encBody(first, 50, '2026-10-09T12:00:10Z') },
+        { status: 200, body: encBody(second, 60, '2026-10-09T12:00:20Z') },
+      ],
+    });
+    await settle(() => b.timers.length === 1);
+    const status = b.els('status');
+    assert.equal(status.hidden, false);
+    assert.ok(status.textContent.includes(STRINGS_EN.encMapUnavailable), status.textContent);
+    assert.ok(status.textContent.includes('10.12346, -20.50000'), status.textContent);
+    assert.equal(b.els('who').textContent, 'Sam');
+    assert.equal(b.markers.length, 0);
+    assert.equal(b.timers[0].ms, 5000, 'keeps polling');
+    b.timers[0].fn();
+    await settle(() => b.timers.length === 2);
+    assert.ok(b.els('status').textContent.includes('11.00000, 21.00000'), b.els('status').textContent);
+  });
+
+  test('map present: marker rendered, no coordinate text fallback', async () => {
+    const b = boot({ hash: '#k=' + golden.key, feed: [{ status: 200, body: encBody(golden.ciphertext, 1760000000007, null) }] });
+    await settle(() => b.timers.length > 0);
+    assert.equal(b.markers.length, 1);
+    assert.equal(b.els('status').hidden, true);
+    assert.ok(!b.els('status').textContent.includes(STRINGS_EN.encMapUnavailable));
+  });
+
   test('waiting payload: waiting message, no marker', async () => {
     const blob = await seal(JSON.stringify(payload({ lat: null, lng: null, status: 'waiting' })));
     const b = boot({ hash: '#k=' + golden.key, feed: [{ status: 200, body: encBody(blob, 42, null) }] });
@@ -694,4 +727,5 @@ const STRINGS_EN = {
   encRevokedTitle: 'This link is no longer available',
   expiredH1: '⏰ This link has expired',
   waitingForLocation: 'Waiting for location...',
+  encMapUnavailable: 'Map could not be loaded. Last position:',
 };
