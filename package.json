@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "node scripts/write-version.js && next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --test test/*.test.mjs"
   },
   "repository": {
     "type": "git",
